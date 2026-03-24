@@ -17,7 +17,8 @@ Execute a spec-driven task with validation and status tracking.
    - If missing or not approved → **STOP**: "Session plan не утверждён. Сначала `/decompose-tech-spec` и подтверди план сессий."
 3. Check that the requested task belongs to the current session (compare with session-plan.md).
    - If task is in a future session → **WARN**: "Задача {N} относится к сессии {M}, текущая сессия — {K}. Выполнить досрочно? (да/нет)"
-4. Present scope confirmation before starting:
+4. **Codebase readiness:** check that directories from task's "Files to modify" exist (e.g., `src/`, `tests/`). If missing → **STOP**: "Каталог {path} не найден. Убедись, что проект инициализирован."
+5. Present scope confirmation before starting:
 
    ```
    Задача {N}: {title}

@@ -151,8 +151,9 @@ After user approves task decomposition, calculate session grouping for predictab
 7. Ask user explicitly: **"План сессий готов. Подтверждаешь? (да/нет/правки)"**
 8. Wait for explicit approval. Do NOT suggest running `/do-feature` until user confirms.
 9. Only after explicit approval:
-   - Git commit: `chore(tasks): session plan approved for {feature} — {N} sessions`
    - Update `session-plan.md` frontmatter: `status: approved`
+   - Use `git add -f work/{feature}/logs/session-plan.md` (the `logs/` directory is typically gitignored — force-add is required)
+   - Git commit: `chore(tasks): session plan approved for {feature} — {N} sessions`
 10. After approval, inform user:
 
     ```
