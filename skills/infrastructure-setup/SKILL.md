@@ -114,6 +114,14 @@ Pre-commit scope (fast, staged files only):
 - Lint staged files
 - Format check
 
+**lint-staged + prettier — MUST avoid circular failures.** The pre-commit hook MUST run `prettier --write` (fix mode), NOT `prettier --check` (read-only mode). If lint-staged runs `--check`, it will fail on unformatted files that it could have auto-fixed, creating a cycle where the commit never passes. Correct lint-staged config:
+```json
+{
+  "*.{js,ts,tsx,json,md}": ["prettier --write", "eslint --fix"]
+}
+```
+Do NOT have both `prettier --check` and `prettier --write` in the same pipeline — pick `--write` only. If a pre-commit hook fails due to formatting, run `npx prettier --write .` on all staged files, re-stage, and retry.
+
 Full test suites, integration tests, builds belong in CI.
 
 **Checkpoint — clean testing approach.** Verify gitleaks blocks secrets WITHOUT polluting git history. Follow these steps EXACTLY:
@@ -127,7 +135,13 @@ Full test suites, integration tests, builds belong in CI.
 
 Set up test framework, create smoke test: 1-2 tests verifying setup works (import main module, check environment).
 
-**Checkpoint:** test command passes.
+**Canonical test commands** — configure `package.json` scripts AND document the direct `npx` form:
+- Vitest: `npx vitest run` (all), `npx vitest run <pattern>` (filtered)
+- Jest: `npx jest` (all), `npx jest <pattern>` (filtered)
+
+On Windows, `npm test -- <pattern>` is unreliable. Always prefer `npx <runner> run <pattern>` for filtered runs.
+
+**Checkpoint:** test command passes (`npx vitest run` or equivalent).
 
 ## Cross-platform Notes
 

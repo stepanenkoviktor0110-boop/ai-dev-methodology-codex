@@ -19,6 +19,7 @@ These instructions are written for Codex agents that default to the laziest inte
 
 - **`rg` (ripgrep) may be blocked** on some Windows environments (`Access denied` on `rg.exe`). If `rg` fails, you MUST fall back to `Get-ChildItem -Recurse | Select-String` (PowerShell) or `findstr /S` (cmd). Narrow search scope with explicit paths to compensate for lower performance. Do NOT give up on code search — always use a fallback.
 - **`npm install` with heavy packages** (e.g., `pdfjs-dist`, `sharp`, `prisma`) WILL exceed default terminal timeouts. Use `timeout_ms: 300000` (5 min) or higher for install commands. If it times out, retry — npm caches partial downloads. Do NOT report "install failed" after a single timeout.
+- **Test runner on Windows:** `npm test -- <pattern>` is unreliable on Windows (memory errors, `cannot execute specified program`). Use `npx vitest run <pattern>` (or `npx jest <pattern>`) directly — this is the canonical form. Same applies to any `npm run` wrapper — prefer `npx <tool>` when passing arguments.
 
 ## Git: Known Pitfalls
 

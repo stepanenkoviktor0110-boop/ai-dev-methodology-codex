@@ -43,6 +43,8 @@ Before any execution, verify the pipeline was followed correctly:
 4. Verify at least one task has `status: planned`. If all tasks are `done` → inform user, stop.
 5. **Codebase readiness check:** collect unique file paths from "Files to modify" across current session's tasks. Check that base directories exist (e.g., `src/`, `tests/`, `package.json` or equivalent). If key directories are missing → **STOP and redirect**: "Кодовая база не найдена (нет `src/`, `package.json`). Для нового проекта сначала запусти `/infrastructure-setup` — он создаст скелет проекта по tech-spec. После этого вернись к `/do-feature`." Do NOT proceed into session scope confirmation with a missing codebase. Do NOT ask user "where is the code?" — if there is no code, the answer is `/infrastructure-setup`.
 6. **Skill file integrity check:** verify that this SKILL.md and the shim entry-point (`do-feature/SKILL.md`) contain no git conflict markers (`<<<<<<<`, `=======`, `>>>>>>>`). If found → **STOP**: "В файле скилла обнаружен merge-конфликт. Исправь вручную перед запуском."
+7. **Dependency health check:** if `package.json` (or equivalent) exists, run `npm run build` (or the project's build command). If build fails → **STOP and fix** before proceeding. This catches type errors, broken imports, and stale dependencies BEFORE any feature work starts. Common after dependency upgrades between sessions.
+8. **Dependency scope check:** if the current session's tasks require new libraries not yet in `package.json`, install them NOW and re-run build. Use `timeout_ms: 300000` for heavy packages. Do NOT discover missing dependencies mid-wave.
 
 > **Do NOT proceed if any pre-flight check fails.** These checks ensure the user approved each prior stage and the workspace is ready for execution.
 
@@ -130,6 +132,7 @@ If findings exist, spawn a fixer worker (`tier_high`) and re-run only affected a
      git add -f work/{feature}/logs/execution-plan.md
      ```
    - `chore: complete wave {N} — update task statuses and decisions`
+   - **If commit fails** (pre-commit hooks, formatting, lint): fix the issue (`npx prettier --write .`, re-stage), retry. Do NOT leave wave in `docs-synced / commit-pending` state — the commit MUST succeed before moving on. If stuck after 3 attempts, commit with `--no-verify` and log in decisions.md: "Pre-commit bypassed for wave {N} — reason: {what failed}."
 4. Update checkpoint:
    - `last_completed_wave`, `next_wave`, task statuses.
 5. **Session boundary check** — read session-plan.md, determine if current wave is last in current session.
