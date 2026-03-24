@@ -417,3 +417,32 @@ skill-checker is defined in `$AGENTS_HOME/agents/skill-checker.md` and has skill
 **Functional (all skills):**
 - [ ] Run skill-checker and fix all issues
 
+## 5. Deployment
+
+Skills live in two locations and must be synced:
+
+| Location | Role | Discovery |
+|----------|------|-----------|
+| `$AGENTS_HOME/skills/{name}/` | Source of truth (git-tracked framework repo) | Not auto-discovered by Claude Code |
+| `~/.claude/skills/{name}/` | Runtime copy — Claude Code discovers skills here | Auto-discovered, appears as `/skill-name` |
+
+After creating or updating a skill:
+
+1. Copy the skill directory to `~/.claude/skills/`:
+   ```
+   cp -r $AGENTS_HOME/skills/{skill-name} ~/.claude/skills/{skill-name}
+   ```
+2. If the skill uses shared references (`shared/{dir}/`), sync them too:
+   ```
+   cp -r $AGENTS_HOME/shared/{dir} ~/.claude/shared/{dir}
+   ```
+3. The skill appears in the available skills list immediately — no restart needed.
+
+When updating an existing skill, overwrite the runtime copy. Source of truth is always `$AGENTS_HOME` (the git repo).
+
+### Self-Check (Deployment)
+
+- [ ] Skill directory copied to `~/.claude/skills/`
+- [ ] Shared references (if any) copied to `~/.claude/shared/`
+- [ ] Skill appears in the available skills list (check system-reminder)
+
