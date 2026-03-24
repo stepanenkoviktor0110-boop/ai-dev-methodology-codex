@@ -13,6 +13,14 @@ description: |
 Orchestrate work as a single coordinator. Use `spawn_agent`, `wait_agent`, `send_input`, `close_agent`.
 Do not rely on team APIs or direct agent-to-agent messaging.
 
+**Required Codex config** (`~/.codex/config.toml`):
+```toml
+[agents]
+max_threads = 10                    # parallel workers per wave
+max_depth = 2                       # worker (depth 1) can spawn reviewer (depth 2)
+job_max_runtime_seconds = 3600      # 1 hour for large waves
+```
+
 Before starting, check [lessons-learned.md](references/lessons-learned.md) for known pitfalls (if file exists).
 
 ## Model Profiles

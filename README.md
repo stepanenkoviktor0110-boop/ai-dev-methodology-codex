@@ -36,6 +36,12 @@ Add to `~/.codex/config.toml`:
 ```toml
 model = "gpt-5.4"
 
+# Multi-agent orchestration (feature-execution spawns parallel workers + reviewers)
+[agents]
+max_threads = 10                    # parallel workers per wave (default 6)
+max_depth = 2                       # worker can spawn reviewer subagent
+job_max_runtime_seconds = 3600      # 1 hour for large waves
+
 # SessionStart hook for checkpoint recovery (optional, for long features)
 [[hooks]]
 event = "SessionStart"
@@ -179,11 +185,45 @@ your-project/
 - **Just-In-Time Context** — agents read only what's needed for current task
 - **Retrospective** — lessons learned embedded back into skills after each feature
 
+### Multi-Agent Architecture
+
+The framework uses Codex CLI's built-in subagent system (`spawn_agent`, `wait_agent`, `send_input`, `close_agent`).
+
+**How `/do-feature` orchestrates a wave:**
+```
+Orchestrator (feature-execution)
+├─ spawn_agent: Worker 1 (task 1, tier_opus)     ─┐
+├─ spawn_agent: Worker 2 (task 2, tier_opus)      ├─ parallel
+├─ spawn_agent: Worker 3 (task 3, tier_opus)     ─┘
+│
+├─ wait_agent: collect results from all workers
+│
+├─ spawn_agent: code-reviewer (tier_sonnet)      ─┐
+├─ spawn_agent: security-auditor (tier_sonnet)    ├─ parallel reviews
+├─ spawn_agent: test-reviewer (tier_sonnet)      ─┘
+│
+├─ wait_agent: collect review reports
+├─ fix findings → re-run reviewers (max 3 rounds)
+└─ commit wave
+```
+
+**Other subagent patterns:**
+- `/decompose-tech-spec`: spawns `task-creator` per task (parallel) + `task-validator` + `reality-checker` (parallel)
+- `/new-tech-spec`: spawns 5 validators in parallel (skeptic, completeness, security, test, template)
+- `/new-user-spec`: spawns 2 validators in parallel (quality, adequacy)
+
+**Config** (`~/.codex/config.toml`):
+```toml
+[agents]
+max_threads = 10    # how many subagents can run in parallel
+max_depth = 2       # worker (depth 1) can spawn reviewer (depth 2)
+```
+
 ### Model Tiers
 
 | Tier | Model | Use |
 |------|-------|-----|
-| `tier_opus` | `gpt-5.4` | Complex architecture, security-critical work |
+| `tier_opus` | `gpt-5.4` | Workers, complex architecture, security-critical work |
 | `tier_sonnet` | `gpt-5.4-mini` | Reviewers, validators, medium tasks |
 | `tier_haiku` | `gpt-5.4-mini` (low reasoning) | Simple checks, formatting |
 
