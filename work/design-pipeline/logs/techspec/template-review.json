@@ -1,0 +1,30 @@
+{
+  "status": "approved",
+  "findings": [
+    {
+      "severity": "minor",
+      "category": "standards",
+      "issue": "Project Knowledge files (architecture.md, patterns.md) not found. Cannot verify file path conventions and naming patterns compliance.",
+      "fix": "If project has architecture.md and patterns.md in .claude/skills/project-knowledge/references/, ensure tech-spec paths align. If not — no action needed."
+    },
+    {
+      "severity": "minor",
+      "category": "tasks",
+      "issue": "Task 8 (Delete like-figma) uses skill `code-writing` with only `code-reviewer` as reviewer. Default reviewers for `code-writing` are `code-reviewer, security-auditor, test-reviewer`.",
+      "fix": "Either add missing default reviewers (`security-auditor`, `test-reviewer`) or document why they are unnecessary for a deletion task. Alternatively, consider if `code-writing` is the right skill for a directory deletion."
+    },
+    {
+      "severity": "minor",
+      "category": "verification",
+      "issue": "Task 6 (design-retrospective) and Task 7 (do-task integration) lack Verify-smoke fields, while similar skill-creation tasks (3, 4) have them.",
+      "fix": "Add Verify-smoke to Task 6 (e.g., spawn agent with test prompt to verify retrospective flow) and Task 7 (e.g., verify do-task SKILL.md contains design-review hook)."
+    },
+    {
+      "severity": "minor",
+      "category": "tasks",
+      "issue": "Task 2 (font-pairing.md) reads `shared/design-references/design-tokens.md` which is created by Task 1 in the same Wave 1. If tasks execute in parallel, Task 2 may not find the file.",
+      "fix": "Move Task 2 to Wave 2 (depends on Wave 1), or remove the dependency on `shared/design-references/design-tokens.md` from Files to read (use the source file `skills/like-figma/references/design-tokens.md` instead)."
+    }
+  ],
+  "summary": "Tech-spec is well-structured and compliant with the template. All required sections present and filled. Frontmatter valid. Implementation tasks are properly scoped with correct skills and reviewers. Wave dependencies are mostly logical with one minor concern (Task 2 reads a file created by Task 1 in the same wave). No critical or major findings. Approved."
+}

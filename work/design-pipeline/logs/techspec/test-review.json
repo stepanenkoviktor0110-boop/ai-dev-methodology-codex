@@ -1,0 +1,80 @@
+{
+  "status": "needs_improvement",
+  "summary": "Testing strategy correctly identifies unit/integration/E2E as N/A for markdown skill artifacts and uses scenario tests as primary method. However, 5 edge cases explicitly listed in user-spec are missing from scenario test coverage, and the manual verification plan lacks structured pass/fail criteria. For an L-size feature, scenario coverage gaps are a concern.",
+  "findings": [
+    {
+      "severity": "major",
+      "category": "missing_coverage",
+      "location": "Section: Scenario tests > design-system-init",
+      "issue": "User-spec explicitly lists edge case 'Conflicting values in project (Tailwind config says one thing, CSS variables say another) -> agent shows conflict, asks which takes priority' but no scenario test covers this. This is a core decision-making behavior that differentiates the skill from naive extraction.",
+      "recommendation": "Add scenario: 'Project with conflicting style sources (Tailwind config primary=#3B82F6, CSS var --primary=#2563EB) -- agent detects conflict, presents both values, asks user which to prioritize before generating tokens.json'"
+    },
+    {
+      "severity": "major",
+      "category": "missing_coverage",
+      "location": "Section: Scenario tests > design-generate",
+      "issue": "User-spec explicitly lists edge case 'tokens.json corrupted or invalid JSON -> error with suggestion to recreate via /design-system-init' but no scenario test covers this. Corrupted input is a critical error path -- the skill must not silently fail or produce garbage output.",
+      "recommendation": "Add scenario: 'tokens.json exists but contains invalid JSON (truncated/malformed) -- agent reports validation error with specific parse error location, suggests running /design-system-init to recreate'"
+    },
+    {
+      "severity": "major",
+      "category": "missing_coverage",
+      "location": "Section: Scenario tests > design-system-init",
+      "issue": "User-spec lists 'Project without any CSS/styles at all -> agent offers defaults, interview starts from scratch' as an edge case. This is distinct from 'fresh project with no styles' only if the existing scenario covers zero-CSS explicitly, but the phrasing 'no styles' is ambiguous -- it could mean 'no inline styles but has Tailwind'. A dedicated scenario for truly bare projects ensures the default-value proposal path is tested.",
+      "recommendation": "Clarify existing scenario 'Fresh project with no styles' to explicitly state: 'No Tailwind, no CSS files, no style-related config -- agent proposes default palette/typography/spacing and runs full interview from scratch without scan results'"
+    },
+    {
+      "severity": "minor",
+      "category": "missing_coverage",
+      "location": "Section: Scenario tests > design-generate",
+      "issue": "User-spec lists 'SVG renders incorrectly (shadows, gradients, fonts) -> ask for screenshot, simplify problematic elements' as an edge case. No scenario tests this feedback-iteration loop for rendering issues.",
+      "recommendation": "Add scenario: 'User reports SVG rendering issues (clipped shadows, missing fonts) -- agent requests screenshot, identifies problematic SVG features, regenerates with simplified alternatives (e.g., drop-shadow replaced with solid border)'"
+    },
+    {
+      "severity": "minor",
+      "category": "missing_coverage",
+      "location": "Section: Scenario tests > design-retrospective",
+      "issue": "No scenario covers first-run case (no existing lessons-learned.md) or empty session case (user ran design-generate but provided no feedback). These are boundary conditions for the retrospective skill.",
+      "recommendation": "Add two scenarios: (1) 'First retrospective run -- no lessons-learned.md exists yet, agent creates file from scratch'; (2) 'Session with zero user feedback/corrections -- agent reports no patterns detected, skips lesson creation'"
+    },
+    {
+      "severity": "minor",
+      "category": "missing_coverage",
+      "location": "Section: Agent Verification Plan",
+      "issue": "Agent verification covers design-system-init (steps 1-3), design-review (step 4), and design-generate (step 5), but has no verification step for design-retrospective outputs. For an L-size feature with 4 skills, each skill should have at least one automated verification.",
+      "recommendation": "Add verification step: 'After design-retrospective: check lessons-learned.md exists and contains at least one entry in Problem/Cause/Solution/Rule format; if design-principles.md exists, verify promoted entries have occurrence count >= 3'"
+    },
+    {
+      "severity": "minor",
+      "category": "missing_coverage",
+      "location": "Section: Manual verification",
+      "issue": "Manual verification plan lists 4 checks but provides no structured pass/fail criteria or specific test project setup instructions. For an L-size feature, manual testing should specify: which project to use, what prompts to give, what constitutes pass vs fail for each check.",
+      "recommendation": "Add structured manual test plan: specify test project (e.g., hookah webapp), exact prompts for each skill invocation, and concrete pass/fail criteria (e.g., 'PASS: tokens.json has >= 5 color shades per palette; FAIL: any component HTML shows raw hex values instead of CSS custom properties')"
+    }
+  ],
+  "metrics": {
+    "filesReviewed": 2,
+    "litmusTest": {
+      "checked": 0,
+      "passed": 0,
+      "failed": 0
+    },
+    "coverageAssessment": "insufficient",
+    "pyramidBalance": {
+      "unit": 0,
+      "integration": 0,
+      "e2e": 0,
+      "assessment": "healthy",
+      "note": "Traditional pyramid N/A for markdown skill artifacts. 15 scenario tests serve as behavioral tests, manual verification serves as acceptance tests. Balance is appropriate for artifact type."
+    },
+    "scenarioTestBalance": {
+      "designSystemInit": 4,
+      "designGenerate": 4,
+      "designReview": 4,
+      "designRetrospective": 3,
+      "total": 15,
+      "missingFromUserSpec": 5,
+      "assessment": "Scenario count is reasonable but coverage has gaps -- 5 edge cases from user-spec are not represented"
+    }
+  }
+}

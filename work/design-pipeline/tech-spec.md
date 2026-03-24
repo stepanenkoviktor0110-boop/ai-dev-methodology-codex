@@ -26,6 +26,7 @@ All design artifacts are stored as code in the project's `.design-system/` direc
 - **`shared/design-references/`** — shared reference directory for files used by multiple design skills (design-tokens.md, color-psychology.md, color-principles.md).
 - **`skills/do-task/SKILL.md`** — minimal modification (~5 lines): after code commit, check for `.design-system/tokens.json` + UI files → call design-review subagent.
 - **`skills/design-system-init/references/font-pairing.md`** — new reference: font pairing rules, classic combinations, weight contrasts, typographic scale.
+- **`shared/design-references/library-catalog.md`** — new reference: catalog of free icon/element libraries with descriptions and use-case guidance. Links only, no asset storage.
 
 ### How it works
 
@@ -92,7 +93,22 @@ None.
 **Rationale:** Skills must be self-contained. Symlinks are fragile on Windows. File copies are simple, verified by skill-checker.
 **Alternatives considered:** Git symlinks or relative paths — platform-dependent, adds complexity.
 
-### Decision 7: design-principles.md lives in project, not in skill
+### Decision 7: Reference naming: user-spec names → tech-spec files
+**Decision:** User-spec AC mentions `color-theory.md`, `composition.md`, `font-pairing.md`. Tech-spec maps these to: `color-theory.md` → `color-psychology.md` + `color-principles.md` (split into psychology and technique); `composition.md` → `grid-techniques.md` (composition = grid/layout techniques); `font-pairing.md` → `font-pairing.md` (1:1).
+**Rationale:** During user-spec interview, names were placeholders for content areas. Actual content was researched and written with more precise names reflecting the material. Color theory splits naturally into emotional psychology and combination principles. Composition is specifically about grid/layout techniques.
+**Alternatives considered:** Renaming files to match user-spec literally — would lose semantic precision.
+
+### Decision 8: CSP protection for generated HTML
+**Decision:** preview-template.html must include `<meta http-equiv="Content-Security-Policy" content="script-src 'none'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com">` to prevent XSS in generated HTML files opened in browser.
+**Rationale:** Generated HTML uses placeholder substitution (`{{PAGE_CONTENT}}`) — unsanitized content could execute scripts. CSP with `script-src 'none'` blocks all JS execution, making XSS impossible even if content is injected.
+**Alternatives considered:** HTML-entity encoding of all content — fragile, relies on every code path encoding correctly.
+
+### Decision 9: File naming validation for .design-system/ paths
+**Decision:** Component and page names derived from user input must be validated: alphanumeric + hyphens only, no path separators. Pattern: `/^[a-z0-9-]+$/`.
+**Rationale:** Prevents path traversal (`../../etc/passwd`) when creating files in `.design-system/components/` and `.design-system/pages/`.
+**Alternatives considered:** Sanitizing paths — error-prone, validation is simpler and safer.
+
+### Decision 10: design-principles.md lives in project, not in skill
 **Decision:** `.design-system/design-principles.md` is a project-level file, populated by design-retrospective. Not a skill reference.
 **Rationale:** Design principles are project-specific taste accumulated from user feedback. Different projects have different aesthetic profiles. Skill references contain universal design knowledge.
 **Alternatives considered:** Skill-level reference — would mix universal knowledge with project-specific taste.
@@ -177,10 +193,10 @@ Not applicable — skills don't have a testable runtime.
 
 Via skill-test-designer → skill-tester pipeline:
 
-- **design-system-init:** (1) Fresh project with no styles — creates tokens.json from scratch. (2) Project with Tailwind config — extracts existing values. (3) `.design-system/` already exists — asks update/recreate/cancel. (4) Non-web project — refuses with explanation.
-- **design-generate:** (1) Valid DS exists — generates HTML+SVG from description. (2) No DS — refuses, suggests `/design-system-init`. (3) Missing component — creates simple on-the-fly, decomposes complex. (4) Context exhaustion — stops, generates continuation prompt.
+- **design-system-init:** (1) Fresh project with no styles — creates tokens.json from scratch. (2) Project with Tailwind config — extracts existing values. (3) `.design-system/` already exists — asks update/recreate/cancel. (4) Non-web project — refuses with explanation. (5) Conflicting style sources (Tailwind config vs CSS vars) — shows conflict, asks priority. (6) Project with existing CSS vars but no Tailwind — extracts from vars.
+- **design-generate:** (1) Valid DS exists — generates HTML+SVG from description. (2) No DS — refuses, suggests `/design-system-init`. (3) Missing simple component (badge) — creates on-the-fly. (4) Missing complex component (carousel) — decomposes, separate session. (5) Context exhaustion — stops, generates continuation prompt. (6) Corrupted/invalid tokens.json — error with suggestion to recreate via `/design-system-init`. (7) SVG renders incorrectly — asks for screenshot, simplifies problematic elements.
 - **design-review:** (1) UI files with hardcoded colors — gives concrete token recommendations. (2) Files already using DS tokens — reports "styles match DS". (3) No `.design-system/tokens.json` — skips silently. (4) No UI files changed — skips silently.
-- **design-retrospective:** (1) Session with corrections — creates lessons in lessons-learned.md. (2) Lesson repeated 3+ times — promotes to design-principles.md. (3) Generates next-session prompt.
+- **design-retrospective:** (1) Session with corrections — creates lessons in lessons-learned.md. (2) Lesson repeated 3+ times — promotes to design-principles.md. (3) Generates next-session prompt. (4) First run (no existing lessons-learned.md) — creates file from scratch. (5) Empty session (no corrections) — reports "no patterns detected", skips lesson creation.
 
 ### Manual verification
 
@@ -226,11 +242,14 @@ Technical acceptance criteria (complement user-spec criteria):
 - [ ] `shared/design-references/` contains design-tokens.md, color-psychology.md, color-principles.md
 - [ ] `design-system-init/references/font-pairing.md` created with concrete font pair recommendations
 - [ ] `design-generate/references/` contains component-patterns.md, generation-guide.md (enriched), grid-techniques.md
-- [ ] `design-generate/assets/preview-template.html` copied from like-figma
+- [ ] `design-generate/assets/preview-template.html` copied from like-figma with CSP meta tag added (`script-src 'none'`)
 - [ ] do-task SKILL.md updated with design-review integration (~5 lines between Step 2.3 and 2.4)
 - [ ] All reference links in SKILL.md files resolve to existing files
 - [ ] like-figma skill directory deleted after migration verified
 - [ ] No regression in existing do-task flow (design-review is additive, skips silently when no DS)
+- [ ] Component/page file names validated: alphanumeric + hyphens only (no path traversal)
+- [ ] preview-template.html includes CSP `script-src 'none'` to prevent XSS
+- [ ] `shared/design-references/library-catalog.md` created with free icon/element library links
 
 ## Implementation Tasks
 
@@ -245,11 +264,11 @@ Technical acceptance criteria (complement user-spec criteria):
 ### Wave 1 (independent — shared references + font-pairing)
 
 #### Task 1: Create shared design-references directory
-- **Description:** Create `shared/design-references/` and populate with design-tokens.md (from like-figma), color-psychology.md, color-principles.md (from work/design-pipeline/references/). These shared references are used by multiple design skills.
+- **Description:** Create `shared/design-references/` and populate with design-tokens.md (from like-figma), color-psychology.md, color-principles.md (from work/design-pipeline/references/), and library-catalog.md (new — catalog of free icon/element libraries). These shared references are used by multiple design skills.
 - **Skill:** skill-master
 - **Reviewers:** skill-checker
-- **Verify-smoke:** check all 3 files exist and are non-empty: `ls -la shared/design-references/`
-- **Files to modify:** `shared/design-references/design-tokens.md` (new), `shared/design-references/color-psychology.md` (new), `shared/design-references/color-principles.md` (new)
+- **Verify-smoke:** check all 4 files exist and are non-empty: `ls -la shared/design-references/`
+- **Files to modify:** `shared/design-references/design-tokens.md` (new), `shared/design-references/color-psychology.md` (new), `shared/design-references/color-principles.md` (new), `shared/design-references/library-catalog.md` (new)
 - **Files to read:** `skills/like-figma/references/design-tokens.md`, `work/design-pipeline/references/color-psychology.md`, `work/design-pipeline/references/color-principles.md`
 
 #### Task 2: Create font-pairing.md reference
@@ -257,7 +276,7 @@ Technical acceptance criteria (complement user-spec criteria):
 - **Skill:** skill-master
 - **Reviewers:** skill-checker
 - **Files to modify:** `skills/design-system-init/references/font-pairing.md` (new)
-- **Files to read:** `shared/design-references/design-tokens.md` (typography section for schema alignment)
+- **Files to read:** `skills/like-figma/references/design-tokens.md` (typography section for schema alignment)
 
 ### Wave 2 (depends on Wave 1 — core skills creation)
 
@@ -294,16 +313,17 @@ Technical acceptance criteria (complement user-spec criteria):
 ### Wave 3 (depends on Wave 2 — integration + cleanup)
 
 #### Task 7: Integrate design-review into do-task
-- **Description:** Add design-review hook to do-task SKILL.md between Step 2.3 (git commit) and Step 2.4 (reviewers). Check `.design-system/tokens.json` existence + UI file changes → call design-review subagent. ~5 lines addition, no existing flow disruption.
+- **Description:** Add design-review hook to do-task SKILL.md between Step 2.3 (git commit) and Step 2.4 (reviewers). Check `.design-system/tokens.json` existence + UI file changes → call design-review subagent. ~5 lines addition, no existing flow disruption. Guard: no full pipeline, no mockups, no interview, no new components.
 - **Skill:** skill-master
 - **Reviewers:** skill-checker
+- **Verify-smoke:** read updated do-task SKILL.md → verify design-review hook present between Step 2.3 and 2.4
 - **Files to modify:** `skills/do-task/SKILL.md`
 - **Files to read:** `skills/design-review/SKILL.md`
 
 #### Task 8: Delete like-figma skill
 - **Description:** Remove `skills/like-figma/` directory after verifying all content has been migrated to new skills. This is the final cleanup — all references, assets, and logic are now in design-system-init, design-generate, and shared/design-references.
 - **Skill:** code-writing
-- **Reviewers:** code-reviewer
+- **Reviewers:** code-reviewer, security-auditor, test-reviewer
 - **Verify-smoke:** verify like-figma directory no longer exists; verify all 4 new skills + shared references exist
 - **Files to modify:** `skills/like-figma/` (delete entire directory)
 - **Files to read:** `skills/design-system-init/SKILL.md`, `skills/design-generate/SKILL.md`, `skills/design-review/SKILL.md`, `skills/design-retrospective/SKILL.md`, `shared/design-references/`

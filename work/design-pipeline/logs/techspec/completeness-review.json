@@ -1,0 +1,64 @@
+{
+  "status": "fail",
+  "sources": {
+    "user_spec": true,
+    "tech_spec": true,
+    "tasks": false
+  },
+  "requirements_total": 27,
+  "requirements_covered": 23,
+  "requirements_partial": 2,
+  "requirements_missing": 2,
+  "findings": [
+    {
+      "type": "gap",
+      "source": "user-spec",
+      "requirement": "US-16: composition.md in shared references",
+      "detail": "User-spec acceptance criteria explicitly states: 'Shared references содержат color-theory.md, composition.md, font-pairing.md с конкретными правилами'. Tech-spec has no task to create composition.md — neither as a shared reference nor anywhere else. The file is not mentioned in Dependencies, Architecture, or any task description. This is a complete omission of a required reference file.",
+      "severity": "critical"
+    },
+    {
+      "type": "gap",
+      "source": "user-spec",
+      "requirement": "US-24: library-catalog.md (icon/element library catalog)",
+      "detail": "User-spec Constraints section: 'Каталог библиотек — ссылки на бесплатные библиотеки иконок/элементов с описанием специфики'. Roadmap table lists library-catalog.md as a shared reference. Tech-spec has no task to create this file. It appears in Dependencies only as a listed shared reference (implicitly), but no task creates it and it is not listed in any task's 'Files to modify'.",
+      "severity": "major"
+    },
+    {
+      "type": "partial",
+      "source": "user-spec",
+      "requirement": "US-16: color-theory.md naming in acceptance criterion",
+      "detail": "User-spec acceptance criterion says 'color-theory.md' but tech-spec creates 'color-psychology.md' and 'color-principles.md'. The content may be semantically equivalent (two files split the domain), but the acceptance criterion name 'color-theory.md' does not match any file created by tech-spec. This creates a gap when running the acceptance checklist literally. Should be documented as a deliberate renaming decision.",
+      "severity": "minor"
+    },
+    {
+      "type": "partial",
+      "source": "user-spec",
+      "requirement": "US-3: Edge cases for design-system-init (conflicting values, empty project, existing .design-system/)",
+      "detail": "Edge cases are covered in Testing Strategy scenario tests (scenario 2, 3, 4 for design-system-init) but are not explicitly mentioned in Task 3 description. Task description only says 'Migrates like-figma Phase 1-2, enriched with...'. Since task descriptions are intentionally brief scope descriptions (per spec header comment), this is a minor gap — the scenarios exist but are not anchored to the task.",
+      "severity": "minor"
+    },
+    {
+      "type": "underengineering",
+      "source": "tech-spec",
+      "requirement": "US-5: Edge cases for design-generate (invalid tokens.json, missing component, SVG artifacts)",
+      "detail": "Task 4 description does not mention handling of corrupted tokens.json (user-spec edge case: 'tokens.json повреждён или невалидный JSON → ошибка с предложением пересоздать'). The scenario test covers it, but the task description omits it. For an L-size feature, error path coverage in task descriptions matters to ensure the implementing agent addresses them. Minor because scenario tests do capture the behavior.",
+      "severity": "minor"
+    },
+    {
+      "type": "underengineering",
+      "source": "tech-spec",
+      "requirement": "US-8: design-review must NOT trigger full pipeline when called from do-task",
+      "detail": "User-spec explicitly lists what must NOT happen during MVP integration (no full pipeline, no mockup generation, no interview, no retrospective, no new components). Task 7 description ('Add design-review hook to do-task SKILL.md') does not mention these guard clauses. The negative requirements are entirely absent from the task scope, leaving them implicit. Given this is a behavioral constraint critical to token economy, it warrants explicit mention.",
+      "severity": "minor"
+    },
+    {
+      "type": "scope_creep",
+      "source": "tech-spec",
+      "requirement": null,
+      "detail": "Task 9 (Code Audit), Task 10 (Security Audit), Task 11 (Test Audit) are not requested by user-spec. However, these are standard engineering infrastructure tasks (quality gates) justified by the L-size classification and methodology conventions. Not flagged as actual scope creep — engineering additions are acceptable per review rules. Noted for completeness only.",
+      "severity": "minor"
+    }
+  ],
+  "summary": "23/27 requirements covered, 2 partial, 2 missing. Critical gap: composition.md required by acceptance criteria is entirely absent from tech-spec. Major gap: library-catalog.md required by constraints and roadmap has no creation task. Minor issues: color-theory.md naming mismatch vs color-psychology.md+color-principles.md split, edge cases for init/generate not anchored in task descriptions, negative behavioral guards for do-task integration not explicit in Task 7."
+}
