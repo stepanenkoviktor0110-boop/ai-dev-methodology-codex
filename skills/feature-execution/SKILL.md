@@ -126,6 +126,13 @@ If findings exist, spawn a fixer worker (`tier_high`) and re-run only affected a
 
 **When Audit Wave is in a different session:** If session-plan.md places the Audit Wave in a later session (e.g., final session), do NOT run it in the current session. Record in decisions.md: "Audit wave (code-reviewer, security-auditor, test-reviewer): not run — scheduled for session {N}." This is expected behavior, not a failure.
 
+**Post-audit hardening — STRICT SCOPE RULE.** After audit findings are fixed, do NOT expand scope beyond what the audit flagged. Specifically:
+- Fix ONLY the risks identified by auditors (security holes, missing error handling, test gaps for existing code).
+- Do NOT add "nice to have" improvements, refactoring, or features "while we're here".
+- If audit says "add integration test for X" — add that test only, do NOT expand the test suite broadly.
+- If audit says "add input validation" — validate that input only, do NOT redesign the validation layer.
+- Log every fix in decisions.md with the audit finding it addresses. If a fix has no matching finding — it's scope creep, remove it.
+
 ## Phase 3: Wave Transition
 
 1. Verify decisions entries exist and include verification results.

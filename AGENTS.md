@@ -20,6 +20,7 @@ These instructions are written for Codex agents that default to the laziest inte
 - **`rg` (ripgrep) may be blocked** on some Windows environments (`Access denied` on `rg.exe`). If `rg` fails, you MUST fall back to `Get-ChildItem -Recurse | Select-String` (PowerShell) or `findstr /S` (cmd). Narrow search scope with explicit paths to compensate for lower performance. Do NOT give up on code search — always use a fallback.
 - **`npm install` with heavy packages** (e.g., `pdfjs-dist`, `sharp`, `prisma`) WILL exceed default terminal timeouts. Use `timeout_ms: 300000` (5 min) or higher for install commands. If it times out, retry — npm caches partial downloads. Do NOT report "install failed" after a single timeout.
 - **Test runner on Windows:** `npm test -- <pattern>` is unreliable on Windows (memory errors, `cannot execute specified program`). Use `npx vitest run <pattern>` (or `npx jest <pattern>`) directly — this is the canonical form. Same applies to any `npm run` wrapper — prefer `npx <tool>` when passing arguments.
+- **File deletion may be blocked** by execution policies or OS locks (antivirus, open handles). If `rm` or `Remove-Item` fails, do NOT retry in a loop. Log the leftover in decisions.md as technical debt: "Cleanup blocked: {file} — reason: {error}. Manual removal needed." Move on — blocked cleanup is NOT a blocker for the pipeline.
 
 ## Git: Known Pitfalls
 

@@ -49,11 +49,23 @@ Otherwise, read current PK files and update only those affected by the feature:
 
 Apply quality principles from documentation-writing skill: no code examples, no obvious content, only project-specific information.
 
-## Step 6: Archive
+## Step 6: Pre-archive Safety Check
+
+**MUST check working tree state before archiving.** Run `git status`.
+- If there are uncommitted changes in `work/{feature}/` → commit them first: `chore: sync final state of {feature} before archiving`
+- If there are uncommitted changes OUTSIDE `work/{feature}/` (parallel work, other features) → do NOT touch them. Archive ONLY the feature directory. Warn user: "В рабочем дереве есть изменения вне {feature} — они не затронуты."
+- If there are untracked files in `work/{feature}/` that should be preserved → stage and commit them.
+
+## Step 7: Archive
 
 Move `work/{feature}/` → `work/completed/{feature}/` (create `work/completed/` if it doesn't exist).
 
-## Step 7: Commit & Report
+**Post-archive path consistency.** After moving the directory, check if any committed files reference the old path `work/{feature}/`:
+- `checkpoint.yml` — update `feature_path` if it contains the old path.
+- Do NOT update paths in `tech-spec.md` or `user-spec.md` — they are historical records.
+- Do NOT search-and-replace across the whole repo. Only fix operational files that would break.
+
+## Step 8: Commit & Report
 
 1. Commit PK file changes and feature archive move.
    ```
@@ -67,11 +79,16 @@ Move `work/{feature}/` → `work/completed/{feature}/` (create `work/completed/`
 
 ## Self-Verification
 
+ALL items MUST be checked. Do NOT mark as done without actual verification.
+
 - [ ] Documentation-writing skill loaded
 - [ ] Feature artifacts read and understood
 - [ ] Completeness assessed (user warned if incomplete)
 - [ ] Retrospective completed (lessons extracted)
 - [ ] PK files updated (only affected ones)
+- [ ] Working tree checked — no uncommitted feature changes lost
+- [ ] Parallel work outside feature directory left untouched
 - [ ] Feature archived to work/completed/
+- [ ] Post-archive paths consistent (checkpoint.yml updated)
 - [ ] Changes committed
 - [ ] Report delivered to user
