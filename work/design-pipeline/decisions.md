@@ -205,3 +205,16 @@ Review details — in JSON files via links. QA report — in logs/working/.
 
 **Verification:**
 - Report: [logs/working/task-11/test-audit-report.md]
+
+## Task 12: Pre-deploy QA
+
+**Status:** Done
+**Commit:** (no code changes — QA only)
+**Agent:** qa-lead
+**Summary:** Финальное приёмочное тестирование фичи. PASSED: 25/25 критериев пройдено, 0 failed. Проверены: 4 скилла (frontmatter, line count, типы), 4 shared + 4 skill-specific references, preview-template.html с CSP, 11 reference links в SKILL.md, path validation pattern, do-task hook, удаление like-figma, отсутствие stale references. Все 3 аудита учтены (code: clean, security: approved, test: adequate).
+**Deviations:** None
+
+**Reviews:** QA task — финальная проверка, ревьюеры не назначаются.
+
+**Verification:**
+- Report: [logs/working/qa-report.json]

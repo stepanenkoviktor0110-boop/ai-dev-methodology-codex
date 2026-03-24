@@ -1,0 +1,170 @@
+{
+  "task": 12,
+  "type": "pre-deploy-qa",
+  "date": "2026-03-25",
+  "status": "passed",
+  "summary": "All 25 acceptance criteria passed. 4 skill directories created with valid SKILL.md files (all <500 lines, correct frontmatter, correct skill types). All 12 reference/asset files exist and are non-empty. All reference links in SKILL.md files resolve to existing files. CSP with script-src 'none' present in preview-template.html. File name validation pattern described in both file-creating skills. do-task hook correctly placed between commit and reviewers. like-figma directory deleted with no stale references.",
+  "criteria": [
+    {
+      "id": "AC-1",
+      "description": "4 skill directories created: design-system-init, design-generate, design-review, design-retrospective",
+      "status": "passed",
+      "notes": "All 4 directories exist under skills/ with SKILL.md files."
+    },
+    {
+      "id": "AC-2",
+      "description": "Each SKILL.md has frontmatter with name + description",
+      "status": "passed",
+      "notes": "design-system-init: name + description with trigger phrases. design-generate: name + description with trigger phrases. design-review: name + description with trigger phrases. design-retrospective: name + description with trigger phrases."
+    },
+    {
+      "id": "AC-3",
+      "description": "Each SKILL.md is under 500 lines",
+      "status": "passed",
+      "notes": "design-system-init: 171 lines. design-generate: 149 lines. design-review: 111 lines. design-retrospective: 167 lines."
+    },
+    {
+      "id": "AC-4",
+      "description": "Skill types correct (procedural: phases+checkpoints; informational: sections+decision framework)",
+      "status": "passed",
+      "notes": "design-system-init: procedural, 5 phases (0-4) with checkpoints after each. design-generate: procedural, 5 phases (0-4) with checkpoints. design-review: informational, sections by logic with decision framework table. design-retrospective: procedural, 5 phases (1-5) with checkpoints."
+    },
+    {
+      "id": "AC-5",
+      "description": "shared/design-references/ contains design-tokens.md, color-psychology.md, color-principles.md, library-catalog.md",
+      "status": "passed",
+      "notes": "All 4 files exist: design-tokens.md (3422B), color-psychology.md (18396B), color-principles.md (13416B), library-catalog.md (5880B)."
+    },
+    {
+      "id": "AC-6",
+      "description": "design-system-init/references/font-pairing.md created with concrete font pair recommendations",
+      "status": "passed",
+      "notes": "File exists (7786B), contains 10 font combinations with heading/body pairs, pairing type, mood, weights."
+    },
+    {
+      "id": "AC-7",
+      "description": "design-generate/references/ contains component-patterns.md, generation-guide.md, grid-techniques.md",
+      "status": "passed",
+      "notes": "All 3 files exist: component-patterns.md (4260B), generation-guide.md (9616B), grid-techniques.md (10666B)."
+    },
+    {
+      "id": "AC-8",
+      "description": "preview-template.html exists with CSP meta tag (script-src 'none')",
+      "status": "passed",
+      "notes": "File at design-generate/assets/preview-template.html line 6: <meta http-equiv=\"Content-Security-Policy\" content=\"script-src 'none'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com\">. script-src 'none' blocks all JS execution."
+    },
+    {
+      "id": "AC-9",
+      "description": "do-task SKILL.md updated with design-review integration between Step 2.3 and 2.5",
+      "status": "passed",
+      "notes": "do-task SKILL.md Step 2, item 4 (line 49): design-review hook checks both conditions (tokens.json exists AND UI files changed), spawns design-review subagent, skips silently if conditions fail. Placed after item 3 (git commit) and before item 5 (reviewers). Explicit guard: 'This hook calls ONLY design-review, not the full design pipeline.'"
+    },
+    {
+      "id": "AC-10",
+      "description": "All reference links in SKILL.md files resolve to existing files",
+      "status": "passed",
+      "notes": "Verified 11 reference links across 3 skills: design-system-init (4 links), design-generate (5 links including preview-template.html), design-review (2 links). All resolve. design-retrospective has 0 reference links (by design — it operates on project runtime files)."
+    },
+    {
+      "id": "AC-11",
+      "description": "like-figma skill directory deleted",
+      "status": "passed",
+      "notes": "skills/like-figma/ does not exist. Confirmed via test -d."
+    },
+    {
+      "id": "AC-12",
+      "description": "No stale references to skills/like-figma/ in skills/ or shared/",
+      "status": "passed",
+      "notes": "grep for 'like-figma' in skills/ and shared/ returned 0 matches."
+    },
+    {
+      "id": "AC-13",
+      "description": "File name validation /^[a-z0-9-]+$/ described in design-system-init and design-generate",
+      "status": "passed",
+      "notes": "design-system-init: Phase 3.1 line 117 and Phase 4 step 4 line 156. design-generate: Phase 3.4 line 97. Both explain the pattern prevents path traversal."
+    },
+    {
+      "id": "AC-14",
+      "description": "User-spec AC: /design-system-init creates tokens.json with colors, fonts (Google Fonts), spacing",
+      "status": "passed",
+      "notes": "SKILL.md Phase 3 covers: tokens.json generation per design-tokens.md schema (colors primary/secondary/neutral/semantic/background/text, typography families/sizes/weights/lineHeights, spacing). Phase 2.3 selects Google Fonts pairs via font-pairing.md. Phase 3.3 loads Google Fonts via <link> tag."
+    },
+    {
+      "id": "AC-15",
+      "description": "User-spec AC: /design-system-init creates minimum 3 components (button, card, input) as HTML files",
+      "status": "passed",
+      "notes": "SKILL.md Phase 2.6 proposes components including 'button, card, input, badge, alert, navbar'. Phase 3.3 generates .design-system/components/{name}.html for each approved component."
+    },
+    {
+      "id": "AC-16",
+      "description": "User-spec AC: Each component opens in browser autonomously (valid HTML, CSS custom properties resolve)",
+      "status": "passed",
+      "notes": "SKILL.md Phase 3.3 specifies: each file is self-contained with <!DOCTYPE html>, :root CSS custom properties, component styles using only var(--token-name), opens standalone in browser — no build step."
+    },
+    {
+      "id": "AC-17",
+      "description": "User-spec AC: /design-generate creates .design-system/pages/{name}.html and .svg",
+      "status": "passed",
+      "notes": "SKILL.md Phase 3.4 saves HTML to .design-system/pages/{name}.html and SVG to .design-system/pages/{name}.svg."
+    },
+    {
+      "id": "AC-18",
+      "description": "User-spec AC: HTML uses tokens from DS (no hardcoded colors/sizes)",
+      "status": "passed",
+      "notes": "design-generate Phase 3.2 uses preview-template.html with CSS custom properties. Final Check verifies 'no hardcoded color/spacing values'. design-system-init Phase 4 step 2 checks for hardcoded hex/px."
+    },
+    {
+      "id": "AC-19",
+      "description": "User-spec AC: Contrast ratio text >= 4.5:1",
+      "status": "passed",
+      "notes": "design-system-init Phase 4 step 3 checks 3 text/background pairs against 4.5:1 target and auto-adjusts if any fails."
+    },
+    {
+      "id": "AC-20",
+      "description": "User-spec AC: Agent requests screenshot on bad rendering and iterates",
+      "status": "passed",
+      "notes": "design-generate Phase 4.1 step 3: 'Send a screenshot if you'd like adjustments'. Phase 4.2: iterates on user feedback (text or screenshot)."
+    },
+    {
+      "id": "AC-21",
+      "description": "User-spec AC: Context exhaustion handling — stops and generates continuation prompt",
+      "status": "passed",
+      "notes": "design-generate Phase 4.3: saves current state, generates continuation prompt with all context needed, tells user to start new session."
+    },
+    {
+      "id": "AC-22",
+      "description": "User-spec AC: Shared references contain color-theory (→ color-psychology + color-principles), composition (→ grid-techniques), font-pairing with concrete rules",
+      "status": "passed",
+      "notes": "Per Decision 7 mapping: color-psychology.md (18396B) + color-principles.md (13416B) replace color-theory.md. grid-techniques.md (10666B) in design-generate/references/ replaces composition.md. font-pairing.md (7786B) in design-system-init/references/. All contain substantive actionable rules per code audit."
+    },
+    {
+      "id": "AC-23",
+      "description": "User-spec AC: Design-review in do-task gives concrete token-based recommendations",
+      "status": "passed",
+      "notes": "design-review SKILL.md How to Report section specifies format: 'found {what} in {file}:{line} -> use {token CSS variable}'. Examples: 'found color #3B82F6 in Button.tsx:14 -> use --color-primary-500'. Cap at 3, prioritized by impact."
+    },
+    {
+      "id": "AC-24",
+      "description": "User-spec AC: Retrospective creates lessons in lessons-learned.md, promotes 3+ to design-principles.md, generates next-session prompt",
+      "status": "passed",
+      "notes": "design-retrospective Phase 3: writes lessons to .design-system/lessons-learned.md (Problem/Cause/Solution/Rule format). Phase 4: counts occurrences, promotes 3+ times rules to .design-system/design-principles.md. Phase 5: generates self-contained next-session prompt."
+    },
+    {
+      "id": "AC-25",
+      "description": "No regression in existing do-task flow (design-review is additive, skips silently when no DS)",
+      "status": "passed",
+      "notes": "do-task hook (item 4 in Step 2) has two guard conditions. Decision framework in design-review: 3 of 4 cells result in 'Skip silently'. No error, no message when conditions not met. Existing steps 1-3 and 5 unchanged."
+    }
+  ],
+  "audit_summary": {
+    "code_audit": "PASS. 17 files reviewed. 0 critical, 0 major, 4 minor findings (library-catalog.md unreferenced from skills, design-retrospective has no shared reference links, minor clarity issue in design-generate Phase 3.2, cosmetic CSP note). All structural checks pass: <500 lines, correct frontmatter, valid reference links, no emphasis words, no duplication, correct integration placement.",
+    "security_audit": "PASS (APPROVED). 0 critical, 0 high, 1 medium (style-src 'unsafe-inline' — accepted trade-off for local previews), 4 low (theoretical only). Decision 8 (CSP script-src 'none') and Decision 9 (path validation /^[a-z0-9-]+$/) correctly implemented. No hardcoded secrets, no unsafe commands, no prompt injection vectors.",
+    "test_audit": "ADEQUATE with recommendations. 22 scenario tests across 4 skills. 0 critical, 2 major gaps (missing .design-system/ scenario for retrospective, untested contrast auto-fix), 5 minor gaps (path traversal test, review prioritization cap, cross-skill interaction, promotion boundary, SCSS extraction). Recommendation: add 7 scenarios (22 → 29). For L-size markdown-only feature, scenario testing is the appropriate and sufficient primary method."
+  },
+  "statistics": {
+    "total_criteria": 25,
+    "passed": 25,
+    "failed": 0,
+    "not_verifiable": 0
+  }
+}
