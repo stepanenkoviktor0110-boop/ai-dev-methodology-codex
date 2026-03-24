@@ -166,3 +166,42 @@ Review details — in JSON files via links. QA report — in logs/working/.
 - All 4 shared references exist → PASS
 - All 3 design-generate references + template exist → PASS
 - `grep -r "like-figma" skills/ shared/` (excluding specs) → no stale references → PASS
+
+## Task 9: Code Audit
+
+**Status:** Done
+**Commit:** (no code changes — audit only)
+**Agent:** code-auditor
+**Summary:** Полный аудит качества 17 файлов фичи. 0 critical, 0 major, 4 minor (library-catalog.md не привязан к скиллу, косметические уточнения). Все 4 SKILL.md структурно корректны (<500 строк, max 171), cross-skill consistency высокая, все reference links валидны, CSP на месте, do-task hook размещён правильно.
+**Deviations:** None
+
+**Reviews:** Audit task — сам IS review.
+
+**Verification:**
+- Report: [logs/working/task-9/code-audit-report.json]
+
+## Task 10: Security Audit
+
+**Status:** Done
+**Commit:** (no code changes — audit only)
+**Agent:** security-auditor
+**Summary:** Аудит безопасности всех артефактов. APPROVED. 0 critical, 0 high, 1 medium (style-src 'unsafe-inline' в CSP — принятый компромисс для локальных превью). Decision 8 (CSP script-src 'none') и Decision 9 (path validation /^[a-z0-9-]+$/) корректно реализованы во всех релевантных скиллах.
+**Deviations:** None
+
+**Reviews:** Audit task — сам IS review.
+
+**Verification:**
+- Report: [logs/working/task-10/security-audit.md]
+
+## Task 11: Test Audit
+
+**Status:** Done
+**Commit:** (no code changes — audit only)
+**Agent:** test-auditor
+**Summary:** Аудит тестового покрытия. 22 сценария покрывают основные пути и ошибки. Выявлены 2 major gaps (отсутствие сценария "нет .design-system/" для retrospective, непротестированный auto-fix контрастности в init) и 5 minor gaps. Рекомендация: добавить 7 сценариев для расширения покрытия до 29. Для L-size фичи без исполняемого кода scenario testing достаточен как основной метод.
+**Deviations:** None
+
+**Reviews:** Audit task — сам IS review.
+
+**Verification:**
+- Report: [logs/working/task-11/test-audit-report.md]

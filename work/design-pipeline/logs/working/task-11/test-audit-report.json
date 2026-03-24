@@ -1,0 +1,71 @@
+{
+  "status": "needs_improvement",
+  "summary": "22 scenario tests cover core happy paths and primary error cases well across 4 markdown skills. However, 2 major gaps (missing DS guard in retrospective, untested contrast ratio auto-fix) and 5 minor gaps (path traversal validation, review prioritization cap, cross-skill interactions, promotion boundary, SCSS extraction) reduce confidence in edge case coverage. Recommend adding 7 scenarios to reach 29 total.",
+  "findings": [
+    {
+      "severity": "major",
+      "category": "missing_coverage",
+      "location": "Section: Testing Strategy > design-retrospective scenarios",
+      "issue": "design-retrospective SKILL.md Phase 1 explicitly refuses when .design-system/ is missing, but no scenario tests this readiness gate. Every other DS-dependent skill has a 'missing DS' scenario except retrospective.",
+      "recommendation": "Add scenario 6: 'No .design-system/ directory -- refuses with suggestion to run /design-system-init.' Mirrors design-generate scenario #2."
+    },
+    {
+      "severity": "major",
+      "category": "missing_coverage",
+      "location": "Section: Testing Strategy > design-system-init scenarios",
+      "issue": "Phase 4 step 3 specifies contrast ratio check >= 4.5:1 with auto-fix behavior ('adjust the color and update tokens.json'). This remediation branch has no test scenario. Acceptance criteria explicitly list contrast ratio verification.",
+      "recommendation": "Add scenario 7: 'Generated palette has low contrast (text.primary on background.default < 4.5:1) -- skill auto-adjusts colors and updates tokens.json.' Tests the Phase 4 remediation loop."
+    },
+    {
+      "severity": "minor",
+      "category": "missing_coverage",
+      "location": "Section: Testing Strategy > design-generate scenarios",
+      "issue": "File name validation (/^[a-z0-9-]+$/) is a security measure (Decision 9) present in both init and generate skills. No scenario tests rejection of invalid names (path traversal attempts, special characters).",
+      "recommendation": "Add scenario: 'User provides page name with special characters or path separators -- skill rejects and asks for valid name.'"
+    },
+    {
+      "severity": "minor",
+      "category": "missing_coverage",
+      "location": "Section: Testing Strategy > design-review scenarios",
+      "issue": "SKILL.md defines prioritization (colors > typography > spacing) and cap at 3 findings with 'N more findings' message. Scenario 1 only tests hardcoded colors. Multi-type violation prioritization and capping behavior is untested.",
+      "recommendation": "Add scenario 5: 'UI files with 5+ violations across colors, typography, and spacing -- outputs 3 highest-priority findings with N more message.'"
+    },
+    {
+      "severity": "minor",
+      "category": "missing_coverage",
+      "location": "Section: Testing Strategy (overall cross-skill)",
+      "issue": "All 22 scenarios test skills in isolation. No scenario tests cross-skill interactions: do-task triggering design-review, retrospective consuming design-generate session data, generate reading init-produced tokens.json.",
+      "recommendation": "Add 1-2 cross-skill scenarios: (a) do-task with UI changes + existing DS triggers design-review; (b) retrospective analyzes generate session with repeated color corrections."
+    },
+    {
+      "severity": "minor",
+      "category": "missing_coverage",
+      "location": "Section: Testing Strategy > design-retrospective scenario 2",
+      "issue": "Promotion threshold is 3 occurrences. Only the 'promotes at 3+' side is tested. No scenario verifies that 2 occurrences do NOT trigger promotion (boundary pair testing).",
+      "recommendation": "Extend scenario 2 to include boundary pair: 2 occurrences = no promotion, 3 occurrences = promotion triggered."
+    },
+    {
+      "severity": "minor",
+      "category": "missing_coverage",
+      "location": "Section: Testing Strategy > design-system-init scenarios",
+      "issue": "Phase 1 lists 4 scan sources in priority order. Sources #3 (SCSS variables) and #4 (hardcoded repeated values) have no dedicated scenario. Only Tailwind (#1), CSS vars (#2), and 'no styles' are covered.",
+      "recommendation": "Add scenario: 'Project with SCSS variables ($color-primary, $font-heading) but no Tailwind/CSS vars -- extracts from SCSS patterns.'"
+    }
+  ],
+  "metrics": {
+    "filesReviewed": 6,
+    "litmusTest": {
+      "checked": 22,
+      "passed": 22,
+      "failed": 0
+    },
+    "coverageAssessment": "adequate",
+    "pyramidBalance": {
+      "unit": 0,
+      "integration": 0,
+      "e2e": 0,
+      "scenario": 22,
+      "assessment": "unbalanced"
+    }
+  }
+}

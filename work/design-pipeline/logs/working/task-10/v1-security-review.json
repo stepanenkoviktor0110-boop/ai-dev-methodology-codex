@@ -1,0 +1,61 @@
+{
+  "status": "approved",
+  "summary": {
+    "totalFindings": 5,
+    "critical": 0,
+    "major": 0,
+    "minor": 5
+  },
+  "findings": [
+    {
+      "severity": "minor",
+      "category": "A03: Injection",
+      "title": "CSP allows unsafe-inline for styles enabling CSS injection",
+      "description": "The Content-Security-Policy in preview-template.html includes style-src 'unsafe-inline' which permits CSS injection. Injected CSS could theoretically exfiltrate data via background-image URL requests or use CSS selectors to detect page content. However, exploitation requires attacker-controlled input flowing into generated styles, pages being served to third parties, and no img-src restriction -- all unlikely in local preview context.",
+      "location": "skills/design-generate/assets/preview-template.html:6",
+      "impact": "Low. Local preview files, agent-mediated content generation, script-src 'none' blocks primary XSS vector. CSS exfiltration requires additional conditions not present in this architecture.",
+      "recommendation": "Accepted trade-off for MVP. Consider adding 'img-src self data:;' to CSP to block external URL loading from CSS in a future hardening pass.",
+      "cwe": "CWE-79"
+    },
+    {
+      "severity": "minor",
+      "category": "best-practice",
+      "title": "Node.js command execution for JSON validation",
+      "description": "Verification step uses 'node -e JSON.parse(...)' to validate tokens.json. JSON.parse is safe against code execution (unlike eval), and the file is agent-generated. Pattern is correct but worth noting for future reference.",
+      "location": "skills/design-system-init/SKILL.md (Phase 4, referenced in tech-spec.md verification plan)",
+      "impact": "None. JSON.parse is safe. Agent generates the file content.",
+      "recommendation": "No action required. Continue using JSON.parse, never switch to eval or require for untrusted JSON.",
+      "cwe": "CWE-94"
+    },
+    {
+      "severity": "minor",
+      "category": "A03: Injection",
+      "title": "Template placeholders lack auto-escaping",
+      "description": "{{PAGE_TITLE}}, {{PAGE_STYLES}}, {{PAGE_CONTENT}} are replaced by the agent without HTML entity escaping. Mitigated by Decision 9 filename validation (/^[a-z0-9-]+$/), CSP script-src 'none', and agent-controlled content generation.",
+      "location": "skills/design-generate/SKILL.md:82-85",
+      "impact": "None with current mitigations. Defense-in-depth (validation + CSP) covers this.",
+      "recommendation": "No action required for MVP. Current defense-in-depth is adequate.",
+      "cwe": "CWE-79"
+    },
+    {
+      "severity": "minor",
+      "category": "best-practice",
+      "title": "Read-only skills correctly skip path validation",
+      "description": "design-review and design-retrospective do not perform filename validation because they either read-only or write to fixed paths. This is correct behavior -- noted for completeness.",
+      "location": "skills/design-review/SKILL.md, skills/design-retrospective/SKILL.md",
+      "impact": "None.",
+      "recommendation": "No action required.",
+      "cwe": ""
+    },
+    {
+      "severity": "minor",
+      "category": "best-practice",
+      "title": "Subagent file paths from git diff are implicitly trusted",
+      "description": "The design-review hook in do-task passes git-diff-derived file paths to the subagent without explicit validation. Git-derived paths are trustworthy in local development context.",
+      "location": "skills/do-task/SKILL.md:49",
+      "impact": "None. Git diff output is a trusted source within local development.",
+      "recommendation": "No action required.",
+      "cwe": ""
+    }
+  ]
+}
