@@ -45,6 +45,11 @@ Before any execution, verify the pipeline was followed correctly:
 6. **Skill file integrity check:** verify that this SKILL.md and the shim entry-point (`do-feature/SKILL.md`) contain no git conflict markers (`<<<<<<<`, `=======`, `>>>>>>>`). If found → **STOP**: "В файле скилла обнаружен merge-конфликт. Исправь вручную перед запуском."
 7. **Dependency health check:** if `package.json` (or equivalent) exists, run `npm run build` (or the project's build command). If build fails → **STOP and fix** before proceeding. This catches type errors, broken imports, and stale dependencies BEFORE any feature work starts. Common after dependency upgrades between sessions.
 8. **Dependency scope check:** if the current session's tasks require new libraries not yet in `package.json`, install them NOW and re-run build. Use `timeout_ms: 300000` for heavy packages. Do NOT discover missing dependencies mid-wave.
+9. **Artifact sync check:** scan all task files in `work/{feature}/tasks/`. For each task from PREVIOUS sessions (sessions before the current one), verify its `status` matches reality:
+   - If task files it was supposed to create/modify exist and work → status MUST be `done`.
+   - If status is still `planned` or `in_progress` but the work is clearly done → fix status to `done` NOW.
+   - Log every correction in decisions.md: "Synced task-{N} status: {old} → done (work was completed in session {M})."
+   - This prevents false pre-flight failures from stale statuses left by previous sessions.
 
 > **Do NOT proceed if any pre-flight check fails.** These checks ensure the user approved each prior stage and the workspace is ready for execution.
 
