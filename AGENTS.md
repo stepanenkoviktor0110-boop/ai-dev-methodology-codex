@@ -52,6 +52,9 @@ After completing any pipeline step, ALWAYS tell the user the next step. This is 
 **New feature (full pipeline):**
 `/new-user-spec` → `/new-tech-spec` → `/decompose-tech-spec` → `/do-feature` or `/do-task` → `/retrospective` → `/done`
 
+**If codebase doesn't exist yet** (no `src/`, no `package.json`, etc.):
+After `/decompose-tech-spec` and before `/do-feature`, run `/infrastructure-setup` to initialize the project skeleton (framework, folders, testing, git hooks). This is NOT optional for new projects — without it, implementation tasks have nowhere to write code.
+
 **After each step, say:** "Следующий шаг: `/command-name` — краткое описание. Запустить?"
 
 If unsure where the user is in the pipeline, check `work/` directory for existing specs/tasks and their statuses to determine the current stage.
