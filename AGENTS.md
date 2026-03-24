@@ -17,6 +17,12 @@ After completing each phase/checkpoint WITHIN a skill (not just at the end), ALW
 
 This applies to every checkpoint marked in skill instructions. Do NOT silently proceed to the next phase — the user must see progress between steps.
 
+## Documentation Discipline
+
+- **decisions.md**: update after every significant decision during any pipeline step — tech choice, scope change, tradeoff, rejected alternative. If a decision was made — it goes into decisions.md immediately, not at the end.
+- **`/done` is mandatory**: after `/retrospective`, ALWAYS remind the user to run `/done`. This is the step that updates Project Knowledge. Skipping it = documentation debt.
+- **Mid-feature PK updates**: if a pipeline step reveals that project-knowledge is outdated or wrong (e.g., architecture changed, new pattern established), fix it immediately — don't wait for `/done`.
+
 ## Pipeline Navigation
 
 After completing any pipeline step, ALWAYS tell the user the next step. This is the standard flow:
