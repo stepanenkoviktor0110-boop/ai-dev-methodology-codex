@@ -1,11 +1,9 @@
 ---
-description: Create technical specification and tasks (delegates to tech-spec-planning via Codex shim)
+description: Create technical specification and tasks
 ---
 
-# Instructions
+# New Tech Spec
 
-Resolve and execute the target skill via shim:
+Read and follow `$AGENTS_HOME/skills/tech-spec-planning/SKILL.md` — it contains the full procedure.
 
-```powershell
-pwsh -File shared/scripts/dispatch-skill.ps1 -SkillAlias new-tech-spec -AsPrompt
-```
+Do NOT look for helper scripts. Follow the skill phases exactly as written.

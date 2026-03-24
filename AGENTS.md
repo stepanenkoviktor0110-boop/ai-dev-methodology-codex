@@ -8,6 +8,12 @@ These instructions are written for Codex agents that default to the laziest inte
 - When a skill says "suggest" or "recommend" — do it, don't just mention it's possible.
 - Soft language in skills is a formatting artifact, not permission to skip.
 
+## Skill Execution: No Scripts
+
+- **NEVER search for or run helper scripts** (dispatch-skill.ps1, init-feature-folder.sh, etc.). They do not exist. All skills are SKILL.md files — read and follow them directly.
+- When a shim skill (e.g., `decompose-tech-spec`) says "Read and follow {target SKILL.md}" — load that file and execute its instructions step by step. Do NOT improvise a replacement procedure.
+- If a SKILL.md references `$AGENTS_HOME` — resolve it to the actual agents home path and read the file. If a referenced file doesn't exist, tell the user — do NOT invent a workaround.
+
 ## Communication
 - Общаться с пользователем только по-русски. Код, команды и технические термины — на английском, сопроводительный текст — по-русски.
 

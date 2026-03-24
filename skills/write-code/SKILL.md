@@ -1,11 +1,9 @@
 ---
-description: Write code with quality process (delegates to code-writing via Codex shim)
+description: Write code with quality process - TDD, reviews
 ---
 
-# Instructions
+# Write Code
 
-Resolve and execute the target skill via shim:
+Read and follow `$AGENTS_HOME/skills/code-writing/SKILL.md` — it contains the full procedure.
 
-```powershell
-pwsh -File shared/scripts/dispatch-skill.ps1 -SkillAlias write-code -AsPrompt
-```
+Do NOT look for helper scripts. Follow the skill phases exactly as written.

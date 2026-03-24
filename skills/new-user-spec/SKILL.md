@@ -1,11 +1,9 @@
 ---
-description: Create user specification through adaptive interview (delegates to user-spec-planning via Codex shim)
+description: Create user specification through adaptive interview
 ---
 
-# Instructions
+# New User Spec
 
-Resolve and execute the target skill via shim:
+Read and follow `$AGENTS_HOME/skills/user-spec-planning/SKILL.md` — it contains the full procedure.
 
-```powershell
-pwsh -File shared/scripts/dispatch-skill.ps1 -SkillAlias new-user-spec -AsPrompt
-```
+Do NOT look for helper scripts. Follow the skill phases exactly as written.
