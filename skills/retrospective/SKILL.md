@@ -16,7 +16,7 @@ description: |
 Evaluate the completed stage, extract lessons from problems encountered, embed them into methodology.
 
 **Input:** `work/{feature}/decisions.md` + git log of the feature
-**Output:** entries in `~/.claude/skills/{skill}/references/lessons-learned.md`
+**Output:** entries in `$AGENTS_HOME/skills/{skill}/references/lessons-learned.md`
 **Language:** Lessons in Russian (they are for the user), communication in Russian
 
 ## Phase 1: Collect Evidence
@@ -68,7 +68,7 @@ If no problems found (single validation pass, no fix rounds, no deviations) → 
 
 For each target skill:
 
-1. Check if `~/.claude/skills/{skill}/references/lessons-learned.md` exists.
+1. Check if `$AGENTS_HOME/skills/{skill}/references/lessons-learned.md` exists.
    - If yes → read it, append new entry
    - If no → create with header
 

@@ -26,7 +26,7 @@ Before starting, check [lessons-learned.md](references/lessons-learned.md) for k
 2. Read `work/{feature}/user-spec.md`. If missing — ask user to describe the task or create user-spec first.
    Extract `size: S|M|L` from user-spec frontmatter — it determines testing strategy depth in tech-spec.
 
-3. Read all files in `.claude/skills/project-knowledge/references/` (project.md, architecture.md, patterns.md, deployment.md, ux-guidelines.md, and any custom domain files). Missing files are fine — not all projects have all guides.
+3. Read all files in `.agents/skills/project-knowledge/references/` (project.md, architecture.md, patterns.md, deployment.md, ux-guidelines.md, and any custom domain files). Missing files are fine — not all projects have all guides.
 
 4. user-spec.md is the single input source — all information from interview.yml and code research is already consolidated there.
 
@@ -37,7 +37,7 @@ Before starting, check [lessons-learned.md](references/lessons-learned.md) for k
 
 ## Phase 2: Code Research
 
-Launch `code-researcher` subagent (Task tool, opus) with feature path and user-spec path. The agent reads existing `code-research.md` (from user-spec phase if available) and deepens analysis for implementation.
+Launch `code-researcher` subagent (spawn_agent tool, gpt-5.4) with feature path and user-spec path. The agent reads existing `code-research.md` (from user-spec phase if available) and deepens analysis for implementation.
 
 After subagent completes — read `{feature_path}/code-research.md`. Use in Phase 3 clarification and Phase 4 spec writing.
 
@@ -63,7 +63,7 @@ Analyze if additional information is needed based on user-spec and code research
 
 1. Copy template to feature folder:
    ```bash
-   cp ~/.claude/shared/work-templates/tech-spec.md.template work/{feature}/tech-spec.md
+   cp $AGENTS_HOME/shared/work-templates/tech-spec.md.template work/{feature}/tech-spec.md
    ```
    Then edit sections one by one using Edit tool. This keeps template structure and examples visible while you work.
 

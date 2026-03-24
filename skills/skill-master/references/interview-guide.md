@@ -15,7 +15,7 @@ Run this interview when creating a NEW skill. Skip for editing existing skills.
 ### Check for Existing Interview
 
 ```bash
-ls ~/.claude/tmp/interview-skill-*.yml 2>/dev/null
+ls $AGENTS_HOME/tmp/interview-skill-*.yml 2>/dev/null
 ```
 
 If found:
@@ -28,7 +28,7 @@ If found:
 
 ```bash
 TIMESTAMP=$(date +%Y%m%d_%H%M%S)
-cp ~/.claude/shared/interview-templates/skill.yml ~/.claude/tmp/interview-skill-$TIMESTAMP.yml
+cp $AGENTS_HOME/shared/interview-templates/skill.yml $AGENTS_HOME/tmp/interview-skill-$TIMESTAMP.yml
 ```
 
 Set `interview_metadata.started` to current timestamp.
@@ -87,5 +87,5 @@ The interview plan file serves as the source of requirements for skill creation.
 ## Cleanup
 
 After skill is created and user is satisfied:
-- Delete interview file: `rm ~/.claude/tmp/interview-skill-*.yml`
+- Delete interview file: `rm $AGENTS_HOME/tmp/interview-skill-*.yml`
 - Or keep for audit trail (shows how requirements were gathered)

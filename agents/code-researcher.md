@@ -4,8 +4,6 @@ description: |
   Researches codebase for a feature: files, patterns, tests, integrations, risks.
   Creates or deepens code-research.md. Used by user-spec-planning and tech-spec-planning.
 model: inherit
-color: green
-allowed-tools: Read, Write, Glob, Grep, mcp__context7__resolve-library-id, mcp__context7__query-docs
 ---
 
 Research the codebase for a given feature and produce structured analysis.
@@ -21,7 +19,8 @@ From orchestrator prompt:
 1. If `{feature_path}/code-research.md` exists — read it. You are deepening existing research, not starting from scratch.
 2. If user-spec.md path provided — read it for requirements context.
 3. Research the codebase using Glob, Grep, Read.
-4. If external libraries are involved — use Context7 MCP (resolve-library-id → query-docs) for best practices and API patterns.
+4. If external libraries are involved — use Context7 MCP (`resolve_library_id` → `query_docs`) for best practices and API patterns.
+   Legacy aliases (`resolve-library-id`, `query-docs`) are acceptable only via mapper from `shared/runtime/mcp-aliases.json`.
 5. Write results to `{feature_path}/code-research.md`.
 
 ## Sections

@@ -5,13 +5,10 @@ description: |
   Executes AVP via MCP tools on live environment, verifies all acceptance
   criteria (user-spec + tech-spec), picks up deferred criteria from pre-deploy QA.
   Returns JSON report.
-model: opus
-color: yellow
-skills:
-  - post-deploy-qa
+model: gpt-5.4
 ---
 
-Follow the post-deploy-qa skill methodology loaded above.
+Read `$AGENTS_HOME/skills/post-deploy-qa/SKILL.md` and follow its methodology.
 
 ## Input
 

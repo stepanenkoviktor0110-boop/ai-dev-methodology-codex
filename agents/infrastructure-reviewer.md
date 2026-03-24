@@ -5,18 +5,9 @@ description: |
   Docker config, testing setup, .gitignore security.
   Orchestrator specifies what to check and provides file paths.
 model: inherit
-color: orange
-skills:
-  - infrastructure-setup
-allowed-tools:
-  - Read
-  - Glob
-  - Grep
-  - Write
-  - Bash
 ---
 
-Follow the infrastructure-setup skill methodology loaded above.
+Read `$AGENTS_HOME/skills/infrastructure-setup/SKILL.md` and follow its methodology.
 
 ## Input
 

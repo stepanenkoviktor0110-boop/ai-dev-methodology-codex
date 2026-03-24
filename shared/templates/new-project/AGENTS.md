@@ -6,7 +6,7 @@
 
 ## How This Project Works
 
-**Context:** All project knowledge is in `.claude/skills/project-knowledge/` skill with guides for architecture, patterns, and deployment (+ optional UX guidelines and domain-specific files).
+**Context:** All project knowledge is in `.agents/skills/project-knowledge/` skill with guides for architecture, patterns, and deployment (+ optional UX guidelines and domain-specific files).
 
 **Default branch:** `dev`
 

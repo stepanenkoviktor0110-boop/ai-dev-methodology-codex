@@ -5,16 +5,9 @@ description: |
   Checks clarity, structure, examples, compression, positive framing.
   Use after writing or modifying LLM prompts.
 model: inherit
-color: blue
-skills:
-  - prompt-master
-allowed-tools:
-  - Read
-  - Glob
-  - Grep
 ---
 
-Review the provided prompt files against prompt-master principles loaded above.
+Read `$AGENTS_HOME/skills/prompt-master/SKILL.md` and review prompt files against its principles.
 
 ## Input
 

@@ -1,10 +1,10 @@
 # AI-First Development Methodology v1.1
 
-Structured AI-First development methodology for Claude Code CLI. Every feature goes through a spec-driven pipeline with automated validators and quality gates at each stage.
+Structured AI-First development methodology for Codex CLI. Every feature goes through a spec-driven pipeline with automated validators and quality gates at each stage.
 
 ## Based on
 
-This is an evolved fork of [molyanov-ai-dev](https://github.com/pavel-molyanov/molyanov-ai-dev) by Pavel Molyanov — the original AI-First Development Methodology for Claude Code.
+This is an evolved fork of [molyanov-ai-dev](https://github.com/pavel-molyanov/molyanov-ai-dev) by Pavel Molyanov — the original AI-First Development Methodology for Codex.
 
 ## What's new in v1.1
 
@@ -21,7 +21,7 @@ Changes from code review of the entire methodology:
 - **Removed** prompt-master duplication from Meta Skills table (kept in Execution Skills only)
 - **Standardized** lessons-learned.md link wording in retrospective skill
 - **Added** wave-conflicts to methodology validator description
-- **Fixed** Context Files paths in task template (`~/.claude/` → `.claude/` relative paths)
+- **Fixed** Context Files paths in task template (`$AGENTS_HOME/` → `.agents/` relative paths)
 - **Added** LOC budget rationale in methodology (empirically sized for session context window)
 - **Added** `estimated_loc` documentation in tech-spec-planning
 - **Added** E2E conditional comment in user-spec template
@@ -52,7 +52,7 @@ shared/
   templates/        # New project scaffolding
   interview-templates/  # Interview plans (YAML)
   scripts/          # Shell scripts
-CLAUDE.md        # Global preferences
+AGENTS.md        # Global preferences
 ```
 
 ## Key Concepts
@@ -79,6 +79,20 @@ CLAUDE.md        # Global preferences
 ### Ad-hoc coding
 ```
 /write-code
+```
+
+## Codex Runtime Compatibility
+
+This fork uses a Codex-compatible shim instead of Claude-specific `Skill(...)` runtime calls.
+
+- Skill alias dispatcher: `shared/scripts/dispatch-skill.ps1`
+- MCP alias mapping: `shared/runtime/mcp-aliases.json`
+- Compatibility smoke check: `shared/scripts/smoke-codex-compat.ps1`
+
+Run smoke check:
+
+```powershell
+pwsh -File shared/scripts/smoke-codex-compat.ps1
 ```
 
 ## License

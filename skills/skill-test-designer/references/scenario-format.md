@@ -15,7 +15,7 @@ happy-path | edge-case
 
 Default — do not change unless user explicitly asks:
 
-Предприниматель, занимается vibe-coding через Claude Code. Не программист —
+Предприниматель, занимается vibe-coding через Codex. Не программист —
 не знает синтаксис, библиотеки, алгоритмы. Есть техническое образование,
 понимает продукты и архитектуру на уровне "что делает что". Общается прямо,
 без воды.
@@ -46,8 +46,8 @@ Each criterion:
 - How to check time-dependent criteria (e.g., TDD order)
 - What file contents to verify (not just file existence)
 
-### Model for this test
-{opus | sonnet} (agreed with user during design)
+### Model Profile for this test
+{tier_opus | tier_sonnet | tier_haiku} (agreed with user during design)
 ```
 
 ## Prompt Examples
@@ -56,7 +56,7 @@ Each criterion:
 Поставь задачу на завтра: купить продукты в 10:00, уведомление за 30 минут.
 
 ### Coding skill (code-writing):
-Реализуй задачу: ~/.claude/skill-tests/code-writing/scenarios/task-1.md
+Реализуй задачу: $AGENTS_HOME/skill-tests/code-writing/scenarios/task-1.md
 
 ### Dialogue skill (user-spec-planning):
 Хочу добавить авторизацию через Google в мобильное приложение.

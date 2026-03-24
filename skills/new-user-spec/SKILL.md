@@ -1,9 +1,11 @@
 ---
-description: Create user specification through adaptive interview (uses user-spec-planning skill)
-allowed-tools:
-  - Skill
+description: Create user specification through adaptive interview (delegates to user-spec-planning via Codex shim)
 ---
 
 # Instructions
 
-Use the `user-spec-planning` skill.
+Resolve and execute the target skill via shim:
+
+```powershell
+pwsh -File shared/scripts/dispatch-skill.ps1 -SkillAlias new-user-spec -AsPrompt
+```

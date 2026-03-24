@@ -16,7 +16,7 @@ Conduct adaptive interview → make tech decisions → fill all project document
 
 ## Output Files
 
-**Project Knowledge** (`.claude/skills/project-knowledge/references/`):
+**Project Knowledge** (`.agents/skills/project-knowledge/references/`):
 - **project.md** — overview, audience, problem, key features, scope
 - **architecture.md** — tech stack, project structure, dependencies, data model
 - **patterns.md** — git workflow (code patterns, testing, business rules are filled later during development)
@@ -46,7 +46,7 @@ Conduct adaptive interview → make tech decisions → fill all project document
 
 ### 1.1 Interview
 
-Verify that project-knowledge directory and CLAUDE.md exist. If missing — tell user to run `/init-project` first.
+Verify that project-knowledge directory and AGENTS.md exist. If missing — tell user to run `/init-project` first.
 
 Ask user to describe the project in free form. Let them say as much or as little as they want.
 
@@ -160,7 +160,7 @@ Fix any issues before proceeding.
 
 ### 4.2 Documentation Review
 
-Run `documentation-reviewer` agent (Task tool, sonnet) on the project. Fix critical and major findings. Minor findings — fix or leave at your discretion.
+Run `documentation-reviewer` agent (spawn_agent tool, gpt-5.4-mini) on the project. Fix critical and major findings. Minor findings — fix or leave at your discretion.
 
 ### 4.3 Show Files
 

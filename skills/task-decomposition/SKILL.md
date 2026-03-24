@@ -38,17 +38,17 @@ This ensures predictable scope, manageable task sizes, and clear progress tracki
 
 3. Read `work/{feature}/user-spec.md`.
 
-4. Note the task template path: `~/.claude/shared/work-templates/tasks/task.md.template`
+4. Note the task template path: `$AGENTS_HOME/shared/work-templates/tasks/task.md.template`
 
-5. Read skills/reviewers catalog from [skills-and-reviewers.md](~/.claude/skills/tech-spec-planning/references/skills-and-reviewers.md) — for passing correct skills/reviewers to task-creators.
+5. Read skills/reviewers catalog from [skills-and-reviewers.md]($AGENTS_HOME/skills/tech-spec-planning/references/skills-and-reviewers.md) — for passing correct skills/reviewers to task-creators.
 
-6. For each task in Implementation Tasks — launch [`task-creator`](~/.claude/agents/task-creator.md) subagent in parallel.
+6. For each task in Implementation Tasks — launch [`task-creator`]($AGENTS_HOME/agents/task-creator.md) subagent in parallel.
    Pass each task-creator:
    - feature_path, task_number, task_name
-   - template_path: `~/.claude/shared/work-templates/tasks/task.md.template`
+   - template_path: `$AGENTS_HOME/shared/work-templates/tasks/task.md.template`
    - files_to_modify, files_to_read (from tech-spec)
    - depends_on, wave, skills, reviewers, verify (from tech-spec)
-   - teammate_name (if specified in tech-spec, optional)
+- worker_name (if specified in tech-spec, optional)
    Each task-creator copies the template to `tasks/{N}.md` first, then edits each section in place. This ensures no sections are skipped.
 
 7. Confirm each task-creator returned a file path. Skip reading task content — preserve context budget for validation phase.
@@ -67,12 +67,12 @@ Tech-spec was already validated by 5 validators. This phase checks only: (1) tas
 
 Launch both in parallel:
 
-[`task-validator`](~/.claude/agents/task-validator.md) (sonnet) — Template Compliance + AC/TDD carry-forward:
+[`task-validator`]($AGENTS_HOME/agents/task-validator.md) (gpt-5.4-mini) — Template Compliance + AC/TDD carry-forward:
 - Batch: 5 tasks per call
 - Pass: feature_path, task_numbers array, batch_number, iteration
 - Report: `logs/tasks/template-batch{N}-review.json`
 
-[`reality-checker`](~/.claude/agents/reality-checker.md) (sonnet) — Reality & Adequacy:
+[`reality-checker`]($AGENTS_HOME/agents/reality-checker.md) (gpt-5.4-mini) — Reality & Adequacy:
 - Batch: 3 tasks per call
 - Pass: feature_path, task_numbers array, batch_number, iteration
 - Report: `logs/tasks/reality-batch{N}-review.json`
@@ -81,7 +81,7 @@ Launch both in parallel:
 
 1. Launch both validators in parallel (task-validator in batches of 5, reality-checker in batches of 3).
 2. Read JSON reports, collect findings.
-3. If issues found — for each task with issues, launch [`task-creator`](~/.claude/agents/task-creator.md) in fix mode:
+3. If issues found — for each task with issues, launch [`task-creator`]($AGENTS_HOME/agents/task-creator.md) in fix mode:
    - Pass: same inputs as creation + `mode: fix` + `findings` from validators
    - task-creator reads existing task, applies fixes, overwrites file
 4. After each validation round, git commit: `chore(tasks): validation round {N} — {summary}`
@@ -129,7 +129,7 @@ After user approves task decomposition, calculate session grouping for predictab
    f. If a single wave > budget → it gets its own session (warn user: "Wave N exceeds session budget").
 3. For each session, collect unique Context Files from all tasks in that session (deduplicate).
 4. Give each session a short descriptive title based on its tasks' descriptions.
-5. Generate `work/{feature}/logs/session-plan.md` from template `~/.claude/shared/work-templates/session-plan.md.template`.
+5. Generate `work/{feature}/logs/session-plan.md` from template `$AGENTS_HOME/shared/work-templates/session-plan.md.template`.
 6. Present session plan to user as a table: session number, title, waves, tasks, estimated LOC.
 7. Git commit: `chore(tasks): session plan for {feature} — {N} sessions`
 8. Suggest next step: `/do-feature {feature}` to start session 1, or `/do-task` for manual execution.
@@ -141,5 +141,5 @@ After user approves task decomposition, calculate session grouping for predictab
 ## Final Check
 
 - [ ] All phases completed (tasks created, validation passed)
-- [ ] All tasks match template (frontmatter: status, depends_on, wave, skills, reviewers, teammate_name)
+- [ ] All tasks match template (frontmatter: status, depends_on, wave, skills, reviewers, worker_name)
 - [ ] Validation: both validators passed or user confirmed remaining issues

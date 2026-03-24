@@ -14,9 +14,9 @@ description: |
 ## Gathering Deployment Context
 
 Read project-knowledge to understand the deployment target:
-- `.claude/skills/project-knowledge/references/deployment.md`
-- `.claude/skills/project-knowledge/references/architecture.md`
-- `.claude/skills/project-knowledge/references/patterns.md`
+- `.agents/skills/project-knowledge/references/deployment.md`
+- `.agents/skills/project-knowledge/references/architecture.md`
+- `.agents/skills/project-knowledge/references/patterns.md`
 
 If deployment target is not documented, ask the user:
 - Target platform (Vercel, Railway, Fly.io, AWS ECS, VPS, NPM, Chrome Web Store)
@@ -49,7 +49,7 @@ jobs:
       - id: check
         run: |
           FILES=$(git diff --name-only HEAD~1 HEAD 2>/dev/null || git diff --name-only HEAD)
-          if echo "$FILES" | grep -vqE '\.(md|txt)$|^\.claude/|^\.spec/|^docs/'; then
+          if echo "$FILES" | grep -vqE '\.(md|txt)$|^\.agents/|^\.spec/|^docs/'; then
             echo "should_skip=false" >> $GITHUB_OUTPUT
           else
             echo "should_skip=true" >> $GITHUB_OUTPUT
@@ -90,7 +90,7 @@ For VPS deployments: server-specific details (IPs, SSH keys, paths) go to `deplo
 
 ## Secrets Convention
 
-Document all required secrets in `.claude/skills/project-knowledge/references/deployment.md`. For each secret:
+Document all required secrets in `.agents/skills/project-knowledge/references/deployment.md`. For each secret:
 - Name (GitHub Actions key)
 - Where to obtain value (dashboard URL or CLI command)
 - Which workflow uses it

@@ -7,9 +7,7 @@ description: |
   Use when: validating task files after task-creator generates them,
   during /decompose-tech-spec validation phase.
   Not for: template compliance (task-validator), deep security audit (security-auditor).
-model: sonnet
-color: yellow
-allowed-tools: Read, Glob, Grep, Write
+model: gpt-5.4-mini
 ---
 
 Validate task files against codebase reality. Catch mismatches between task descriptions and actual code.

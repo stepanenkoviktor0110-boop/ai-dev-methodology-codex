@@ -10,8 +10,6 @@ description: |
   Also used in fix mode: receives existing task + validator findings, applies fixes.
   Scope excludes: validating tasks (use task-validator).
 model: inherit
-color: green
-allowed-tools: Read, Glob, Grep, Write, Bash, Edit
 ---
 
 Create task file for the specified task from tech-spec.
@@ -25,14 +23,14 @@ Create task file for the specified task from tech-spec.
 - files_to_modify: List of code files to modify (from tech-spec's Implementation Tasks)
 
 **Optional:**
-- template_path: Path to task template (default: `~/.claude/shared/work-templates/tasks/task.md.template`)
+- template_path: Path to task template (default: `$AGENTS_HOME/shared/work-templates/tasks/task.md.template`)
 - files_to_read: List of code files to read for context (default: [])
 - depends_on: List of task dependency numbers (default: [])
 - wave: Wave number for parallel execution (default: 1)
 - skills: Array of skills for the task (default: [code-writing])
 - reviewers: Array of reviewers (default: [code-reviewer, test-reviewer])
 - verify: Array of verification types: [smoke], [user], [smoke, user], or [] (default: []). Derives from tech-spec Verify-smoke: and Verify-user: presence
-- teammate_name: Cosmetic name for agent teams (default: none)
+- worker_name: Optional worker alias for orchestration (default: none)
 
 **Fix mode (optional):**
 - mode: `fix` (default: `create`)
@@ -55,7 +53,7 @@ Create task file for the specified task from tech-spec.
    - {feature_path}/user-spec.md (if exists)
    - {feature_path}/decisions.md (if exists)
 
-2. PK discovery — Glob `.claude/skills/project-knowledge/` to find what exists, then read SKILL.md to understand references.
+2. PK discovery — Glob `.agents/skills/project-knowledge/` to find what exists, then read SKILL.md to understand references.
    Then read:
    - **Always:** project.md, architecture.md (project context is always needed)
    - **By task relevance:** other PK references needed for this task. Examples:
@@ -73,7 +71,7 @@ Create task file for the specified task from tech-spec.
    - Ensure `tasks/` directory exists first (`mkdir -p {feature_path}/tasks`)
 
 5. Edit each section in the copied file using Edit tool. Work through sections top-to-bottom:
-   - Frontmatter: replace placeholder values with actual status, depends_on, wave, skills, verify, reviewers, teammate_name
+  - Frontmatter: replace placeholder values with actual status, depends_on, wave, skills, verify, reviewers, worker_name
    - Title: replace `Task N: Название` with actual task number and name
    - Required Skills: replace with actual skills for this task
    - Description, What to do, TDD Anchor, Acceptance Criteria, Context Files, Verification Steps, Details, Reviewers, Post-completion: replace placeholder content with real content based on tech-spec and code analysis
@@ -88,7 +86,7 @@ Create task file for the specified task from tech-spec.
 - skills: {from input, array}
 - verify: {from input, array of types: [smoke], [user], [smoke, user], or []}
 - reviewers: {from input, array}
-- teammate_name: {from input, optional — cosmetic name for agent teams}
+- worker_name: {from input, optional — worker alias}
 
 ### 2. Required Skills
 Instructions for the implementing agent — which skills to load before starting work on this task.

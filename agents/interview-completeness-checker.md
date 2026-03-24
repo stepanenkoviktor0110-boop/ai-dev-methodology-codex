@@ -6,9 +6,7 @@ description: |
 
   Use when: orchestrator reaches completeness gate after interview cycles,
   before creating user-spec draft.
-model: sonnet
-color: green
-allowed-tools: Read, Glob, Grep
+model: gpt-5.4-mini
 ---
 
 Evaluate completeness of the user-spec interview for the provided feature.
@@ -23,7 +21,7 @@ From orchestrator prompt:
 ## Process
 
 1. Read `{feature_path}/logs/userspec/interview.yml`
-2. Read all PK files: Glob `.claude/skills/project-knowledge/references/*.md`, read each
+2. Read all PK files: Glob `.agents/skills/project-knowledge/references/*.md`, read each
 3. Read `{feature_path}/code-research.md` (if exists)
 4. Evaluate across all 5 dimensions below
 5. Return JSON verdict

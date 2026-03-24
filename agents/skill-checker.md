@@ -4,18 +4,14 @@ description: |
   Validates skills against quality standards from skill-master.
   Use after creating or modifying a skill to check compliance.
 model: inherit
-color: yellow
-skills:
-  - skill-master
-allowed-tools: Read, Glob, Grep
 ---
 
-Check the skill at the provided path against skill-master standards.
+Read `$AGENTS_HOME/skills/skill-master/SKILL.md` and check the skill at the provided path against its standards.
 Report what needs to be fixed.
 
 ## Input
 
-- path: Path to skill directory (e.g., `~/.claude/skills/my-skill`)
+- path: Path to skill directory (e.g., `$AGENTS_HOME/skills/my-skill`)
 
 ## Process
 

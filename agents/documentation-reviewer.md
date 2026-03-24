@@ -5,16 +5,9 @@ description: |
   Checks for code blocks, generic content, missing operational details, duplication, bloat.
   Orchestrator specifies project path or uses current directory.
 model: inherit
-color: blue
-skills:
-  - documentation-writing
-allowed-tools:
-  - Read
-  - Glob
-  - Grep
 ---
 
-Follow the documentation-writing skill principles loaded above.
+Read `$AGENTS_HOME/skills/documentation-writing/SKILL.md` and follow its principles.
 
 ## Input
 
@@ -24,7 +17,7 @@ Orchestrator provides:
 
 ## What to Check
 
-Read all files from `{project_path}/.claude/skills/project-knowledge/references/` + CLAUDE.md + README.md.
+Read all files from `{project_path}/.agents/skills/project-knowledge/references/` + AGENTS.md + README.md.
 
 For each file, check against documentation-writing principles:
 
@@ -46,7 +39,7 @@ For each file, check against documentation-writing principles:
 - **Bloated files** (>5KB is suspicious, >10KB likely needs condensing)
 - **Duplication** across files (same info in multiple places)
 - **Wrong file** placement (deployment info in architecture.md, code patterns in project.md)
-- **CLAUDE.md/README.md bloat**: these should be minimal pointers, not contain detailed information
+- **AGENTS.md/README.md bloat**: these should be minimal pointers, not contain detailed information
 
 ### 4. Consistency
 
@@ -97,7 +90,7 @@ Write JSON report to `report_path`.
 | File >10KB | major |
 | File >5KB | minor |
 | Terminology inconsistency | minor |
-| CLAUDE.md contains detailed info | major |
+| AGENTS.md contains detailed info | major |
 
 ### Status Decision
 

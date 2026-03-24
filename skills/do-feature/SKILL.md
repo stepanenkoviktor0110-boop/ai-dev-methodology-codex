@@ -1,17 +1,23 @@
 ---
 description: |
-  Execute feature with team of agents — waves, reviews, commits.
+  Execute feature by orchestrating worker/reviewer waves via Codex-compatible shim.
 
   Use when: "выполни фичу", "do feature", "execute feature", "запусти фичу"
 ---
 
 # Do Feature
 
-Execute a full feature using a team of agents.
+Execute a full feature with Codex orchestration.
 
-## Step 1: Load Skill
+## Step 1: Resolve Target Skill (Shim)
 
-Invoke Skill tool: `Skill(skill: "feature-execution")`
+Run:
+
+```powershell
+pwsh -File shared/scripts/dispatch-skill.ps1 -SkillAlias do-feature -AsPrompt
+```
+
+Then read and execute the resolved skill file (`skills/feature-execution/SKILL.md`).
 
 ## Step 2: Find Feature
 

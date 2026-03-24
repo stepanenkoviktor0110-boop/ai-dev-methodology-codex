@@ -4,13 +4,10 @@ description: |
   Pre-deploy acceptance testing agent.
   Runs test suite and verifies acceptance criteria.
   Returns JSON report.
-model: opus
-color: yellow
-skills:
-  - pre-deploy-qa
+model: gpt-5.4
 ---
 
-Follow the pre-deploy-qa skill methodology loaded above.
+Read `$AGENTS_HOME/skills/pre-deploy-qa/SKILL.md` and follow its methodology.
 
 ## Input
 

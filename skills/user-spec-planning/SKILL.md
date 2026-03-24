@@ -39,14 +39,14 @@ Conduct interview in Russian. Be thorough and opinionated — an engaged co-thin
 2. Get task description: "Опиши, что хочешь сделать."
 3. Determine work_type (feature / bug / refactoring) from description.
 4. Propose feature name (kebab-case), get user confirmation.
-5. Run `~/.claude/shared/scripts/init-feature-folder.sh {name}` — creates folder structure with interview.yml.
+5. Run `$AGENTS_HOME/shared/scripts/init-feature-folder.sh {name}` — creates folder structure with interview.yml.
 6. Update interview.yml: set metadata.started, metadata.status: in_progress, phase1_feature_overview.feature_name, phase1_feature_overview.work_type.
 
 **Checkpoint:** interview.yml exists with status in_progress, feature name confirmed.
 
 ### Phase 1: Study Project Knowledge
 
-Read ALL files from `.claude/skills/project-knowledge/references/`. If directory missing or empty — warn user, suggest running project-planning skill (or `/init-project-knowledge` command).
+Read ALL files from `.agents/skills/project-knowledge/references/`. If directory missing or empty — warn user, suggest running project-planning skill (or `/init-project-knowledge` command).
 
 These files are your context for the entire interview. Reference them when asking questions and proposing solutions.
 
@@ -63,7 +63,7 @@ These files are your context for the entire interview. Reference them when askin
 
 ### Phase 3: Code Scanning
 
-Launch `code-researcher` subagent (Task tool, opus) with feature path and feature description from Cycle 1.
+Launch `code-researcher` subagent (spawn_agent tool, gpt-5.4) with feature path and feature description from Cycle 1.
 
 After subagent completes — read `{feature_path}/code-research.md`. Use findings in Cycle 2 questions.
 
@@ -92,7 +92,7 @@ Run interview loop on remaining gaps.
 
 ### Phase 6: Completeness Check
 
-Launch `interview-completeness-checker` subagent (Task tool, sonnet) with feature path. It reviews interview.yml against PK files and code-research.md.
+Launch `interview-completeness-checker` subagent (spawn_agent tool, gpt-5.4-mini) with feature path. It reviews interview.yml against PK files and code-research.md.
 
 - `needs_more` → ask the suggested questions, re-run checker
 - `complete` → proceed to Phase 7
@@ -100,7 +100,7 @@ Launch `interview-completeness-checker` subagent (Task tool, sonnet) with featur
 ### Phase 7: Create User Spec
 
 1. Copy template to working file:
-   - Copy `~/.claude/shared/work-templates/user-spec.md.template` → `work/{feature}/user-spec.md`
+   - Copy `$AGENTS_HOME/shared/work-templates/user-spec.md.template` → `work/{feature}/user-spec.md`
    - Edit sections one by one using Edit tool, replacing placeholders with interview data
    Reason: agent sees template structure and comments while editing each section, preventing drift from template format.
 2. Content rules:
@@ -114,9 +114,9 @@ Git commit: `draft(userspec): create user-spec for {feature}`
 
 ### Phase 8: Validation
 
-Run 2 validators in parallel (Task tool):
-- `userspec-quality-validator` (sonnet) — document structure, template compliance, formal completeness. Returns JSON with per-check pass/fail and findings list.
-- `userspec-adequacy-validator` (opus) — feasibility, over/underengineering, better alternatives. Returns JSON with findings by category and severity.
+Run 2 validators in parallel (spawn_agent tool):
+- `userspec-quality-validator` (gpt-5.4-mini) — document structure, template compliance, formal completeness. Returns JSON with per-check pass/fail and findings list.
+- `userspec-adequacy-validator` (gpt-5.4) — feasibility, over/underengineering, better alternatives. Returns JSON with findings by category and severity.
 
 **Handling findings:**
 - Obvious issue → fix silently

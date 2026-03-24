@@ -10,7 +10,7 @@ description: |
 
 ## Step 1: Load Documentation Skill
 
-Use Skill tool: `documentation-writing`
+Read `$AGENTS_HOME/skills/documentation-writing/SKILL.md` and follow its principles.
 
 ## Step 2: Identify Feature
 
@@ -33,13 +33,13 @@ If `decisions.md` is missing or sparse, use `git log --oneline` for feature-rela
 
 Run retrospective skill to extract lessons learned from the feature process:
 
-1. Use Skill tool: `retrospective`
+1. Read and execute `$AGENTS_HOME/skills/retrospective/SKILL.md`
 2. Pass feature path to the skill
 3. Wait for completion — lessons will be written to relevant skills' `references/lessons-learned.md`
 
 ## Step 5: Update Project Knowledge
 
-If `.claude/skills/project-knowledge/references/` does not exist or is empty — skip this step, inform the user that project knowledge has not been initialized.
+If `.agents/skills/project-knowledge/references/` does not exist or is empty — skip this step, inform the user that project knowledge has not been initialized.
 
 Otherwise, read current PK files and update only those affected by the feature:
 - `architecture.md` — new components, changed structure, data model / schema changes

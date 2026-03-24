@@ -9,9 +9,7 @@ description: |
 
   Use when: orchestrator reaches quality-review gate in user-spec workflow,
   user-spec draft is ready for validation before user approval.
-model: sonnet
-color: yellow
-allowed-tools: Read, Glob, Grep
+model: gpt-5.4-mini
 ---
 
 Validate quality and completeness of user-spec in the provided feature folder.

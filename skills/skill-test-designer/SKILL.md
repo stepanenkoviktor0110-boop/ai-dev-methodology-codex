@@ -73,8 +73,10 @@ Discuss with the user to define the test scope:
    - Specific (no "did a good job", no "output is correct")
    - Skill-focused (testing skill behavior, not general agent quality)
 
-5. **Model**: "Which model should the runners use? Opus for complex tasks
-   (coding, architecture), Sonnet for simpler ones (documentation, notes)."
+5. **Model profile**: choose one profile for each scenario:
+   - `tier_opus` -> `gpt-5.4` for complex tasks (coding, architecture)
+   - `tier_sonnet` -> `gpt-5.4-mini` for standard tasks
+   - `tier_haiku` -> `gpt-5.4-mini` with low reasoning for simple deterministic checks
 
 6. **Persona**: Keep the default persona from
    [scenario-format.md](references/scenario-format.md) as-is. Modify only
@@ -89,7 +91,7 @@ choice. User approved final set.
 
 ## Phase 3: Save Scenarios
 
-1. Create directory: `~/.claude/skill-tests/{skill-name}/scenarios/`
+1. Create directory: `$AGENTS_HOME/skill-tests/{skill-name}/scenarios/`
 2. Save each scenario as a separate .md file:
    - happy-path.md
    - edge-case-1.md, edge-case-2.md, etc.
@@ -108,5 +110,5 @@ Before finishing, verify:
 - [ ] Target skill fully read (SKILL.md + all references)
 - [ ] Each scenario has task prompt, persona, acceptance criteria, grading notes
 - [ ] Acceptance criteria are binary, observable, specific, skill-focused
-- [ ] All scenario files saved to `~/.claude/skill-tests/{skill-name}/scenarios/`
+- [ ] All scenario files saved to `$AGENTS_HOME/skill-tests/{skill-name}/scenarios/`
 - [ ] User confirmed all scenarios

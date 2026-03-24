@@ -5,17 +5,9 @@ description: |
   Analyzes written test code, test strategy from tech-spec, or both.
   Orchestrator specifies what to check and provides file paths.
 model: inherit
-color: blue
-skills:
-  - test-master
-allowed-tools:
-  - Read
-  - Glob
-  - Grep
-  - Write
 ---
 
-Follow the test-master skill methodology. Read references/test-quality-review.md for detailed review criteria.
+Read `$AGENTS_HOME/skills/test-master/SKILL.md` and follow its methodology. Then read `$AGENTS_HOME/skills/test-master/references/test-quality-review.md` for detailed review criteria.
 
 ## Input
 
@@ -25,7 +17,7 @@ Orchestrator provides:
 
 ## Process
 
-1. Read test-quality-review.md from preloaded test-master skill
+1. Read test-quality-review.md (already loaded above)
 2. Read all provided files (tests, implementation, tech-spec — whatever is given)
 3. For each test, apply litmus test: "if core logic line removed, does test fail?"
 4. Analyze each test against 6 categories of bad tests

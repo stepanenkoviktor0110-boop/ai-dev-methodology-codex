@@ -43,7 +43,7 @@ This file provides high-level project overview for AI agents. Helps agents under
 
 <!--
 Feature backlog, detailed roadmap, and development phases live in the project backlog
-(see CLAUDE.md for backlog path), not here. This file is a stable overview.
+(see AGENTS.md for backlog path), not here. This file is a stable overview.
 -->
 
 ---

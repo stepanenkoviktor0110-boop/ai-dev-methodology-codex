@@ -8,9 +8,8 @@ These fields are NOT required for most skills. Use only when needed.
 |-------|---------|-------------|
 | `argument-hint` | None | Autocomplete hint shown after skill name |
 | `disable-model-invocation` | `false` | If `true`, skill only triggers manually via `/skill-name` |
-| `user-invocable` | `true` | If `false`, skill hidden from `/` menu, only Claude can invoke |
-| `allowed-tools` | All tools | Restrict which tools the skill can use |
-| `model` | `inherit` | Override model: `sonnet`, `opus`, `haiku`, `inherit` |
+| `user-invocable` | `true` | If `false`, skill hidden from `/` menu, only Codex can invoke |
+| `model` | `inherit` | Override model: `gpt-5.4`, `gpt-5.4-mini`, `gpt-5.3-codex`, `gpt-5.1-codex-max`, `inherit` |
 
 ## When to Use Each Field
 
@@ -29,7 +28,7 @@ User sees: `/fix-issue [issue-number]`
 
 ### disable-model-invocation
 
-Prevents Claude from auto-triggering the skill. Only manual `/skill-name` works.
+Prevents Codex from auto-triggering the skill. Only manual `/skill-name` works.
 
 ```yaml
 ---
@@ -42,7 +41,7 @@ Use for: destructive operations, expensive API calls, operations requiring expli
 
 ### user-invocable
 
-Hides skill from `/` menu. Only Claude can invoke it programmatically.
+Hides skill from `/` menu. Only Codex can invoke it programmatically.
 
 ```yaml
 ---
@@ -53,19 +52,6 @@ user-invocable: false
 
 Use for: helper skills that shouldn't appear in user-facing menu, internal utilities.
 
-### allowed-tools
-
-Restricts which tools the skill can access.
-
-```yaml
----
-name: read-only-analyzer
-allowed-tools: Read, Grep, Glob
----
-```
-
-Use for: read-only analysis skills, security-conscious operations, preventing accidental edits.
-
 ### model
 
 Overrides the model used for this skill.
@@ -73,14 +59,20 @@ Overrides the model used for this skill.
 ```yaml
 ---
 name: quick-lookup
-model: haiku
+model: gpt-5.1-codex-max
 ---
 ```
 
 Options:
 - `inherit` — use orchestrator's model (default, recommended)
-- `sonnet` — fast, good for most tasks
-- `opus` — best quality, use for complex reasoning
-- `haiku` — fastest, use for simple lookups
+- `gpt-5.4-mini` — fast, good for most tasks
+- `gpt-5.4` — best quality, use for complex reasoning
+- `gpt-5.3-codex` — strong code generation, fallback for opus
+- `gpt-5.1-codex-max` — budget option for simple lookups
+
+Recommended profile mapping:
+- `tier_opus`: `gpt-5.4` (fallback `gpt-5.3-codex`)
+- `tier_sonnet`: `gpt-5.4-mini` (fallback `gpt-5.3-codex`)
+- `tier_haiku`: `gpt-5.4-mini` with low reasoning (fallback `gpt-5.1-codex-max`)
 
 Use sparingly. `inherit` is usually best.

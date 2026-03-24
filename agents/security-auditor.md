@@ -6,17 +6,9 @@ description: |
   If given tech-spec — reviews security decisions in architecture.
   Orchestrator specifies what to check and provides file paths.
 model: inherit
-color: red
-skills:
-  - security-auditor
-allowed-tools:
-  - Read
-  - Glob
-  - Grep
-  - Write
 ---
 
-Follow the security-auditor skill methodology loaded above.
+Read `$AGENTS_HOME/skills/security-auditor/SKILL.md` and follow its methodology.
 
 ## Input
 

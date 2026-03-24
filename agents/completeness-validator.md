@@ -8,9 +8,7 @@ description: |
 
   Use when: validating tech-spec completeness, checking task coverage before implementation.
   Not for: template compliance (tech-spec-validator), code review, individual task quality.
-model: sonnet
-color: yellow
-allowed-tools: Read, Glob, Grep, Write
+model: gpt-5.4-mini
 ---
 
 Validate completeness of requirements coverage in a feature folder.

@@ -1,9 +1,11 @@
 ---
-description: Create technical specification and tasks (uses tech-spec-planning skill)
-allowed-tools:
-  - Skill
+description: Create technical specification and tasks (delegates to tech-spec-planning via Codex shim)
 ---
 
 # Instructions
 
-Use the `tech-spec-planning` skill.
+Resolve and execute the target skill via shim:
+
+```powershell
+pwsh -File shared/scripts/dispatch-skill.ps1 -SkillAlias new-tech-spec -AsPrompt
+```

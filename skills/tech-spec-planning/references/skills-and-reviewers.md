@@ -3,6 +3,8 @@
 Single source of truth for selecting skills and reviewers in Implementation Tasks.
 Used by: tech-spec-planning (Phase 4), task-decomposition (Phase 1).
 
+Model tiers are defined in [model-profiles.md](model-profiles.md).
+
 ## Execution Skills
 
 | Skill | What it's for | Typical tasks |
@@ -26,15 +28,15 @@ Prompt tasks (LLM system prompts, user templates) use `prompt-master` skill — 
 
 ## Reviewer Agents
 
-| Agent | What it checks | Model |
-|-------|---------------|-------|
-| `code-reviewer` | Code quality: structure, patterns, naming, complexity, error handling | sonnet |
-| `security-auditor` | OWASP Top 10, injection, XSS, auth, input validation, secrets | sonnet |
-| `test-reviewer` | Test quality: coverage, meaningful assertions, test pyramid balance | sonnet |
-| `skill-checker` | Skill compliance: frontmatter, structure, skill-master guidelines | sonnet |
-| `prompt-reviewer` | Prompt quality: clarity, positive framing, examples over rules, compression, XML structure, success criteria | sonnet |
-| `infrastructure-reviewer` | Infrastructure setup quality: folder structure, pre-commit, Docker, .gitignore, testing | sonnet |
-| `deploy-reviewer` | CI/CD pipeline and deployment config quality: workflows, secrets, platform config | sonnet |
+| Agent | What it checks | Model tier |
+|-------|---------------|------------|
+| `code-reviewer` | Code quality: structure, patterns, naming, complexity, error handling | `tier_sonnet` |
+| `security-auditor` | OWASP Top 10, injection, XSS, auth, input validation, secrets | `tier_sonnet` |
+| `test-reviewer` | Test quality: coverage, meaningful assertions, test pyramid balance | `tier_sonnet` |
+| `skill-checker` | Skill compliance: frontmatter, structure, skill-master guidelines | `tier_sonnet` |
+| `prompt-reviewer` | Prompt quality: clarity, positive framing, examples over rules, compression, XML structure, success criteria | `tier_sonnet` |
+| `infrastructure-reviewer` | Infrastructure setup quality: folder structure, pre-commit, Docker, .gitignore, testing | `tier_sonnet` |
+| `deploy-reviewer` | CI/CD pipeline and deployment config quality: workflows, secrets, platform config | `tier_sonnet` |
 
 ## Skill → Reviewers Mapping
 

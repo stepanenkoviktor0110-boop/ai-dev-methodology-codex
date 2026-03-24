@@ -23,11 +23,11 @@ description: |
    **Working on a task?** Read all files listed in the task's "Context" section — it already specifies everything needed.
 
    **Standalone (no task file)?** Read (skip if missing):
-   - `.claude/skills/project-knowledge/references/project.md` — project overview
-   - `.claude/skills/project-knowledge/references/architecture.md` — system structure
-   - `.claude/skills/project-knowledge/references/patterns.md` — project conventions
+   - `.agents/skills/project-knowledge/references/project.md` — project overview
+   - `.agents/skills/project-knowledge/references/architecture.md` — system structure
+   - `.agents/skills/project-knowledge/references/patterns.md` — project conventions
 
-   Then read `.claude/skills/project-knowledge/SKILL.md` (if exists).
+   Then read `.agents/skills/project-knowledge/SKILL.md` (if exists).
    Consider which domain-specific guides are relevant to your task and read those
    (e.g., `architecture.md` Data Model section for DB work, `ux-guidelines.md` for UI tasks).
 
@@ -91,14 +91,14 @@ description: |
 
 4. **Run Reviews** (launch in parallel)
 
-   **Working as part of a team** (received reviewer instructions from team lead via SendMessage)? Follow team protocol instead of steps below — team lead manages reviewer flow.
+   **Working as part of a team** (received reviewer instructions from team lead via send_input)? Follow team protocol instead of steps below — team lead manages reviewer flow.
 
    **Reviewer selection:**
    - Working on a task file → run reviewers from the task's "Reviewers" section
    - Standalone (no task file) → default: code-reviewer, security-auditor, test-reviewer
 
    For each reviewer:
-   1. Spawn subagent via Task tool (subagent_type = reviewer name, e.g. `code-reviewer`)
+   1. Spawn subagent via spawn_agent tool (agent_type = reviewer name, e.g. `code-reviewer`)
    2. Pass: git diff of changes, path to task file, path to tech-spec, path to user-spec
    3. Reviewer loads its own skill automatically (via agent frontmatter `skills:`)
    4. Report path: from the task's "Reviewers" section (or `logs/working/` if standalone)

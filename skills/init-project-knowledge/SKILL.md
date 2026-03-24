@@ -4,8 +4,8 @@ description: Первичное заполнение документации п
 
 # Instructions
 
-Load and execute `project-planning` skill.
+Resolve and execute `project-planning` via Codex shim.
 
-```
-Skill(project-planning)
+```powershell
+pwsh -File shared/scripts/dispatch-skill.ps1 -SkillAlias init-project-knowledge -AsPrompt
 ```

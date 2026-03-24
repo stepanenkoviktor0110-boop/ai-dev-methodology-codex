@@ -1,7 +1,7 @@
 # [Название проекта]
 
 > **Это README для владельца проекта**, а не для AI-агентов.
-> Инструкции для агентов находятся в CLAUDE.md и .claude/skills/project-knowledge/references/
+> Инструкции для агентов находятся в AGENTS.md и .agents/skills/project-knowledge/references/
 
 ## О проекте
 
@@ -10,10 +10,9 @@
 ## Структура проекта
 
 ```
-.claude/                    # База знаний для AI-агентов
-├── skills/
-│   └── project-knowledge/  # Project docs (architecture, patterns, etc.)
-└── ...
+.agents/                   # Скиллы и знания для AI-агентов
+└── skills/
+    └── project-knowledge/  # Project docs (architecture, patterns, etc.)
 
 backlog.md        # Идеи фич и баги (что делать потом)
 work/             # Активные фичи и баги (что делаем сейчас)

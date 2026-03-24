@@ -118,13 +118,13 @@ One task per session. Suited for manual, controlled execution.
 
 #### Mode B: Full Feature — `/do-feature`
 
-All tasks via agent teams. Team lead orchestrates waves of parallel work.
+All tasks via coordinated agent waves. One orchestrator manages parallel workers and reviewers.
 
 **Process:**
 - Team lead reads tech-spec and all task files, builds execution plan
 - Checks `checkpoint.yml` — if resuming after context compaction or new session, skips completed waves (uses decisions.md as source of truth for what actually completed)
 - Reads `session-plan.md` for session boundaries — stops at session boundary, generates prompt for next session
-- Creates team via TeamCreate
+- Spawns workers/reviewers via `spawn_agent` and coordinates via `wait_agent`/`send_input`
 - Executes tasks wave by wave:
   - Spawns one agent per task (parallel within wave)
   - Each teammate: follows loaded skill workflow, runs smoke verification if task has Verify-smoke (before reviews), commits code (tests pass), sends diff to reviewers, fixes findings with commits per round (max 3 rounds), commits review reports
@@ -134,7 +134,7 @@ All tasks via agent teams. Team lead orchestrates waves of parallel work.
 - **Ad-hoc agents**: when lead needs work outside planned tasks (fixing audit findings, escalations), assigns matching skill + reviewers based on work type
 - **Final Wave**: QA (always), deploy + post-deploy (if applicable)
 - **Escalation**: after 3 failed fix rounds — stop, report to user, write decisions.md entry, wait for decision
-- User reviews results, team shuts down, `checkpoint.yml` deleted
+- User reviews results, active agents are closed, `checkpoint.yml` deleted
 
 Tasks can be code, user-action, deploy, config, or verification. Task nature is determined by its skill + description, not a separate type field.
 
@@ -153,7 +153,7 @@ Tasks can be code, user-action, deploy, config, or verification. Task nature is 
 - Each entry: Problem → Cause → Solution → Rule for the future
 - Adds link to `lessons-learned.md` in target skill's SKILL.md (if not yet linked)
 
-**Output:** entries in `~/.claude/skills/{skill}/references/lessons-learned.md`
+**Output:** entries in `$AGENTS_HOME/skills/{skill}/references/lessons-learned.md`
 
 **Skill:** `retrospective`
 
@@ -175,7 +175,7 @@ Tasks can be code, user-action, deploy, config, or verification. Task nature is 
 
 ### Project Knowledge — the Knowledge Base
 
-All project documentation lives in `.claude/skills/project-knowledge/references/`. This is the single source of truth for everything about the project.
+All project documentation lives in `.agents/skills/project-knowledge/references/`. This is the single source of truth for everything about the project.
 
 **4 core + optional files:**
 
@@ -189,7 +189,7 @@ All project documentation lives in `.claude/skills/project-knowledge/references/
 
 Features and roadmap live in the project backlog (external to PK).
 
-**CLAUDE.md is minimal.** It contains only the project name, a reference to project-knowledge skill, methodology overview, and default branch. All real information lives in Project Knowledge files.
+**AGENTS.md is minimal.** It contains only the project name, a reference to project-knowledge skill, methodology overview, and default branch. All real information lives in Project Knowledge files.
 
 **`project-planning` skill** creates PK from scratch in new projects via interview (`/init-project-knowledge`).
 
@@ -211,17 +211,17 @@ work/{feature}/
 
 Completed features are archived to `work/completed/{feature}/`.
 
-### Global Structure `~/.claude/`
+### Global Structure `$AGENTS_HOME/` (`~/.agents/`)
 
 ```
-~/.claude/
+$AGENTS_HOME/              # Default: ~/.agents/
 ├── skills/               # Skills (methodology, workflow, quality)
 ├── agents/               # Agents (validators, reviewers, creators)
-├── commands/             # Slash commands
 ├── shared/               # Templates, scripts, interview plans
-├── hooks/                # Automation hooks
-└── CLAUDE.md             # Global instructions
+└── AGENTS.md             # Global instructions
 ```
+
+Configuration lives separately in `~/.codex/config.toml` (Codex standard).
 
 ---
 
@@ -249,7 +249,7 @@ Write specifications before code. The hierarchy: User Spec → Tech Spec → Tas
 Max 3 fix iterations at each stage.
 
 ### Project Knowledge as Single Source of Truth
-Project documentation = `.claude/skills/project-knowledge/references/`. CLAUDE.md stays minimal — just a pointer. The `/done` command updates PK after every feature. The `documentation-writing` skill audits PK for bloat and quality.
+Project documentation = `.agents/skills/project-knowledge/references/`. AGENTS.md stays minimal — just a pointer. The `/done` command updates PK after every feature. The `documentation-writing` skill audits PK for bloat and quality.
 
 ### Just-In-Time Context
 Agent reads only what's needed for current task, not everything. Task files list their Context Files explicitly.
@@ -258,10 +258,10 @@ Agent reads only what's needed for current task, not everything. Task files list
 Agent uses Context7 MCP to fetch current library documentation instead of relying on training data. Used during tech-spec research and code implementation.
 
 ### Session Planning
-Task decomposition groups waves into sessions by LOC budget (~1200 lines per session, empirically sized to fit within a single Claude Code session context window). At session boundary, execution stops and generates a precise prompt for the next session — including feature context, completed progress, next session's tasks, and relevant context files. This keeps each session's context window clean and focused. Audit Wave + Final Wave are always grouped into the last session.
+Task decomposition groups waves into sessions by LOC budget (~1200 lines per session, empirically sized to fit within a single Codex session context window). At session boundary, execution stops and generates a precise prompt for the next session — including feature context, completed progress, next session's tasks, and relevant context files. This keeps each session's context window clean and focused. Audit Wave + Final Wave are always grouped into the last session.
 
 ### Checkpoint Recovery
-Feature execution persists state to `checkpoint.yml` after each wave. A `SessionStart(compact)` hook detects context compaction during long feature executions and injects recovery context — the lead resumes from the next pending wave using checkpoint + decisions.md as source of truth.
+Feature execution persists state to `checkpoint.yml` after each wave. A `SessionStart` hook (configured in `~/.codex/config.toml`) injects checkpoint context at session start — the lead resumes from the next pending wave using checkpoint + decisions.md as source of truth.
 
 ---
 
@@ -282,7 +282,7 @@ Feature execution persists state to `checkpoint.yml` after each wave. A `Session
 |-------|---------|
 | `code-writing` | TDD cycle: plan → tests → code → review |
 | `prompt-master` | LLM prompt engineering: write, improve, verify prompts |
-| `feature-execution` | Team lead dispatches agents by wave; teammates commit own code, lead commits statuses |
+| `feature-execution` | Orchestrator dispatches workers/reviewers by wave; workers commit code, orchestrator commits statuses |
 | `pre-deploy-qa` | Pre-deploy acceptance testing: tests + acceptance criteria |
 | `post-deploy-qa` | Post-deploy verification on live environment via MCP tools |
 

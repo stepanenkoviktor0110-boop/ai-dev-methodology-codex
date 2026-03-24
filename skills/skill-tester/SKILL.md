@@ -1,9 +1,9 @@
 ---
 name: skill-tester
 description: |
-  Execute test scenarios prepared by skill-test-designer. Spawns parallel
-  runners with and without the skill, interacts as user persona, grades
-  acceptance criteria, produces detailed test report.
+  Execute test scenarios prepared by skill-test-designer. Runs parallel
+  runners with and without the skill, grades acceptance criteria, and
+  produces a report.
 
   Use when: "запусти тесты для скилла", "run skill tests", "execute skill
   scenarios", "проверь скилл тестами"
@@ -11,153 +11,99 @@ description: |
 
 # Skill Tester
 
-Execute test scenarios prepared by skill-test-designer.
-You are team lead, user actor, and grader — all in one.
+Use only supported Codex primitives:
+- `spawn_agent`
+- `wait_agent`
+- `send_input`
+- `close_agent`
+
+Do not use team APIs, TaskOutput APIs, or run_in_background flags.
 
 ## Input
 
-Scenario files at: `~/.claude/skill-tests/{skill-name}/scenarios/`
-If no scenarios found → tell user to run skill-test-designer first.
+Scenario files: `$AGENTS_HOME/skill-tests/{skill-name}/scenarios/`
+If missing -> ask user to run `skill-test-designer`.
 
 ## Phase 1: Prepare
 
-1. Read ALL scenario files from the scenarios directory
-2. Read the target skill's SKILL.md + key references
-   You need to deeply understand what the skill instructs agents to do:
-   - Which phases must agents follow and in what order?
-   - Which references must agents read?
-   - What outputs must agents produce?
-   - What checkpoints must agents hit?
-3. Read the persona from scenarios (your acting role)
-4. If anything is unclear — ask the user before proceeding
+1. Read all scenario files.
+2. Read tested skill (`SKILL.md` + referenced files).
+3. Extract:
+   - required phases
+   - required references
+   - expected outputs
+   - acceptance criteria
+   - test model profile per scenario
 
-**Checkpoint:** You can list all scenarios, the skill's phases, required
-references, expected outputs, and your persona. If any are unclear, resolve
-before proceeding.
+## Phase 2: Execution Plan
 
-## Phase 2: Setup
+Per scenario:
+- 2 runners with skill
+- 1 baseline runner without skill
+- run runners in parallel, scenarios sequentially
 
-1. TeamCreate(team_name="skill-test-{skill-name}")
-2. Plan: per scenario = 2 runners with skill + 1 baseline without skill
-3. Scenarios run sequentially. Runners within a scenario run in parallel.
-4. Show plan to user: "I'll run {N} scenarios, {M} runners total.
-   Model: {model from scenarios}. Proceed?"
+Model selection:
+- complex/coding scenarios -> `tier_opus` (`gpt-5.4`)
+- medium scenarios -> `tier_sonnet` (`gpt-5.4-mini`)
+- simple deterministic scenarios -> `tier_haiku` (`gpt-5.4-mini`, low reasoning)
 
-**Checkpoint:** User confirmed the execution plan. Team created.
-
-## Phase 3: Execute
-
-For each scenario:
+## Phase 3: Run Scenario
 
 ### 3a. Spawn runners
-Spawn 2 runners that load the tested skill:
-- Prompt = scenario's task prompt (natural, as user would write)
-- Each runner: `Skill(skill="{tested-skill-name}")`
-- Model: as specified in scenario file
-- Use `run_in_background: true`
 
-Spawn 1 baseline runner:
-- Same task prompt
-- Receives no skill to load
-- Same model, same `run_in_background: true`
+Spawn three agents with the same task prompt:
+- `runner_a` (with skill context)
+- `runner_b` (with skill context)
+- `baseline` (without skill context)
 
-Save each runner's task_id from the spawn result. You need these to
-retrieve full transcripts for grading.
+Track returned `agent_id`s.
 
-### 3b. Interact as user
-Runners will send you questions. Answer in character per the scenario's
-persona. Rules:
-- Stay in character: answer as the user would
-- Be consistent: same question from different runners → same answer
-- Answer naturally, as a real user would — without guidance toward any
-  specific behavior
-- Keep conversation purely about the task itself (the feature, the question,
-  the request)
-- Baseline runner may ask different questions (no skill to guide it) — this
-  is expected, answer them too
+### 3b. Interactive loop
 
-### 3c. Grade via grader agents
+If runner asks clarification:
+1. reply in scenario persona via `send_input`
+2. keep answers consistent across runners
 
-When all 3 runners finish, DO NOT read transcripts yourself — they are too
-large and will fill your context. Instead, spawn grader agents (one per
-runner) that read transcripts and return structured evaluations.
+When each runner reports done, collect:
+- output summary
+- file paths created/modified
+- verification commands executed
 
-For each runner, spawn a grader via Task (not a team member, just a
-subagent). Each grader receives:
+### 3c. Grade with grader agents
 
-1. The runner's task_id (grader calls `TaskOutput(task_id)` to get the full
-   transcript with every tool call: Read, Grep, Write, WebFetch, Bash, Skill)
-2. The scenario's acceptance criteria (copy the criteria list into the prompt)
-3. The skill's SKILL.md path (grader reads it for compliance check)
-4. Whether this is a skill-runner or baseline
+Spawn one grader per runner (`tier_sonnet`).
+Pass grader:
+- runner final message
+- runner output files (read by grader)
+- scenario acceptance criteria
+- skill requirements checklist
 
-Grader returns a structured evaluation:
+Each grader returns structured result:
+- criterion verdicts with evidence
+- phase compliance
+- references actually read
+- final verdict
 
-```
-## Acceptance Criteria
-| # | Criterion | Verdict | Evidence |
-|---|-----------|---------|----------|
-| 1 | WebFetch  | PASS    | "Tool call #3: WebFetch(url='https://...')" |
-| 2 | Read INDEX| PASS    | "Tool call #7: Read('vault/knowledge/INDEX.md')" |
+### 3d. Consolidate
 
-## Skill Compliance
-| Phase | Executed | Evidence |
-|-------|----------|----------|
-| 1. WebFetch | YES | call #3 |
-| 2. Topic routing | YES | call #7: Read INDEX.md |
-
-## References Read
-- TAGS.md: YES (call #9)
-- notes.md: NO (never read)
-
-## Files Created
-- vault/knowledge/example.md — frontmatter: {type, tags, source, created}
-```
-
-Grader rules (include in grader prompt):
-- **PASS** requires clear evidence: a specific tool call, file content, or
-  message. Quote it directly.
-- **FAIL** when no evidence found, evidence contradicts criterion, or only
-  surface compliance (correct format, wrong substance).
-- **When uncertain: FAIL.** Burden of proof is on the criterion.
-- For process criteria: cite specific tool calls with arguments
-- For outcome criteria: cite file content (read the created files)
-- For compliance criteria: cite Bash calls for scripts
-
-Spawn all 3 graders in parallel (one per runner). Wait for all to return.
-
-### 3d. Compile results
-
-You now have 3 structured evaluations (one per runner). Do NOT re-read
-transcripts. Using only the grader outputs:
-
-1. Build the results table (criteria × runners)
-2. Cross-runner consistency: where did skill-runners diverge?
-3. Baseline comparison:
-   - Passed by skill-runners ONLY → skill adds value
-   - Passed by ALL → criterion too easy or skill doesn't help
-   - Failed by ALL → criterion may be unrealistic
-   - Passed by baseline ONLY → skill might be harmful
-4. Identify skill issues and ambiguities
-
-### 3e. Cleanup
-Shutdown all runners for this scenario.
+Build comparison:
+- skill-runners only pass -> skill adds value
+- everyone passes -> scenario too easy or skill neutral
+- everyone fails -> criterion unrealistic or task unclear
+- baseline only pass -> skill likely harmful
 
 ## Phase 4: Report
 
-Compile results from all scenarios following
-[report-template.md](references/report-template.md).
+Generate report from `references/report-template.md`.
+Save to:
+`$AGENTS_HOME/skill-tests/{skill-name}/reports/{timestamp}-report.md`
 
-Save to: `~/.claude/skill-tests/{skill-name}/reports/{timestamp}-report.md`
-Show report to user.
-TeamDelete.
+After report delivery, close all runner/grader agents.
 
 ## Self-Verification
 
-- [ ] All scenarios executed (2 skill-runners + 1 baseline each)
-- [ ] Grader agents used for transcript analysis (not read by lead directly)
-- [ ] Every criterion graded with cited evidence from tool call transcripts
-- [ ] Skill compliance checked for each runner
-- [ ] Baseline comparison completed per criterion
-- [ ] Report saved to expected path and shown to user
-- [ ] Team deleted after report delivery
+- [ ] All scenarios executed
+- [ ] 2 skill-runners + 1 baseline per scenario
+- [ ] Criteria graded with evidence
+- [ ] Skill compliance checked
+- [ ] Report saved and shown

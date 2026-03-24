@@ -12,7 +12,7 @@ secrets/
 *secret*
 
 # Local settings (not shared)
-.claude/settings.local.json
+.codex/*.local.toml
 
 # Dependencies
 node_modules/

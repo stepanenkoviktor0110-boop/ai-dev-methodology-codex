@@ -1,10 +1,10 @@
 # Procedural Skills
 
-Procedural skills guide Claude through a strict sequence of phases where order matters. This reference covers patterns specific to procedural skills.
+Procedural skills guide Codex through a strict sequence of phases where order matters. This reference covers patterns specific to procedural skills.
 
 ## Explicit Steps + Phase Checkpoints
 
-"Analyze appropriately" — bad. Claude doesn't know what specifically to do.
+"Analyze appropriately" — bad. Codex doesn't know what specifically to do.
 
 Break into explicit steps. For each phase — checkpoint:
 

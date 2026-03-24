@@ -10,7 +10,7 @@ description: |
 
 ## About Skills
 
-Skills are modular, self-contained packages that extend Claude's capabilities by providing specialized knowledge, workflows, and tools. Think of them as "onboarding guides" for specific domains or tasks—they transform Claude from a general-purpose agent into a specialized agent equipped with procedural knowledge that no model can fully possess.
+Skills are modular, self-contained packages that extend Codex's capabilities by providing specialized knowledge, workflows, and tools. Think of them as "onboarding guides" for specific domains or tasks—they transform Codex from a default agent into a specialized agent equipped with procedural knowledge that no model can fully possess.
 
 ### What Skills Provide
 
@@ -21,7 +21,7 @@ Skills are modular, self-contained packages that extend Claude's capabilities by
 
 ## Skill Types
 
-There are two types of skills based on how they guide Claude's work.
+There are two types of skills based on how they guide Codex's work.
 
 ### Procedural Skills
 
@@ -86,7 +86,7 @@ skill-name/
 
 #### Description Best Practices
 
-Claude uses description to decide when to auto-invoke the skill. Be specific and include key terms.
+Codex uses description to decide when to auto-invoke the skill. Be specific and include key terms.
 
 **Template:**
 ```yaml
@@ -110,7 +110,7 @@ Why bad: Vague phrases ("work with docs"), no specific triggers.
 **Good:**
 ```yaml
 description: |
-  Manage .claude/skills/project-knowledge/ docs: create, check, update.
+  Manage .agents/skills/project-knowledge/ docs: create, check, update.
 
   Use when: "заполни документацию", "создай документацию", "проверь документацию", "обнови документацию"
 ```
@@ -143,7 +143,7 @@ Executable code (Python/Bash/etc.) for tasks that require deterministic reliabil
 - **When to include**: When the same code is being rewritten repeatedly or deterministic reliability is needed
 - **Example**: `scripts/rotate_pdf.py` for PDF rotation tasks
 - **Benefits**: Token efficient, deterministic, may be executed without loading into context
-- **Note**: Scripts may still need to be read by Claude for patching or environment-specific adjustments
+- **Note**: Scripts may still need to be read by Codex for patching or environment-specific adjustments
 
 **Concrete example:** When building a `pdf-editor` skill for queries like "Help me rotate this PDF":
 1. Rotating a PDF requires re-writing the same code each time
@@ -208,12 +208,12 @@ Quality principles...
 
 #### Assets (`assets/`)
 
-Files not intended to be loaded into context, but rather used within the output Claude produces.
+Files not intended to be loaded into context, but rather used within the output Codex produces.
 
 - **When to include**: When the skill needs files that will be used in the final output
 - **Examples**: `assets/logo.png` for brand assets, `assets/slides.pptx` for PowerPoint templates, `assets/frontend-template/` for HTML/React boilerplate
 - **Use cases**: Templates, images, icons, boilerplate code, fonts, sample documents that get copied or modified
-- **Benefits**: Separates output resources from documentation, enables Claude to use files without loading them into context
+- **Benefits**: Separates output resources from documentation, enables Codex to use files without loading them into context
 
 **Concrete example:** When designing a `frontend-webapp-builder` skill for queries like "Build me a todo app":
 1. Writing a frontend webapp requires the same boilerplate HTML/React each time
@@ -223,9 +223,9 @@ Files not intended to be loaded into context, but rather used within the output 
 
 ### Concise is Key
 
-The context window is a public good. Skills share the context window with everything else Claude needs: system prompt, conversation history, other Skills' metadata, and the actual user request.
+The context window is a public good. Skills share the context window with everything else Codex needs: system prompt, conversation history, other Skills' metadata, and the actual user request.
 
-**Default assumption: Claude is already very smart.** Only add context Claude doesn't already have. Challenge each piece of information: "Does Claude really need this explanation?" and "Does this paragraph justify its token cost?"
+**Default assumption: Codex is already very smart.** Only add context Codex doesn't already have. Challenge each piece of information: "Does Codex really need this explanation?" and "Does this paragraph justify its token cost?"
 
 Prefer concise examples over verbose explanations.
 
@@ -239,7 +239,7 @@ Match the level of specificity to the task's fragility and variability:
 
 **Low freedom (specific scripts, few parameters)**: Use when operations are fragile and error-prone, consistency is critical, or a specific sequence must be followed.
 
-Think of Claude as exploring a path: a narrow bridge with cliffs needs specific guardrails (low freedom), while an open field allows many routes (high freedom).
+Think of Codex as exploring a path: a narrow bridge with cliffs needs specific guardrails (low freedom), while an open field allows many routes (high freedom).
 
 ### Progressive Disclosure
 
@@ -247,7 +247,7 @@ Skills use a three-level loading system to manage context efficiently:
 
 1. **Metadata (name + description)** — Always in context (~100 words)
 2. **SKILL.md body** — When skill triggers (<5k words)
-3. **Bundled resources** — As needed by Claude (unlimited, scripts execute without reading)
+3. **Bundled resources** — As needed by Codex (unlimited, scripts execute without reading)
 
 Keep SKILL.md body under 500 lines. Split content into separate files when approaching this limit. When splitting, reference them from SKILL.md and describe clearly when to read them.
 
@@ -269,7 +269,7 @@ Extract text with pdfplumber:
 For complete API reference, see [REFERENCE.md](REFERENCE.md) — all methods with examples.
 ```
 
-Claude loads FORMS.md or REFERENCE.md only when needed.
+Codex loads FORMS.md or REFERENCE.md only when needed.
 
 **Pattern 2: Domain-specific organization**
 
@@ -314,14 +314,14 @@ For tracked changes, see [REDLINING.md](REDLINING.md) — revision marks, accept
 
 ### Positive over Negative
 
-Claude follows positive instructions better. Negative ("don't do X") often ignored.
+Codex follows positive instructions better. Negative ("don't do X") often ignored.
 
 **Bad:** "Don't use bullet points. Never include examples. Avoid long explanations."
 **Good:** "Write in prose paragraphs. Keep explanations to 2-3 sentences."
 
 ### Add Motivation
 
-When Claude understands WHY a rule matters, it follows more reliably.
+When Codex understands WHY a rule matters, it follows more reliably.
 
 **Bad:** "Always return JSON format."
 **Good:** "Return findings as JSON. Reason: orchestrator parses this automatically. Invalid JSON crashes pipeline."
@@ -362,7 +362,7 @@ If skill has context-heavy tasks (reviews, research, validation):
 
 1. **Inline prompts** — for simple, one-off tasks (<50 lines):
    ```
-   Use general-purpose/explore/plan subagent to find all TypeScript files importing {module}
+   Use default/explore/plan subagent to find all TypeScript files importing {module}
    ```
 
 2. **Skill + Agent pattern** — for complex, reusable tasks (>50 lines):
@@ -386,7 +386,7 @@ Use skill-checker subagent to validate the skill at {path}.
 If issues found → fix them → run skill-checker again.
 ```
 
-skill-checker is defined in `~/.claude/agents/skill-checker.md` and has skill-master preloaded.
+skill-checker is defined in `$AGENTS_HOME/agents/skill-checker.md` and has skill-master preloaded.
 
 ### Self-Check Before Validation
 

@@ -8,11 +8,11 @@ The orchestrator's context window is limited. Loading a skill, conversation hist
 
 **Solution:** Delegate heavy work to subagents. Each runs in isolated context, performs its task, and returns a structured result. The orchestrator receives only what it needs.
 
-**Impact:** According to Anthropic research, multi-agent systems with Claude Opus orchestrator and Claude Sonnet subagents outperform single-agent Claude Opus by 90.2% on research tasks.
+**Impact:** Research shows multi-agent systems with orchestrator + specialized subagents significantly outperform single-agent approaches on complex tasks.
 
 ## Orchestration Rules
 
-Subagents cannot call other subagents — Claude Code supports only one level of orchestration. Nested calls fail silently:
+Subagents cannot call other subagents — Codex supports only one level of orchestration. Nested calls fail silently:
 
 ```
 Orchestrator (main skill)
@@ -39,19 +39,19 @@ If subagent needs more work → return to orchestrator → orchestrator launches
 
 ## Inline Agents (Ad-hoc Tasks)
 
-For simple, one-off tasks — use Task tool with built-in subagent types:
+For simple, one-off tasks — use spawn_agent tool with built-in subagent types:
 
 ```markdown
-Use Explore subagent to find all files related to authentication
-Use general-purpose subagent to analyze the error and suggest fixes
-Use Plan subagent to design implementation approach for {feature}
+Use explorer agent to find all files related to authentication
+Use default subagent to analyze the error and suggest fixes
+Use default agent (planning-focused prompt) to design implementation approach for {feature}
 ```
 
-The orchestrator calls Task tool with arbitrary prompt and `subagent_type`. No agent file needed.
+The orchestrator calls spawn_agent tool with arbitrary prompt and `agent_type`. No agent file needed.
 
 **Built-in subagent types:**
 - `Explore` — fast codebase exploration, file search, pattern matching
-- `general-purpose` — flexible tasks, research, analysis
+- `default` — flexible tasks, research, analysis
 - `Plan` — designing implementation approaches
 
 **When to use:**
@@ -93,12 +93,9 @@ description: Code review methodology and quality standards.
 ---
 name: code-reviewer
 description: Review code quality after implementation.
-color: blue
-skills:
-  - code-reviewing    # Full SKILL.md content loaded
-allowed-tools: Read, Glob, Grep
+model: inherit
 ---
-Follow code-reviewing methodology.
+Read `$AGENTS_HOME/skills/code-reviewing/SKILL.md` and follow its methodology.
 
 ## Output
 { "findings": [...], "summary": {...} }
@@ -112,29 +109,28 @@ Follow code-reviewing methodology.
 
 ## Agent File Format
 
-Agent files use YAML frontmatter + Markdown body. Store in `~/.claude/agents/{name}.md`.
+Agent files use YAML frontmatter + Markdown body. Store in `$AGENTS_HOME/agents/{name}.md`.
 
 ```yaml
 ---
 name: agent-name
 description: |
-  When Claude should delegate to this agent. Include:
+  When Codex should delegate to this agent. Include:
   - Purpose and capabilities
   - Example triggers
   - What NOT to use it for
-color: blue
-skills:
-  - methodology-skill
-allowed-tools: Read, Glob, Grep
+model: inherit
 ---
 
 # Agent Instructions
+
+Read `$AGENTS_HOME/skills/{methodology-skill}/SKILL.md` and follow its methodology.
 
 ## Input
 [What the agent receives from the orchestrator]
 
 ## Process
-[Step-by-step methodology — or reference preloaded skill]
+[Step-by-step methodology — or reference the skill read above]
 
 ## Output
 [Output contract: JSON schema, file changes, or actions]
@@ -145,31 +141,15 @@ allowed-tools: Read, Glob, Grep
 | Field | Description |
 |-------|-------------|
 | `name` | Unique identifier (kebab-case) |
-| `description` | When/why to use — Claude reads this to decide delegation |
-| `color` | Badge color for visual identification (see below) |
-| `skills` | Skill(s) to preload — agent must have methodology from skill |
-
-### Color Recommendations
-
-All agents must have a color for visual identification. Valid values: `red`, `blue`, `green`, `yellow`, `purple`, `orange`, `pink`, `cyan`.
-
-| Color | Agent Type |
-|-------|------------|
-| blue/cyan | Analysis, review (code-reviewer, test-reviewer) |
-| red | Security, critical (security-auditor) |
-| yellow | Validation, caution (skill-checker, schema-validator) |
-| green | Success-oriented, exploration (Explore) |
-| purple/pink | Creative, generation, research |
-| orange | Infrastructure, deployment |
+| `description` | When/why to use — Codex reads this to decide delegation |
 
 ### Optional Fields
 
 | Field | Default | Description |
 |-------|---------|-------------|
-| `model` | `inherit` | Always use `inherit` to match orchestrator's model |
-| `allowed-tools` | All tools | Restrict to necessary tools (e.g., `Read, Glob, Grep`) |
-| `permissionMode` | `default` | Permission handling: `default`, `acceptEdits`, `bypassPermissions`, `plan` |
-| `hooks` | None | Lifecycle hooks for validation |
+| `model` | `inherit` | Model override: `gpt-5.4`, `gpt-5.4-mini`, `gpt-5.3-codex`, `inherit` |
+| `model_reasoning_effort` | — | Reasoning level: `low`, `medium`, `high` |
+| `sandbox_mode` | `workspace-write` | Sandbox: `read-only`, `workspace-write`, `danger-full-access` |
 
 ## Output Contracts
 
@@ -223,7 +203,7 @@ Resume agent {agentId} to ask follow-up question about findings
 
 ## Writing Effective Descriptions
 
-The `description` field is critical — Claude uses it to decide when to delegate. Include:
+The `description` field is critical — Codex uses it to decide when to delegate. Include:
 
 1. **Purpose** — what the agent does
 2. **Triggers** — when to use (with examples)
@@ -275,17 +255,17 @@ Use `code-reviewer` subagent with:
 2. **Restrict tools** — Most agents only need `Read, Glob, Grep`
 3. **Use `model: inherit`** — Ensures maximum quality from orchestrator's model
 4. **Always preload skill** — Agent must have methodology, not just output format
-5. **Include examples in description** — Helps Claude know when to invoke
+5. **Include examples in description** — Helps Codex know when to invoke
 6. **One level of orchestration** — Subagents cannot call other subagents
 
 ## Example Agents
 
 See existing agents for full examples:
-- `~/.claude/agents/code-reviewer.md` — Detailed methodology with review dimensions
-- `~/.claude/agents/security-auditor.md` — OWASP-based security analysis
-- `~/.claude/agents/skill-checker.md` — Skill validation against standards
+- `$AGENTS_HOME/agents/code-reviewer.md` — Detailed methodology with review dimensions
+- `$AGENTS_HOME/agents/security-auditor.md` — OWASP-based security analysis
+- `$AGENTS_HOME/agents/skill-checker.md` — Skill validation against standards
 
 ## References
 
-- [Create custom subagents - Claude Code Docs](https://code.claude.com/docs/en/sub-agents)
-- [Multi-agent research system - Anthropic](https://www.anthropic.com/engineering/multi-agent-research-system)
+- [Subagents — Codex Docs](https://developers.openai.com/codex/subagents)
+- [Agent Skills — Codex Docs](https://developers.openai.com/codex/skills)

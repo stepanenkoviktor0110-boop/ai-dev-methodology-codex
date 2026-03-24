@@ -26,7 +26,7 @@ Execute a spec-driven task with validation and status tracking.
 2. Follow loaded skill workflow
 3. Git commit implementation (code + tests pass): `feat|fix|refactor: task {N} — {brief description}`
 4. For each reviewer from the task's "Reviewers" section (if present):
-   1. Spawn subagent via Task tool (subagent_type = reviewer name, e.g. `code-reviewer`)
+   1. Spawn subagent via spawn_agent tool (agent_type = reviewer name, e.g. `code-reviewer`)
    2. Pass: git diff of changes, path to task file, path to tech-spec, path to user-spec
    3. Reviewer loads its own skill automatically (via agent frontmatter `skills:`)
    4. Report is written to the path specified in the task's "Reviewers" section
@@ -43,20 +43,20 @@ Execute a spec-driven task with validation and status tracking.
 
 ## Step 4: Complete
 
-1. Read template `~/.claude/shared/work-templates/decisions.md.template` and write a concise execution report to `work/{feature}/decisions.md`. Follow template format strictly — no extra sections.
+1. Read template `$AGENTS_HOME/shared/work-templates/decisions.md.template` and write a concise execution report to `work/{feature}/decisions.md`. Follow template format strictly — no extra sections.
 2. Update task frontmatter: `status: in_progress` → `status: done`
 3. Update tech-spec: `- [ ] Task N` → `- [x] Task N`
 4. Git commit: `chore: complete task {N} — update status and decisions`
 5. **Session boundary check** (skip if `work/{feature}/logs/session-plan.md` does not exist):
    Read session-plan.md. Find which session this task belongs to.
    - If this task is the **last task of current session** (all session's tasks are now `done`):
-     Generate next-session prompt from `~/.claude/shared/work-templates/session-prompt.md.template`.
+     Generate next-session prompt from `$AGENTS_HOME/shared/work-templates/session-prompt.md.template`.
      Save to `work/{feature}/logs/next-session-prompt.md`.
      Present to user:
      ```
      Сессия {N} из {total} завершена.
 
-     Рекомендую начать новую сессию Claude Code и вставить этот промт:
+     Рекомендую начать новую сессию Codex и вставить этот промт:
 
      ---
      {generated prompt content}

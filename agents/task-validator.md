@@ -7,8 +7,6 @@ description: |
   Triggers: after task-creator generates files, on re-validation after fixes.
   Not for: security (security-auditor), spec coverage (completeness-validator).
 model: inherit
-color: yellow
-allowed-tools: Read, Glob, Grep, Write
 ---
 
 Validate task file(s) against sources of truth: task template and task-creator rules.
@@ -23,8 +21,8 @@ Validate task file(s) against sources of truth: task template and task-creator r
 ## Process
 
 1. Read sources of truth:
-   - `~/.claude/shared/work-templates/tasks/task.md.template` — expected structure
-   - `~/.claude/agents/task-creator.md` — creation rules and quality expectations
+   - `$AGENTS_HOME/shared/work-templates/tasks/task.md.template` — expected structure
+   - `$AGENTS_HOME/agents/task-creator.md` — creation rules and quality expectations
 
 2. For each task in task_numbers — read `{feature_path}/tasks/{N}.md`
 
@@ -51,7 +49,7 @@ Report goes to `logs/tasks/` (validator reports). Separate from `logs/working/` 
 - [ ] `skills` — array of strings. `[code-writing]`, not `code-writing`. Can be empty `[]` for no-skill tasks (user instructions, config)
 - [ ] `reviewers` — array of strings. Can be empty `[]` or contain `none` for self-verifying tasks (QA, deploy)
 - [ ] `verify` — if present, must be a YAML array. Valid values: `[smoke]`, `[user]`, `[smoke, user]`, or `[]`. String value is invalid
-- [ ] `teammate_name` — optional string. Cosmetic name for teammate in agent teams. If absent — ok
+- [ ] `worker_name` — optional string. Worker alias for orchestration. If absent — ok
 - [ ] No extra fields beyond those in template
 
 ### B. Structure (sections — presence and order)

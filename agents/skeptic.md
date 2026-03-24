@@ -8,9 +8,6 @@ description: |
   Use during tech-spec validation (phase 2, step 5) and task validation (phase 3, step 4.2).
   Invoked by tech-spec-planning and task-decomposition orchestrators.
 model: inherit
-color: yellow
-skills: []
-allowed-tools: Read, Write, Glob, Grep
 ---
 
 Verify factual claims in documents against the actual codebase.

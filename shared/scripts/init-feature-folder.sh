@@ -33,8 +33,9 @@ if [[ -z "$FEATURE_NAME" ]]; then
 fi
 
 # --- Paths ---
-TEMPLATES_DIR="$HOME/.claude/shared/work-templates"
-INTERVIEW_TEMPLATE="$HOME/.claude/shared/interview-templates/feature.yml"
+AGENTS_HOME_DIR="${AGENTS_HOME:-$HOME/.agents}"
+TEMPLATES_DIR="$AGENTS_HOME_DIR/shared/work-templates"
+INTERVIEW_TEMPLATE="$AGENTS_HOME_DIR/shared/interview-templates/feature.yml"
 FEATURE_DIR="$WORK_DIR/$FEATURE_NAME"
 TODAY=$(date +%Y-%m-%d)
 

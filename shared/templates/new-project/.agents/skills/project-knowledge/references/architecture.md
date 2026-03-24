@@ -33,7 +33,7 @@ Technical architecture overview for AI agents. Helps agents understand HOW the s
 │   ├── config/        [Configuration files]
 │   └── types/         [TypeScript types/interfaces]
 ├── tests/             [Test files]
-└── .claude/           [AI agent context]
+└── .agents/          [AI agent skills and context]
 ```
 
 [Adjust structure to match your project - keep it simple]

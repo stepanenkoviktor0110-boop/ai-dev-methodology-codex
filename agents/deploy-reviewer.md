@@ -6,18 +6,9 @@ description: |
   platform configuration.
   Orchestrator specifies what to check and provides file paths.
 model: inherit
-color: orange
-skills:
-  - deploy-pipeline
-allowed-tools:
-  - Read
-  - Glob
-  - Grep
-  - Write
-  - Bash
 ---
 
-Follow the deploy-pipeline skill methodology loaded above.
+Read `$AGENTS_HOME/skills/deploy-pipeline/SKILL.md` and follow its methodology.
 
 ## Input
 
@@ -35,7 +26,7 @@ Determine scope from orchestrator's prompt:
 ### CI/CD Workflow Correctness
 
 - Jobs have correct dependency chain (`needs:` fields)
-- Skip logic covers documentation patterns (`.md`, `.claude/`, `docs/`)
+- Skip logic covers documentation patterns (`.md`, `.agents/`, `docs/`)
 - Deploy job only runs on main branch push (not on PRs)
 - Actions use pinned major versions (`@v4`, not `@master`)
 - Caching configured for dependency installs

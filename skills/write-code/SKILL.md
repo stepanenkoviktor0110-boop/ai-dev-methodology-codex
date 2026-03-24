@@ -1,9 +1,11 @@
 ---
-description: Write code with quality process - TDD, reviews (uses code-writing skill)
-allowed-tools:
-  - Skill
+description: Write code with quality process (delegates to code-writing via Codex shim)
 ---
 
 # Instructions
 
-Use the `code-writing` skill.
+Resolve and execute the target skill via shim:
+
+```powershell
+pwsh -File shared/scripts/dispatch-skill.ps1 -SkillAlias write-code -AsPrompt
+```

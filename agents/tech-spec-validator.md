@@ -7,8 +7,6 @@ description: |
   and code mirage detection handled by dedicated validators.
   Use before creating task files to ensure tech-spec is ready for implementation.
 model: inherit
-color: yellow
-allowed-tools: Read, Glob, Grep, Write
 ---
 
 Validate tech-spec template compliance at the provided path.
@@ -23,9 +21,9 @@ Validate tech-spec template compliance at the provided path.
 Read these files:
 - `{feature_path}/tech-spec.md`
 - `{feature_path}/user-spec.md` (if exists — for Acceptance Criteria presence check)
-- `.claude/skills/project-knowledge/references/architecture.md` (if exists)
-- `.claude/skills/project-knowledge/references/patterns.md` (if exists)
-- `~/.claude/skills/tech-spec-planning/references/skills-and-reviewers.md` (for task quality checks)
+- `.agents/skills/project-knowledge/references/architecture.md` (if exists)
+- `.agents/skills/project-knowledge/references/patterns.md` (if exists)
+- `$AGENTS_HOME/skills/tech-spec-planning/references/skills-and-reviewers.md` (for task quality checks)
 
 Validate against criteria below. For each violation, create a finding.
 
@@ -84,7 +82,7 @@ Skip if Project Knowledge files are absent — create a suggestion finding.
 Each task contains full information:
 - **Description** — what and why (scope description, not detailed implementation steps)
 - **Skill** — specified
-- **Reviewers** — specified, not empty. Each reviewer is an existing agent (verify via Glob: `~/.claude/agents/{name}.md`)
+- **Reviewers** — specified, not empty. Each reviewer is an existing agent (verify via Glob: `$AGENTS_HOME/agents/{name}.md`)
 - **Verify-smoke** / **Verify-user** — present if task has external integration, infra, UI, or LLM work (see section 5b)
 - **Files to modify** — concrete file paths
 - **Files to read** — concrete file paths for context
@@ -102,7 +100,7 @@ If >15 tasks — create a finding recommending split into MVP + Extension.
 
 Go beyond field presence — check that task content is correct and appropriate for tech-spec level.
 
-Read `~/.claude/skills/tech-spec-planning/references/skills-and-reviewers.md` for the authoritative skills and reviewers catalog.
+Read `$AGENTS_HOME/skills/tech-spec-planning/references/skills-and-reviewers.md` for the authoritative skills and reviewers catalog.
 
 ### 8a. Skill Correctness
 

@@ -1,7 +1,7 @@
 ---
 name: documentation-writing
 description: |
-  Maintain project documentation in .claude/skills/project-knowledge/: audit, edit, check consistency, track status.
+  Maintain project documentation in .agents/skills/project-knowledge/: audit, edit, check consistency, track status.
 
   Use when: "проверь документацию", "обнови документацию", "аудит документации",
   "check docs", "audit documentation", "update docs", "проверь базу знаний проекта"
@@ -12,7 +12,7 @@ description: |
 
 # Documentation Management
 
-Maintain project documentation in `.claude/skills/project-knowledge/references/`. Audit for bloat, edit files, check consistency, track status.
+Maintain project documentation in `.agents/skills/project-knowledge/references/`. Audit for bloat, edit files, check consistency, track status.
 
 For creating documentation from scratch (new project or empty docs), use `project-planning` skill.
 
@@ -28,11 +28,11 @@ These rules apply to ALL documentation operations (audit, edit, create).
 
 **No duplication between files.** Information lives in ONE place. Cross-reference: "See deployment.md for env vars."
 
-**patterns.md: only project-specific patterns.** Universal coding standards live in `~/.claude/skills/code-writing/references/universal-patterns.md`. Project patterns.md contains only what's unique to THIS project.
+**patterns.md: only project-specific patterns.** Universal coding standards live in `$AGENTS_HOME/skills/code-writing/references/universal-patterns.md`. Project patterns.md contains only what's unique to THIS project.
 
 ## File Structure
 
-**4 core files** in `.claude/skills/project-knowledge/references/`:
+**4 core files** in `.agents/skills/project-knowledge/references/`:
 
 | File | Contains |
 |------|----------|
@@ -45,7 +45,7 @@ These rules apply to ALL documentation operations (audit, edit, create).
 - **ux-guidelines.md** — only for projects with significant UI
 - **{custom}.md** — domain-specific (bot.md, vault.md, api.md)
 
-Templates with placeholder structure are in `~/.claude/shared/templates/new-project/.claude/skills/project-knowledge/references/`. The templates are self-documenting — each section has comments explaining what to write.
+Templates with placeholder structure are in `$AGENTS_HOME/shared/templates/new-project/.agents/skills/project-knowledge/references/`. The templates are self-documenting — each section has comments explaining what to write.
 
 ## Workflows
 
@@ -53,7 +53,7 @@ Templates with placeholder structure are in `~/.claude/shared/templates/new-proj
 
 **Trigger:** User asks to audit, check quality, or find bloat.
 
-1. Read all files from `.claude/skills/project-knowledge/references/` + CLAUDE.md + README.md
+1. Read all files from `.agents/skills/project-knowledge/references/` + AGENTS.md + README.md
 2. Flag issues:
    - Code blocks → replace with file references
    - Generic framework knowledge (belongs in official docs) → remove
@@ -96,16 +96,16 @@ Templates with placeholder structure are in `~/.claude/shared/templates/new-proj
 
 ## Root Project Files
 
-CLAUDE.md and README.md are entry points, not documentation. Keep them minimal — they point to project-knowledge, not contain information.
+AGENTS.md and README.md are entry points, not documentation. Keep them minimal — they point to project-knowledge, not contain information.
 
-**CLAUDE.md** (for AI agents): project name, one-line description, reference to project-knowledge skill, backlog path, default branch. Template: `~/.claude/shared/templates/new-project/CLAUDE.md`.
+**AGENTS.md** (for AI agents): project name, one-line description, reference to project-knowledge skill, backlog path, default branch. Template: `$AGENTS_HOME/shared/templates/new-project/AGENTS.md`.
 
-**README.md** (for humans, in Russian): project title, purpose, folder structure overview, link to references/. Template: `~/.claude/shared/templates/new-project/README.md`.
+**README.md** (for humans, in Russian): project title, purpose, folder structure overview, link to references/. Template: `$AGENTS_HOME/shared/templates/new-project/README.md`.
 
-When auditing, verify that CLAUDE.md and README.md stay minimal — detailed info belongs in project-knowledge.
+When auditing, verify that AGENTS.md and README.md stay minimal — detailed info belongs in project-knowledge.
 
 ## Custom Domain Files
 
 Add when project has a significant domain not covered by 4 core files (bot.md, vault.md, trading.md).
 
-Process: create in `references/` → update project-knowledge SKILL.md to list it → update CLAUDE.md and README.md if they list doc files.
+Process: create in `references/` → update project-knowledge SKILL.md to list it → update AGENTS.md and README.md if they list doc files.
