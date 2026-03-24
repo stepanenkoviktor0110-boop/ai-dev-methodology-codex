@@ -41,11 +41,36 @@ Before any execution, verify the pipeline was followed correctly:
 1. Read `work/{feature}/user-spec.md`.
 2. Read all task frontmatters in `work/{feature}/tasks/`:
    - `status`, `wave`, `depends_on`, `skills`, `reviewers`, `verify`, optional `worker_name`.
-3. Build execution plan from `$AGENTS_HOME/shared/work-templates/execution-plan.md.template`.
-4. Save plan to `work/{feature}/logs/execution-plan.md`.
-5. Present execution plan to user. Ask explicitly: **"Execution plan готов. Подтверждаешь запуск сессии {N}? (да/нет)"**
-6. Wait for explicit approval. Do NOT start execution without it.
-7. Initialize/update `work/{feature}/logs/checkpoint.yml` with `total_waves`, `current_session`, `total_sessions`.
+3. Read `work/{feature}/logs/session-plan.md`. Determine current session number (from checkpoint or first incomplete session).
+4. Build execution plan from `$AGENTS_HOME/shared/work-templates/execution-plan.md.template`.
+5. Save plan to `work/{feature}/logs/execution-plan.md`.
+
+### Session Scope Confirmation — BLOCKING GATE
+
+Present session boundaries to user before any code:
+
+```
+## Запуск сессии {N} из {total}
+
+### Границы этой сессии
+| # | Задача | Wave | estimated_loc |
+|---|--------|------|---------------|
+| 3 | ... | 2 | 300 |
+| 4 | ... | 2 | 250 |
+
+**Суммарный LOC бюджет:** ~{sum_loc} из ~1200 лимита
+**Waves:** {wave_start}-{wave_end}
+**Scope:** {краткое описание что будет сделано}
+**Риски:** {если есть — зависимости от предыдущих сессий, сложные интеграции}
+
+Подтверждаешь запуск сессии {N}? (да/нет)
+```
+
+Wait for explicit **"да"**. Do NOT start execution without it.
+
+> If user requests changes to session boundaries (move tasks, split differently) — update session-plan.md, re-present, wait for new approval.
+
+6. Initialize/update `work/{feature}/logs/checkpoint.yml` with `total_waves`, `current_session`, `total_sessions`.
 
 ## Phase 2: Execute Wave
 

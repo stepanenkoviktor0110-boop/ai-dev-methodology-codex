@@ -17,6 +17,18 @@ Execute a spec-driven task with validation and status tracking.
    - If missing or not approved → **STOP**: "Session plan не утверждён. Сначала `/decompose-tech-spec` и подтверди план сессий."
 3. Check that the requested task belongs to the current session (compare with session-plan.md).
    - If task is in a future session → **WARN**: "Задача {N} относится к сессии {M}, текущая сессия — {K}. Выполнить досрочно? (да/нет)"
+4. Present scope confirmation before starting:
+
+   ```
+   Задача {N}: {title}
+   Сессия: {session_num} из {total}
+   estimated_loc: ~{loc}
+   Оставшийся LOC бюджет сессии: ~{remaining} из ~1200
+
+   Подтверждаешь запуск? (да/нет)
+   ```
+
+   Wait for explicit **"да"**.
 
 ## Step 1: Read Task
 
