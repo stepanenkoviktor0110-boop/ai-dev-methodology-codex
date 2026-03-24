@@ -24,6 +24,7 @@ Conduct interview in Russian. Be thorough and opinionated — an engaged co-thin
 - For EVERY question, propose a concrete answer based on Project Knowledge + code research + your own reasoning. The user confirms, adjusts, or rejects — not invents from scratch.
 - Format: "**{Тема}:** я предлагаю {конкретный вариант}. Причина: {почему}. Подходит / поправишь?"
 - NEVER ask open-ended questions like "Что считаем главным результатом?" — instead: "Главный результат MVP: пользователь должен уметь {X}. Основываюсь на {project.md / код / логику}. Так?"
+- **Human language:** Formulate proposals and choices in plain language the user understands — describe what they will SEE and DO, not technical internals. Wrong: "Локальный импорт файлов (ручная загрузка)" / "API-режим с backend". Right: "Вы загружаете файл с результатами вручную" / "Данные подтягиваются автоматически из сервиса". Technical details go into your reasoning, not into the choice text. The user picks a behavior, you translate it into architecture.
 - Challenge with substance — concrete counterexamples, code references, unexplored scenarios: "А что если пользователь сделает Z? В коде модуль Q не обрабатывает этот случай."
 - Accept the answer after one substantive challenge and move on to the next gap.
 - When user says "не знаю": propose a default answer with reasoning, ask to confirm. Optional item → mark TBD. Required item → break into simpler yes/no choices.

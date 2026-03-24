@@ -29,6 +29,8 @@ Conduct adaptive interview → make tech decisions → fill all project document
 
 **NEVER ask open-ended questions.** Wrong: "Какой стек хочешь использовать?" Right: "Предлагаю Next.js + Supabase — у тебя веб-приложение с авторизацией, это покроет и фронт, и бэк, и БД. Подходит?"
 
+**Human language.** When presenting choices to the user, describe what they will SEE and DO — not technical internals. Wrong: "Unit + интеграционные, без E2E" / "API-режим с backend". Right: "Тесты проверяют логику и связки между частями, но не кликают по интерфейсу" / "Данные подтягиваются автоматически из сервиса". Technical terms go into your reasoning, the choice itself stays in plain language. The user picks a behavior — you translate it into tech decisions.
+
 **One topic at a time.** Propose answer for one topic, wait for response, then next.
 
 **Build on answers.** If user mentioned a domain — propose domain-relevant solutions. If they said something vague — propose a specific interpretation and ask to confirm.
