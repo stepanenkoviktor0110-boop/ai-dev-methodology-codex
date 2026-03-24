@@ -1,0 +1,5 @@
+{
+  "status": "approved",
+  "issues": [],
+  "summary": "design-generate skill passes all checks. Procedural skill with 5 phases (0-4), each with checkpoint. YAML frontmatter valid: name in kebab-case (16 chars), description 548 chars with 10 trigger phrases (RU+EN). SKILL.md is 149 lines (under 500 limit). All 5 referenced files exist and resolve correctly. References linked via Pattern A (action-embedded). No emphasis words. No extra documentation files. Self-verification section present (Final Check). File name validation enforced in Phase 3."
+}
