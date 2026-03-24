@@ -24,8 +24,29 @@ These instructions are written for Codex agents that default to the laziest inte
 
 ## Work Style
 - Границы сессий определяются автоматически из `session-plan.md` (генерируется при `/decompose-tech-spec`). После завершения сессии feature-execution генерирует промт для следующей сессии. Не запускать следующую сессию автоматически.
-- После завершения каждого этапа: проверить документацию, зафиксировать шаги, дать рекомендацию начать новую сессию с конкретным промтом для копирования.
 - Сначала искать ответы в документации проекта (project knowledge, backlog, code-research, skills), не спрашивать пользователя то, что можно найти самостоятельно.
+
+## Session End Protocol — MANDATORY
+
+After completing ANY pipeline step (`/new-user-spec`, `/new-tech-spec`, `/decompose-tech-spec`, `/infrastructure-setup`, `/do-feature` session, `/do-task`, `/retrospective`, `/done`), you MUST end with this exact block:
+
+```
+---
+✅ **Завершено:** {что было сделано — 1 предложение}
+
+📋 **Следующий шаг:** `/command-name` — {что он делает на человеческом языке}
+
+💡 **Рекомендация:** начать новую сессию. Скопируй и вставь этот промт:
+
+> {Готовый промт для следующей сессии — включает: название проекта, путь, название фичи, текущий этап, что делать дальше. Промт должен быть самодостаточным — новая сессия должна понять контекст без предыдущей.}
+---
+```
+
+**Rules:**
+- This block is NOT optional. If you finished a pipeline step — this block MUST appear.
+- The prompt for next session must include the project path, feature name, and exact command to run. A new session has ZERO context from the current one.
+- If the next step can run in the current session (user hasn't hit context limits), still show the block but say: "Можно продолжить здесь или начать новую сессию."
+- Do NOT silently continue to the next pipeline step without showing this block first.
 
 ## Intermediate Summaries
 
