@@ -107,9 +107,10 @@ Two modes:
 
 #### Mode A: Single Task — `/do-task`
 
-One task per session. Suited for manual, controlled execution.
+One task per invocation. Suited for manual, controlled execution.
 
 **Process:**
+- Pre-flight: checks session-plan.md approved, task belongs to current session
 - Reads task file and all its Context Files
 - Loads skills specified in task (e.g. `code-writing`, `pre-deploy-qa`, `infrastructure-setup`)
 - Follows loaded skill workflow (TDD for code tasks, verification for QA tasks, etc.)
@@ -118,6 +119,7 @@ One task per session. Suited for manual, controlled execution.
 - Git commit after each round of review fixes (tests pass)
 - Writes entry to `decisions.md`, updates task status → done
 - Git commit status + decisions
+- **Session boundary check**: if last task in session → **HARD STOP** with session report + handoff prompt
 
 **Skill:** Loaded from task file (typically `code-writing` for code tasks)
 
@@ -128,7 +130,7 @@ All tasks via coordinated agent waves. One orchestrator manages parallel workers
 **Process:**
 - Team lead reads tech-spec and all task files, builds execution plan
 - Checks `checkpoint.yml` — if resuming after context compaction or new session, skips completed waves (uses decisions.md as source of truth for what actually completed)
-- Reads `session-plan.md` for session boundaries — stops at session boundary, generates prompt for next session
+- Reads `session-plan.md` for session boundaries — **HARD STOP at session boundary**: presents session report (done/not done/checks/risks), generates handoff prompt, does NOT auto-continue
 - Spawns workers/reviewers via `spawn_agent` and coordinates via `wait_agent`/`send_input`
 - Executes tasks wave by wave:
   - Spawns one agent per task (parallel within wave)

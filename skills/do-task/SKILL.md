@@ -57,20 +57,50 @@ Execute a spec-driven task with validation and status tracking.
 4. Git commit: `chore: complete task {N} — update status and decisions`
 5. **Session boundary check** (skip if `work/{feature}/logs/session-plan.md` does not exist):
    Read session-plan.md. Find which session this task belongs to.
-   - If this task is the **last task of current session** (all session's tasks are now `done`):
-     Generate next-session prompt from `$AGENTS_HOME/shared/work-templates/session-prompt.md.template`.
-     Save to `work/{feature}/logs/next-session-prompt.md`.
-     Present to user:
-     ```
-     Сессия {N} из {total} завершена.
 
-     Рекомендую начать новую сессию Codex и вставить этот промт:
+   **If tasks remain in current session:**
+   Inform user which tasks are left: "В текущей сессии осталось: задачи {list}."
 
-     ---
-     {generated prompt content}
-     ---
-     ```
-   - If tasks remain in current session: inform user which tasks are left in this session.
+   **If this task is the last task of current session → SESSION END PROTOCOL (HARD STOP):**
+
+   > **This is a HARD STOP. Do NOT pick up the next task. Do NOT continue to the next session.**
+
+   a. Present session report:
+      ```
+      ## Отчёт по сессии {N} из {total}
+
+      ### Что сделано
+      - Задача {X}: {краткое описание} ✅
+
+      ### Что не сделано
+      - (если есть)
+
+      ### Проверки и результаты
+      - Тесты: {pass/fail}
+      - Ревью: {раунды, findings}
+
+      ### Риски и замечания
+      - (если есть)
+      ```
+
+   b. Generate next-session prompt from `$AGENTS_HOME/shared/work-templates/session-prompt.md.template`.
+      Save to `work/{feature}/logs/next-session-prompt.md`.
+
+   c. Present handoff:
+      ```
+      Сессия {N} из {total} завершена. Отчёт выше.
+
+      Скопируй этот промт для старта следующей сессии:
+
+      ---
+      {generated prompt content}
+      ---
+
+      ⚠️ Следующая сессия НЕ начнётся, пока ты явно не запустишь её.
+      ```
+
+   d. Git commit: `chore: complete session {N} — checkpoint and handoff prompt`
+   e. **STOP.** Do not execute any more tasks.
 
 ## Self-Verification
 
@@ -79,3 +109,5 @@ Execute a spec-driven task with validation and status tracking.
 - [ ] decisions.md entry written with reviews and verification results
 - [ ] Git commit created with task reference
 - [ ] Every acceptance criterion from task file is met
+- [ ] Session boundary check performed (if session-plan exists)
+- [ ] If session ended: report + handoff prompt presented, execution stopped

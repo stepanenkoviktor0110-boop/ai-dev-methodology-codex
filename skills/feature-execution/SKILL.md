@@ -89,9 +89,54 @@ If findings exist, spawn a fixer worker (`tier_opus`) and re-run only affected a
    - `chore: complete wave {N} — update task statuses and decisions`
 4. Update checkpoint:
    - `last_completed_wave`, `next_wave`, task statuses.
-5. Session boundary rule:
-   - If current wave is last in current session: generate `work/{feature}/logs/next-session-prompt.md`, show it, then stop.
-   - Else continue to next wave.
+5. **Session boundary check** — read session-plan.md, determine if current wave is last in current session.
+
+### If waves remain in current session → continue to next wave.
+
+### If current wave is last in current session → SESSION END PROTOCOL (HARD STOP)
+
+> **This is a HARD STOP. Do NOT continue to the next session. Do NOT start the next wave.**
+
+**Step 1: Session Report.** Present to user:
+
+```
+## Отчёт по сессии {N} из {total}
+
+### Что сделано
+- Задача {X}: {краткое описание} ✅
+- Задача {Y}: {краткое описание} ✅
+
+### Что не сделано
+- (если есть незавершённые задачи или отложенные проверки)
+
+### Проверки и результаты
+- Тесты: {pass/fail, количество}
+- Ревью: {раунды, ключевые findings}
+- Smoke-верификация: {результаты}
+
+### Риски и замечания
+- (если есть — технический долг, открытые вопросы, блокеры)
+```
+
+**Step 2: Next Session Prompt.** Generate from `$AGENTS_HOME/shared/work-templates/session-prompt.md.template`. Save to `work/{feature}/logs/next-session-prompt.md`.
+
+**Step 3: Present handoff package.** Show user:
+
+```
+Сессия {N} из {total} завершена. Отчёт выше.
+
+Скопируй этот промт для старта следующей сессии:
+
+---
+{generated prompt content}
+---
+
+⚠️ Следующая сессия НЕ начнётся, пока ты явно не запустишь её.
+```
+
+**Step 4: STOP.** Do not execute any more waves, tasks, or code. Wait for user to start a new session with the provided prompt.
+
+Git commit: `chore: complete session {N} — checkpoint and handoff prompt`
 
 ## Phase 4: User Review
 
