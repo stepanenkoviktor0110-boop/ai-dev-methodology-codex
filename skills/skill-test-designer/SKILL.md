@@ -74,9 +74,9 @@ Discuss with the user to define the test scope:
    - Skill-focused (testing skill behavior, not general agent quality)
 
 5. **Model profile**: choose one profile for each scenario:
-   - `tier_opus` -> `gpt-5.4` for complex tasks (coding, architecture)
-   - `tier_sonnet` -> `gpt-5.4-mini` for standard tasks
-   - `tier_haiku` -> `gpt-5.4-mini` with low reasoning for simple deterministic checks
+   - `tier_high` -> `gpt-5.4` for complex tasks (coding, architecture)
+   - `tier_medium` -> `gpt-5.4-mini` for standard tasks
+   - `tier_low` -> `gpt-5.4-mini` with low reasoning for simple deterministic checks
 
 6. **Persona**: Keep the default persona from
    [scenario-format.md](references/scenario-format.md) as-is. Modify only

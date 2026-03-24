@@ -71,8 +71,8 @@ Options:
 - `gpt-5.1-codex-max` — budget option for simple lookups
 
 Recommended profile mapping:
-- `tier_opus`: `gpt-5.4` (fallback `gpt-5.3-codex`)
-- `tier_sonnet`: `gpt-5.4-mini` (fallback `gpt-5.3-codex`)
-- `tier_haiku`: `gpt-5.4-mini` with low reasoning (fallback `gpt-5.1-codex-max`)
+- `tier_high`: `gpt-5.4` (fallback `gpt-5.3-codex`)
+- `tier_medium`: `gpt-5.4-mini` (fallback `gpt-5.3-codex`)
+- `tier_low`: `gpt-5.4-mini` with low reasoning (fallback `gpt-5.1-codex-max`)
 
 Use sparingly. `inherit` is usually best.

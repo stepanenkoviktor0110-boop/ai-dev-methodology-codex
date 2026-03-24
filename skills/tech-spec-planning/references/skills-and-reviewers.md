@@ -30,13 +30,13 @@ Prompt tasks (LLM system prompts, user templates) use `prompt-master` skill — 
 
 | Agent | What it checks | Model tier |
 |-------|---------------|------------|
-| `code-reviewer` | Code quality: structure, patterns, naming, complexity, error handling | `tier_sonnet` |
-| `security-auditor` | OWASP Top 10, injection, XSS, auth, input validation, secrets | `tier_sonnet` |
-| `test-reviewer` | Test quality: coverage, meaningful assertions, test pyramid balance | `tier_sonnet` |
-| `skill-checker` | Skill compliance: frontmatter, structure, skill-master guidelines | `tier_sonnet` |
-| `prompt-reviewer` | Prompt quality: clarity, positive framing, examples over rules, compression, XML structure, success criteria | `tier_sonnet` |
-| `infrastructure-reviewer` | Infrastructure setup quality: folder structure, pre-commit, Docker, .gitignore, testing | `tier_sonnet` |
-| `deploy-reviewer` | CI/CD pipeline and deployment config quality: workflows, secrets, platform config | `tier_sonnet` |
+| `code-reviewer` | Code quality: structure, patterns, naming, complexity, error handling | `tier_medium` |
+| `security-auditor` | OWASP Top 10, injection, XSS, auth, input validation, secrets | `tier_medium` |
+| `test-reviewer` | Test quality: coverage, meaningful assertions, test pyramid balance | `tier_medium` |
+| `skill-checker` | Skill compliance: frontmatter, structure, skill-master guidelines | `tier_medium` |
+| `prompt-reviewer` | Prompt quality: clarity, positive framing, examples over rules, compression, XML structure, success criteria | `tier_medium` |
+| `infrastructure-reviewer` | Infrastructure setup quality: folder structure, pre-commit, Docker, .gitignore, testing | `tier_medium` |
+| `deploy-reviewer` | CI/CD pipeline and deployment config quality: workflows, secrets, platform config | `tier_medium` |
 
 ## Skill → Reviewers Mapping
 

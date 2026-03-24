@@ -194,15 +194,15 @@ The framework uses Codex CLI's built-in subagent system (`spawn_agent`, `wait_ag
 **How `/do-feature` orchestrates a wave:**
 ```
 Orchestrator (feature-execution)
-├─ spawn_agent: Worker 1 (task 1, tier_opus)     ─┐
-├─ spawn_agent: Worker 2 (task 2, tier_opus)      ├─ parallel
-├─ spawn_agent: Worker 3 (task 3, tier_opus)     ─┘
+├─ spawn_agent: Worker 1 (task 1, tier_high)     ─┐
+├─ spawn_agent: Worker 2 (task 2, tier_high)      ├─ parallel
+├─ spawn_agent: Worker 3 (task 3, tier_high)     ─┘
 │
 ├─ wait_agent: collect results from all workers
 │
-├─ spawn_agent: code-reviewer (tier_sonnet)      ─┐
-├─ spawn_agent: security-auditor (tier_sonnet)    ├─ parallel reviews
-├─ spawn_agent: test-reviewer (tier_sonnet)      ─┘
+├─ spawn_agent: code-reviewer (tier_medium)      ─┐
+├─ spawn_agent: security-auditor (tier_medium)    ├─ parallel reviews
+├─ spawn_agent: test-reviewer (tier_medium)      ─┘
 │
 ├─ wait_agent: collect review reports
 ├─ fix findings → re-run reviewers (max 3 rounds)
@@ -225,9 +225,9 @@ max_depth = 2       # worker (depth 1) can spawn reviewer (depth 2)
 
 | Tier | Model | Use |
 |------|-------|-----|
-| `tier_opus` | `gpt-5.4` | Workers, complex architecture, security-critical work |
-| `tier_sonnet` | `gpt-5.4-mini` | Reviewers, validators, medium tasks |
-| `tier_haiku` | `gpt-5.4-mini` (low reasoning) | Simple checks, formatting |
+| `tier_high` | `gpt-5.4` | Workers, complex architecture, security-critical work |
+| `tier_medium` | `gpt-5.4-mini` | Reviewers, validators, medium tasks |
+| `tier_low` | `gpt-5.4-mini` (low reasoning) | Simple checks, formatting |
 
 ### Skills & Agents
 

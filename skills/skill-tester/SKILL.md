@@ -43,9 +43,9 @@ Per scenario:
 - run runners in parallel, scenarios sequentially
 
 Model selection:
-- complex/coding scenarios -> `tier_opus` (`gpt-5.4`)
-- medium scenarios -> `tier_sonnet` (`gpt-5.4-mini`)
-- simple deterministic scenarios -> `tier_haiku` (`gpt-5.4-mini`, low reasoning)
+- complex/coding scenarios -> `tier_high` (`gpt-5.4`)
+- medium scenarios -> `tier_medium` (`gpt-5.4-mini`)
+- simple deterministic scenarios -> `tier_low` (`gpt-5.4-mini`, low reasoning)
 
 ## Phase 3: Run Scenario
 
@@ -71,7 +71,7 @@ When each runner reports done, collect:
 
 ### 3c. Grade with grader agents
 
-Spawn one grader per runner (`tier_sonnet`).
+Spawn one grader per runner (`tier_medium`).
 Pass grader:
 - runner final message
 - runner output files (read by grader)

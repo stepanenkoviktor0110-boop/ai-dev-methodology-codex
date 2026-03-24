@@ -26,9 +26,9 @@ Before starting, check [lessons-learned.md](references/lessons-learned.md) for k
 ## Model Profiles
 
 Use model tiers from [model-profiles.md](../tech-spec-planning/references/model-profiles.md):
-- Worker default: `tier_opus` (`gpt-5.4`, fallback `gpt-5.3-codex`)
-- Reviewer default: `tier_sonnet` (`gpt-5.4-mini`, fallback `gpt-5.3-codex`)
-- Cheap routine work: `tier_haiku` (`gpt-5.4-mini` with `reasoning_effort: low`, fallback `gpt-5.1-codex-max`)
+- Worker default: `tier_high` (`gpt-5.4`, fallback `gpt-5.3-codex`)
+- Reviewer default: `tier_medium` (`gpt-5.4-mini`, fallback `gpt-5.3-codex`)
+- Cheap routine work: `tier_low` (`gpt-5.4-mini` with `reasoning_effort: low`, fallback `gpt-5.1-codex-max`)
 
 ## Phase 0: Pre-flight Checks — BLOCKING GATE
 
@@ -88,7 +88,7 @@ Wait for explicit **"да"**. Do NOT start execution without it.
 2. **File existence check — MANDATORY before starting any worker.** For each selected task, read "Files to modify" and verify target files/directories exist. If files are listed as "modify" but don't exist yet (e.g., tech-spec assumed a prior wave would create them), the worker MUST **create** them from scratch — do NOT fail or ask the user. Log in decisions.md: "Created {path} from scratch — tech-spec listed as modify but file didn't exist." This is normal when waves have cross-dependencies.
 3. Set each selected task to `in_progress`.
 4. For each task, run worker flow:
-   - Spawn worker (`agent_type: worker`, model from `tier_opus`).
+   - Spawn worker (`agent_type: worker`, model from `tier_high`).
    - Pass task path and feature context files.
    - Worker performs implementation and local verification, then reports:
      - modified files
@@ -96,7 +96,7 @@ Wait for explicit **"да"**. Do NOT start execution without it.
      - unresolved risks
 5. Review flow per task (if `reviewers` not empty):
    - Coordinator gets `git diff` for task changes.
-   - Spawn all reviewer agents in parallel (`tier_sonnet`), pass:
+   - Spawn all reviewer agents in parallel (`tier_medium`), pass:
      - task path
      - spec paths
      - changed files list
@@ -114,8 +114,8 @@ Audit Wave tasks use `reviewers: []` and run as independent auditors:
 - Security audit (`security-auditor`)
 - Test audit (`test-master`)
 
-Spawn all auditors in parallel (`tier_opus`).
-If findings exist, spawn a fixer worker (`tier_opus`) and re-run only affected auditors as reviewers (`tier_sonnet`), max 3 rounds.
+Spawn all auditors in parallel (`tier_high`).
+If findings exist, spawn a fixer worker (`tier_high`) and re-run only affected auditors as reviewers (`tier_medium`), max 3 rounds.
 
 **When Audit Wave is in a different session:** If session-plan.md places the Audit Wave in a later session (e.g., final session), do NOT run it in the current session. Record in decisions.md: "Audit wave (code-reviewer, security-auditor, test-reviewer): not run — scheduled for session {N}." This is expected behavior, not a failure.
 

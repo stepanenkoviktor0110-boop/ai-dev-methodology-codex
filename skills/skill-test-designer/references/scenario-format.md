@@ -47,7 +47,7 @@ Each criterion:
 - What file contents to verify (not just file existence)
 
 ### Model Profile for this test
-{tier_opus | tier_sonnet | tier_haiku} (agreed with user during design)
+{tier_high | tier_medium | tier_low} (agreed with user during design)
 ```
 
 ## Prompt Examples
