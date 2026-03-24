@@ -15,6 +15,14 @@ These instructions are written for Codex agents that default to the laziest inte
 - If a SKILL.md references `$AGENTS_HOME` — resolve it to the actual agents home path and read the file. If a referenced file doesn't exist, tell the user — do NOT invent a workaround.
 - **Integrity check:** before executing any SKILL.md, verify it has no git conflict markers (`<<<<<<<`, `=======`, `>>>>>>>`). If found — do NOT execute, tell user to resolve the conflict first.
 
+## ⛔ Parallel Agent Limit: MAX 4
+
+**NEVER have more than 4 agents running at the same time.** This applies to ALL agent operations: workers, reviewers, auditors, validators — any combination. The host machine WILL freeze at 5+ concurrent agents. There is NO queue — all spawned agents run simultaneously.
+
+**Before calling `spawn_agent`, count your currently running agents. If count >= 4, you MUST `wait_agent` + `close_agent` first.**
+
+This rule overrides `max_threads` in config.toml. Even if config says `max_threads = 10`, the real limit is 4.
+
 ## Environment: Known Pitfalls
 
 - **`rg` (ripgrep) may be blocked** on some Windows environments (`Access denied` on `rg.exe`). If `rg` fails, you MUST fall back to `Get-ChildItem -Recurse | Select-String` (PowerShell) or `findstr /S` (cmd). Narrow search scope with explicit paths to compensate for lower performance. Do NOT give up on code search — always use a fallback.
