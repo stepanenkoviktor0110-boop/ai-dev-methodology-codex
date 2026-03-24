@@ -91,25 +91,33 @@ Wait for explicit **"да"**. Do NOT start execution without it.
 
 ## Phase 2: Execute Wave
 
+**Parallel agent limit — max 5 concurrent agents.** Even if `max_threads` allows more, limit to 5 parallel agents to stay within safe environment bounds. If the wave has more tasks than 4, split into **batches**:
+- Batch 1: tasks 1–N (up to limit), wait for all, close agents.
+- Batch 2: tasks N+1–M, wait, close.
+- Continue until all tasks in the wave are done.
+- Same applies to reviewers: if 3 tasks × 3 reviewers = 9 agents > limit, review in batches.
+- Log batch plan in decisions.md: "Wave {W}: {total} agents, limit {N}, running in {B} batches."
+
 1. Select tasks for current wave: `status: planned` and dependencies done.
 2. **File existence check — MANDATORY before starting any worker.** For each selected task, read "Files to modify" and verify target files/directories exist. If files are listed as "modify" but don't exist yet (e.g., tech-spec assumed a prior wave would create them), the worker MUST **create** them from scratch — do NOT fail or ask the user. Log in decisions.md: "Created {path} from scratch — tech-spec listed as modify but file didn't exist." This is normal when waves have cross-dependencies.
 3. Set each selected task to `in_progress`.
-4. For each task, run worker flow:
+4. For each task, run worker flow (respect parallel agent limit — batch if needed):
    - Spawn worker (`agent_type: worker`, model from `tier_high`).
    - Pass task path and feature context files.
    - Worker performs implementation and local verification, then reports:
      - modified files
      - commits made
      - unresolved risks
+   - **Close worker agent** after collecting results — free the slot for next batch.
 5. Review flow per task (if `reviewers` not empty):
    - Coordinator gets `git diff` for task changes.
-   - Spawn all reviewer agents in parallel (`tier_medium`), pass:
+   - Spawn reviewer agents in parallel (`tier_medium`), respecting agent limit — batch if needed:
      - task path
      - spec paths
      - changed files list
      - diff text
      - output path: `logs/working/task-{N}/{reviewer}-round{R}.json`
-   - Collect reports, apply valid findings, rerun tests.
+   - Collect reports, **close reviewer agents**, apply valid findings, rerun tests.
    - Repeat up to 3 rounds.
 6. If `reviewers` is empty, mark task self-verified after worker checks.
 7. Ensure worker writes a concise decisions entry to `work/{feature}/decisions.md`.
