@@ -1,0 +1,5 @@
+{
+  "status": "approved",
+  "issues": [],
+  "summary": "design-review skill passes all checks. Name is kebab-case (13 chars). Description is 289 chars with 7 trigger phrases (EN+RU). Body is 111 lines (<500). Both referenced files (design-tokens.md, color-principles.md) exist at correct relative paths. No extra files in directory. Zero emphasis words. Informational structure: sections by logic (When to Activate, What to Read, What to Check, How to Report, Scope Guard), decision framework table present, no forced sequential phases. Reference links are action-embedded (Pattern A)."
+}
