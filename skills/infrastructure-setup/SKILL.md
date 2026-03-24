@@ -45,9 +45,17 @@ Example format:
 
 ## Phase 1: Framework Initialization
 
-Init framework from confirmed stack. Use Context7 for up-to-date init commands and flags. Verify it starts.
+**Non-empty directory handling:** Many scaffolding tools (Vite, Next.js, CRA) refuse to init in a non-empty directory. If the project root already has files (e.g., `work/`, `.agents/`, `.gitignore`):
+1. Create the scaffold in a temporary subdirectory (e.g., `_scaffold_tmp/`).
+2. Move runtime files (src/, package.json, tsconfig.json, vite.config.ts, etc.) from `_scaffold_tmp/` to the project root.
+3. Delete `_scaffold_tmp/`.
+4. Merge any generated `.gitignore` entries into the existing `.gitignore` instead of overwriting it.
 
-**Checkpoint:** dev server starts successfully.
+Init framework from confirmed stack. Use Context7 for up-to-date init commands and flags.
+
+**Dev server verification:** Run `npm run dev` (or equivalent) and confirm the process starts. If the environment does not support long-running process stdout (timeouts, restricted terminals), verify the toolchain via `npm run build` instead — a successful build confirms the framework is functional.
+
+**Checkpoint:** dev server starts or build succeeds.
 
 ## Phase 2: Folder Structure
 
@@ -89,6 +97,16 @@ Create `.env.example` with required variable names (no values).
 
 Convention: gitleaks for secret scanning. Target: total pre-commit time under 10 seconds.
 
+**Gitleaks installation:** Ensure gitleaks is available before configuring the hook:
+- macOS: `brew install gitleaks`
+- Windows: `winget install gitleaks` (binary may land outside PATH — check `$LOCALAPPDATA\Microsoft\WinGet\Links\` or `$HOME\AppData\Local\Microsoft\WinGet\Packages\*gitleaks*`)
+- Linux / CI: download from GitHub releases or use `go install github.com/gitleaks/gitleaks/v8@latest`
+- Verify: `gitleaks version`
+
+The pre-commit hook template includes a fallback path search — see `husky-pre-commit-gitleaks.sh`.
+
+**Custom rules (.gitleaks.toml):** The default gitleaks ruleset may not catch all test patterns. Place a `.gitleaks.toml` in the project root with explicit rules for the project's secret formats. Use the template from `$AGENTS_HOME/shared/templates/infrastructure/static/.gitleaks.toml`.
+
 Pre-commit scope (fast, staged files only):
 - gitleaks (~2-5 seconds)
 - Lint staged files
@@ -96,13 +114,28 @@ Pre-commit scope (fast, staged files only):
 
 Full test suites, integration tests, builds belong in CI.
 
-**Checkpoint:** commit a file containing `AKIA1234567890EXAMPLE` — gitleaks blocks it.
+**Checkpoint — clean testing approach:** Verify gitleaks blocks secrets WITHOUT polluting git history:
+1. Create a temp file with a test secret: `echo "AKIA1234567890EXAMPLE" > _gitleaks_test.txt`
+2. Stage it: `git add _gitleaks_test.txt`
+3. Attempt commit: `git commit -m "test: gitleaks check"` — must be BLOCKED.
+4. **Clean up immediately:** `git reset HEAD _gitleaks_test.txt && rm _gitleaks_test.txt`
+5. Do NOT leave test secrets in committed history.
+
+If gitleaks does not block the test secret, check `.gitleaks.toml` rules — the default ruleset may require `AKIA` patterns to have 20+ alphanumeric characters.
 
 ## Phase 6: Testing Infrastructure
 
 Set up test framework, create smoke test: 1-2 tests verifying setup works (import main module, check environment).
 
 **Checkpoint:** test command passes.
+
+## Cross-platform Notes
+
+**Windows / PowerShell gotchas:**
+- Some compound or destructive shell commands may be blocked by execution policies. Break complex operations into smaller steps.
+- Prefer `npm pkg set` / `npm pkg get` for editing `package.json` programmatically instead of parsing JSON via PowerShell objects (PSCustomObject has limitations with dynamic properties).
+- Use forward slashes in paths for cross-platform compatibility in scripts and configs.
+- If `husky` hooks don't fire on Windows, ensure git's `core.hooksPath` is set correctly: `git config core.hooksPath .husky`.
 
 ## Phase 7: Documentation & Commit
 

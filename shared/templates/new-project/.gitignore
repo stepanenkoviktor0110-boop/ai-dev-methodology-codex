@@ -40,6 +40,8 @@ Thumbs.db
 # Logs
 *.log
 logs/
+# Methodology artifacts in work/*/logs/ are tracked (use git add -f if needed)
+!work/*/logs/
 
 # Test coverage
 coverage/

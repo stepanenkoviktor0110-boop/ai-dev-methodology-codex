@@ -121,6 +121,11 @@ If findings exist, spawn a fixer worker (`tier_opus`) and re-run only affected a
 1. Verify decisions entries exist and include verification results.
 2. Update tasks `in_progress` -> `done`.
 3. Commit status/decision updates:
+   - **Stage logs/ artifacts explicitly** (they are gitignored by the global `logs/` rule):
+     ```bash
+     git add -f work/{feature}/logs/checkpoint.yml
+     git add -f work/{feature}/logs/execution-plan.md
+     ```
    - `chore: complete wave {N} — update task statuses and decisions`
 4. Update checkpoint:
    - `last_completed_wave`, `next_wave`, task statuses.
@@ -162,7 +167,12 @@ If findings exist, spawn a fixer worker (`tier_opus`) and re-run only affected a
    - Checklists in task body: all completed items checked off
 3. **tech-spec.md** — update Implementation Tasks checkboxes (`- [ ]` → `- [x]`) for all completed tasks.
 4. **checkpoint.yml** — update with current state.
-5. Git commit: `chore: sync docs for session {N} — decisions, task statuses, tech-spec checkboxes`
+5. Git commit (stage logs/ artifacts explicitly — they are gitignored by the global `logs/` rule):
+   ```bash
+   git add -f work/{feature}/logs/checkpoint.yml
+   git add -f work/{feature}/logs/execution-plan.md
+   ```
+   `chore: sync docs for session {N} — decisions, task statuses, tech-spec checkboxes`
 
 > Do NOT skip this step. Documentation drift is a real problem — if docs are not synced, the next session starts with stale context.
 
@@ -197,7 +207,12 @@ Estimated LOC: ~{loc}
 
 **Step 5: STOP.** Do not execute any more waves, tasks, or code. Wait for user to start a new session with the provided prompt.
 
-Git commit: `chore: complete session {N} — checkpoint and handoff prompt`
+Git commit (force-add logs/ artifacts):
+   ```bash
+   git add -f work/{feature}/logs/checkpoint.yml
+   git add -f work/{feature}/logs/next-session-prompt.md
+   ```
+   `chore: complete session {N} — checkpoint and handoff prompt`
 
 ## Phase 4: User Review
 
