@@ -65,6 +65,24 @@ Review details — in JSON files via links. QA report — in logs/working/.
 **Verification:**
 - `test -s skills/design-system-init/references/font-pairing.md` → OK
 
+## Task 3: Create design-system-init skill
+
+**Status:** Done
+**Commit:** 41bd5e2
+**Agent:** ds-init-builder
+**Summary:** Создан процедурный скилл `skills/design-system-init/SKILL.md` (171 строка) с 5 фазами: Project Readiness (веб-проверка, обработка существующей .design-system/), Project Scan (приоритет: Tailwind > CSS vars > SCSS > hardcoded), Interview (6 тем: настроение через color-psychology.md, палитра через color-principles.md, типографика через font-pairing.md, spacing с 3 опциями golden ratio/Fibonacci/standard, radii/shadows/breakpoints, компоненты), Build (tokens.json по design-tokens.md + самодостаточные HTML-компоненты с CSS custom properties), Verify (JSON, CSS vars, contrast >= 4.5:1, имена файлов). Все 4 ссылки на references action-embedded (Pattern A), ноль emphasis words.
+**Deviations:** None
+
+**Reviews:**
+
+*Round 1:*
+- skill-checker: approved, 0 findings → [logs/working/task-3/skill-checker-round1.json]
+
+**Verification:**
+- `wc -l skills/design-system-init/SKILL.md` → 171 lines (< 500)
+- All 4 reference links resolve to existing files
+- Zero emphasis words
+
 ## Task 6: Create design-retrospective skill
 
 **Status:** Done
