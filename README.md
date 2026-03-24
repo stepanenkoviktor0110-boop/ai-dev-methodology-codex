@@ -1,4 +1,4 @@
-# AI-First Development Methodology v1.1 — Codex Version
+# AI-First Development Methodology v1.2 — Codex Version
 
 Structured AI-First development methodology for [OpenAI Codex CLI](https://github.com/openai/codex). Every feature goes through a spec-driven pipeline with automated validators and quality gates at each stage.
 
@@ -77,23 +77,30 @@ After this you'll have:
 
 ```
 /new-user-spec                 # Step 1: Interview → user-spec.md (requirements)
+                               #   ⛔ user approves spec
 /new-tech-spec                 # Step 2: Research → tech-spec.md (architecture)
-/decompose-tech-spec           # Step 3: Break into tasks → tasks/*.md + session-plan.md
-/do-feature                    # Step 4: Execute all tasks by waves (parallel agents)
+                               #   ⛔ user approves spec
+/decompose-tech-spec           # Step 3: Break into tasks → tasks/*.md
+                               #   ⛔ GATE 1: user approves task decomposition
+                               #   ⛔ GATE 2: user approves session plan (LOC budget)
+                               #   ⛔ HARD STOP — no auto-transition to code
+/do-feature                    # Step 4: Execute tasks by waves
+                               #   ⛔ GATE 3: user confirms session scope + LOC before start
+                               #   ⛔ GATE 4: session end → report + handoff prompt + STOP
 /retrospective                 # Step 5: Extract lessons → update skills
 /done                          # Step 6: Update project docs → archive feature
 ```
 
-Each step has validators that run automatically:
+Each step has validators and **blocking gates** — no step proceeds without explicit user approval:
 
-| Step | Command | Validators | Output |
-|------|---------|-----------|--------|
-| Requirements | `/new-user-spec` | quality + adequacy (2) | `work/{feature}/user-spec.md` |
-| Architecture | `/new-tech-spec` | skeptic + completeness + security + test + template (5) | `work/{feature}/tech-spec.md` |
-| Tasks | `/decompose-tech-spec` | template + reality (2) | `work/{feature}/tasks/*.md` |
-| Code | `/do-feature` | code + security + test reviewers (3) | commits |
-| Audit | (auto, last waves) | holistic code + security + test audit (3) | audit reports |
-| QA | (auto, final wave) | pre-deploy + deploy + post-deploy | verified feature |
+| Step | Command | Validators | Gates | Output |
+|------|---------|-----------|-------|--------|
+| Requirements | `/new-user-spec` | quality + adequacy (2) | user approves spec | `user-spec.md` |
+| Architecture | `/new-tech-spec` | skeptic + completeness + security + test + template (5) | user approves spec | `tech-spec.md` |
+| Tasks | `/decompose-tech-spec` | template + reality (2) | user approves tasks, then session plan | `tasks/*.md` + `session-plan.md` |
+| Code | `/do-feature` | code + security + test reviewers (3) | session scope confirmed, STOP at session end | commits |
+| Audit | (auto, last waves) | holistic code + security + test audit (3) | — | audit reports |
+| QA | (auto, final wave) | pre-deploy + deploy + post-deploy | — | verified feature |
 
 ### Single Task (manual control)
 
@@ -164,8 +171,10 @@ your-project/
 ### Key Principles
 
 - **Spec-Driven** — write specs before code. Hierarchy: User Spec → Tech Spec → Tasks → Code
+- **Blocking Gates** — 6 mandatory HARD STOPs in the pipeline. No step proceeds without explicit user approval. Agent never auto-transitions between decomposition → execution or between sessions
 - **Multi-level Validation** — automated validators at every stage (2 → 5 → 2 → 3)
-- **Session Planning** — waves grouped by ~1200 LOC budget per session (fits context window)
+- **Session Planning** — waves grouped by ~1200 LOC budget per session (fits context window). LOC budget enforced as a communication gate before each session/task
+- **Session Handoff** — at session end: structured report (done/not done/checks/risks) + generated prompt for next session. Execution stops until user explicitly starts next session
 - **Checkpoint Recovery** — `checkpoint.yml` persists state; SessionStart hook resumes after compaction
 - **Just-In-Time Context** — agents read only what's needed for current task
 - **Retrospective** — lessons learned embedded back into skills after each feature
@@ -208,6 +217,17 @@ This framework uses a Codex-compatible shim for skill alias resolution:
 Evolved fork of [molyanov-ai-dev](https://github.com/pavel-molyanov/molyanov-ai-dev) by Pavel Molyanov (MIT License).
 
 ## Changelog
+
+### v1.2 — Blocking Gates (2026-03-24)
+
+Found during real-world testing: agents skipped approval steps, ran sessions without stopping, ignored LOC budgets.
+
+- **6 blocking gates** enforced across pipeline (task approval, session plan approval, scope confirmation, session end STOP)
+- **Session End Protocol**: structured report + handoff prompt + HARD STOP
+- **Session Scope Confirmation**: LOC budget table shown before every session/task start
+- **Pre-flight checks** in `/do-feature` and `/do-task`: verify session-plan approved, task in current session
+- **No auto-transition**: `/decompose-tech-spec` ends with STOP, user must explicitly invoke execution
+- `session-plan.md` now has `status: draft/approved` frontmatter
 
 <details>
 <summary>v1.1 changes</summary>
