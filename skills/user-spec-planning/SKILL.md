@@ -42,7 +42,19 @@ Conduct interview in Russian. Be thorough and opinionated — an engaged co-thin
 2. Get task description: "Опиши, что хочешь сделать."
 3. Determine work_type (feature / bug / refactoring) from description.
 4. Propose feature name (kebab-case), get user confirmation.
-5. Run `$AGENTS_HOME/shared/scripts/init-feature-folder.sh {name}` — creates folder structure with interview.yml.
+5. **Create feature folder structure** (do NOT run shell scripts — create directly):
+   ```
+   work/{name}/
+   ├── tasks/
+   ├── logs/userspec/
+   ├── logs/techspec/
+   ├── logs/tasks/
+   ├── logs/working/
+   ├── user-spec.md       ← from $AGENTS_HOME/shared/work-templates/user-spec.md.template
+   ├── decisions.md        ← from $AGENTS_HOME/shared/work-templates/decisions.md.template
+   └── logs/userspec/interview.yml  ← from $AGENTS_HOME/shared/interview-templates/feature.yml
+   ```
+   Copy templates, replace `[DATE]` with today's date and `{Feature Name}` with the feature name. If a file already exists — do NOT overwrite.
 6. Update interview.yml: set metadata.started, metadata.status: in_progress, phase1_feature_overview.feature_name, phase1_feature_overview.work_type.
 
 **Checkpoint:** interview.yml exists with status in_progress, feature name confirmed.

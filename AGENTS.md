@@ -10,7 +10,7 @@ These instructions are written for Codex agents that default to the laziest inte
 
 ## Skill Execution: No Scripts
 
-- **NEVER search for or run helper scripts** (dispatch-skill.ps1, init-feature-folder.sh, etc.). They do not exist — not in `~/.agents/shared/scripts/`, not in the project workspace, nowhere. Do NOT try local paths, global paths, or fallback paths. All skills are SKILL.md files — read and follow them directly.
+- **NEVER search for or run helper scripts** (dispatch-skill.ps1, init-feature-folder.sh, smoke-codex-compat.ps1, etc.). Legacy scripts exist in `~/.agents/shared/scripts/` but are DEPRECATED — they break on Windows, require specific shells, and duplicate logic already inlined in SKILL.md files. All skills are SKILL.md files — read and follow them directly. If a skill describes folder creation or file copying — do it inline using your tools, do NOT shell out to a script.
 - When a shim skill (e.g., `decompose-tech-spec`) says "Read and follow {target SKILL.md}" — load that file and execute its instructions step by step. Do NOT improvise a replacement procedure.
 - If a SKILL.md references `$AGENTS_HOME` — resolve it to the actual agents home path and read the file. If a referenced file doesn't exist, tell the user — do NOT invent a workaround.
 - **Integrity check:** before executing any SKILL.md, verify it has no git conflict markers (`<<<<<<<`, `=======`, `>>>>>>>`). If found — do NOT execute, tell user to resolve the conflict first.
