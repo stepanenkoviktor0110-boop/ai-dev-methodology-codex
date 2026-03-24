@@ -1,100 +1,225 @@
-# AI-First Development Methodology v1.1
+# AI-First Development Methodology v1.1 — Codex Version
 
-Structured AI-First development methodology for Codex CLI. Every feature goes through a spec-driven pipeline with automated validators and quality gates at each stage.
+Structured AI-First development methodology for [OpenAI Codex CLI](https://github.com/openai/codex). Every feature goes through a spec-driven pipeline with automated validators and quality gates at each stage.
 
-## Based on
+## What It Does
 
-This is an evolved fork of [molyanov-ai-dev](https://github.com/pavel-molyanov/molyanov-ai-dev) by Pavel Molyanov — the original AI-First Development Methodology for Codex.
+A complete development framework where AI agents handle the full cycle: requirements → architecture → tasks → code → review → documentation. You guide the process, agents do the work.
 
-## What's new in v1.1
+**Problems it solves:**
+- **Context loss between sessions** — distributed knowledge base persists across sessions
+- **Quality without human review** — automated validators at every stage
+- **Scope creep** — specs approved before coding starts
+- **Outdated library knowledge** — Context7 MCP fetches current docs
 
-Changes from code review of the entire methodology:
+## Installation
 
-- **Fixed** deploy task skill reference (`infrastructure` → `deploy-pipeline`) in tech-spec template
-- **Fixed** dimension count inconsistency (10 → 11) in methodology — Resource Management was missing from count
-- **Fixed** validator count mismatch (6 → 5) in task-decomposition
-- **Added** `name: do-task` to do-task skill frontmatter
-- **Added** team protocol override note in code-writing skill (prevents conflict with feature-execution reviewer flow)
-- **Added** `Bash` to code-reviewer agent tools (enables cross-file verification via `tsc --noEmit`, linters)
-- **Replaced** documentation-writing reviewer: `code-reviewer` → `documentation-reviewer` in skills-and-reviewers mapping
-- **Removed** TypeScript/JavaScript ecosystem bias from code-reviewer agent (now language-agnostic)
-- **Removed** prompt-master duplication from Meta Skills table (kept in Execution Skills only)
-- **Standardized** lessons-learned.md link wording in retrospective skill
-- **Added** wave-conflicts to methodology validator description
-- **Fixed** Context Files paths in task template (`$AGENTS_HOME/` → `.agents/` relative paths)
-- **Added** LOC budget rationale in methodology (empirically sized for session context window)
-- **Added** `estimated_loc` documentation in tech-spec-planning
-- **Added** E2E conditional comment in user-spec template
-- **Added** Git Bash requirement comment in init-feature-folder.sh
+### Prerequisites
 
-## Pipeline
+- [Codex CLI](https://github.com/openai/codex) installed and configured
+- [PowerShell 7+](https://github.com/PowerShell/PowerShell) (`pwsh`) for skill dispatcher
+- [GitHub CLI](https://cli.github.com/) (`gh`) for project initialization
+- Git Bash on Windows (for shell scripts)
 
-```
-/new-user-spec → /new-tech-spec → /decompose-tech-spec → /do-feature → /retrospective → /done
+### Step 1: Clone the framework
+
+```bash
+git clone https://github.com/stepanenkoviktor0110-boop/ai-dev-methodology-codex.git ~/.agents
 ```
 
-| Stage | Validators | Output |
-|-------|-----------|--------|
-| User Spec | quality + adequacy | `work/{feature}/user-spec.md` |
-| Tech Spec | skeptic + completeness + security + test + template | `work/{feature}/tech-spec.md` |
-| Tasks | template + reality | `work/{feature}/tasks/*.md` |
-| Code | code-reviewer + security-auditor + test-reviewer | commits |
-| Audit Wave | code + security + test (holistic) | audit reports |
-| Final Wave | pre-deploy QA + deploy + post-deploy | verified feature |
+This places all skills, agents, and templates where Codex expects them (`~/.agents/`).
 
-## Structure
+### Step 2: Configure Codex
 
-```
-skills/          # 20+ skills (planning, execution, quality, meta)
-agents/          # 20 agents (validators, reviewers, creators, QA)
-shared/
-  work-templates/   # Templates for specs, tasks, sessions
-  templates/        # New project scaffolding
-  interview-templates/  # Interview plans (YAML)
-  scripts/          # Shell scripts
-AGENTS.md        # Global preferences
+Add to `~/.codex/config.toml`:
+
+```toml
+model = "gpt-5.4"
+
+# SessionStart hook for checkpoint recovery (optional, for long features)
+[[hooks]]
+event = "SessionStart"
+command = "cat work/*/logs/checkpoint.yml 2>/dev/null || echo 'No active checkpoint'"
 ```
 
-## Key Concepts
+### Step 3: Configure MCP (optional but recommended)
 
-- **Spec-Driven Development** — specs approved before code starts
-- **Multi-level Validation** — automated validators at every stage (2 → 5 → 2 → 3 → 3)
-- **Session Planning** — waves grouped by ~1200 LOC budget per session
-- **Checkpoint Recovery** — resume after context compaction
-- **Retrospective** — lessons learned embedded back into skills
-- **Just-In-Time Context** — agents read only what's needed
+Add [Context7](https://github.com/upstash/context7) MCP server for up-to-date library documentation. In `~/.codex/config.toml`:
 
-## Quick Start
-
-### New project
-```
-/init-project → /init-project-knowledge
+```toml
+[mcp_servers.context7]
+command = "npx"
+args = ["-y", "@upstash/context7-mcp"]
 ```
 
-### New feature
-```
-/new-user-spec → /new-tech-spec → /decompose-tech-spec → /do-feature → /done
+### Step 4: Verify installation
+
+```powershell
+pwsh -File ~/.agents/shared/scripts/smoke-codex-compat.ps1
+# Expected output: PASS
 ```
 
-### Ad-hoc coding
+## Usage
+
+### New Project (from scratch)
+
 ```
-/write-code
+/init-project                  # Template + git + GitHub repo
+/init-project-knowledge        # Interview → fill all project documentation
+```
+
+After this you'll have:
+- GitHub repo with `master` + `dev` branches
+- `.agents/skills/project-knowledge/` filled with project docs
+- `AGENTS.md` pointing to your knowledge base
+
+### New Feature (full pipeline)
+
+```
+/new-user-spec                 # Step 1: Interview → user-spec.md (requirements)
+/new-tech-spec                 # Step 2: Research → tech-spec.md (architecture)
+/decompose-tech-spec           # Step 3: Break into tasks → tasks/*.md + session-plan.md
+/do-feature                    # Step 4: Execute all tasks by waves (parallel agents)
+/retrospective                 # Step 5: Extract lessons → update skills
+/done                          # Step 6: Update project docs → archive feature
+```
+
+Each step has validators that run automatically:
+
+| Step | Command | Validators | Output |
+|------|---------|-----------|--------|
+| Requirements | `/new-user-spec` | quality + adequacy (2) | `work/{feature}/user-spec.md` |
+| Architecture | `/new-tech-spec` | skeptic + completeness + security + test + template (5) | `work/{feature}/tech-spec.md` |
+| Tasks | `/decompose-tech-spec` | template + reality (2) | `work/{feature}/tasks/*.md` |
+| Code | `/do-feature` | code + security + test reviewers (3) | commits |
+| Audit | (auto, last waves) | holistic code + security + test audit (3) | audit reports |
+| QA | (auto, final wave) | pre-deploy + deploy + post-deploy | verified feature |
+
+### Single Task (manual control)
+
+```
+/do-task                       # Execute one task with quality gates
+```
+
+Use when you want to debug, iterate, or manually control execution.
+
+### Ad-hoc Coding (no spec)
+
+```
+/write-code                    # TDD cycle: plan → tests → code → review
+```
+
+Quick coding with automatic code review. No specs needed.
+
+### Other Commands
+
+| Command | Purpose |
+|---------|---------|
+| `/init-project-knowledge` | Fill project documentation via interview |
+| `/retrospective` | Extract lessons learned, update skills |
+| `/done` | Finalize feature, update docs, archive |
+
+## How It Works
+
+### Project Structure
+
+```
+your-project/
+├── .agents/                        # AI agent context (auto-created by /init-project)
+│   └── skills/
+│       └── project-knowledge/      # Your project's knowledge base
+│           ├── SKILL.md
+│           └── references/
+│               ├── project.md      # Purpose, audience, scope
+│               ├── architecture.md # Tech stack, structure, data model
+│               ├── patterns.md     # Code conventions, testing, business rules
+│               └── deployment.md   # Platform, CI/CD, monitoring
+├── work/                           # Feature work items
+│   ├── my-feature/
+│   │   ├── user-spec.md           # Requirements (human-readable)
+│   │   ├── tech-spec.md           # Architecture (for agents)
+│   │   ├── decisions.md           # Decisions made during implementation
+│   │   ├── tasks/                 # Atomic task files
+│   │   └── logs/                  # Session plans, checkpoints, review reports
+│   └── completed/                 # Archived finished features
+├── AGENTS.md                      # Minimal — points to project-knowledge
+└── README.md
+```
+
+### Global Framework (`~/.agents/`)
+
+```
+~/.agents/                          # This repository
+├── skills/                        # 20+ skills (methodology, execution, quality)
+├── agents/                        # 20 agents (validators, reviewers, creators)
+├── shared/
+│   ├── work-templates/            # Templates for specs, tasks, sessions
+│   ├── templates/                 # New project scaffolding
+│   ├── interview-templates/       # Interview plans (YAML)
+│   ├── scripts/                   # Dispatcher, smoke test, init scripts
+│   └── runtime/                   # MCP aliases
+└── AGENTS.md                      # Global preferences
+```
+
+### Key Principles
+
+- **Spec-Driven** — write specs before code. Hierarchy: User Spec → Tech Spec → Tasks → Code
+- **Multi-level Validation** — automated validators at every stage (2 → 5 → 2 → 3)
+- **Session Planning** — waves grouped by ~1200 LOC budget per session (fits context window)
+- **Checkpoint Recovery** — `checkpoint.yml` persists state; SessionStart hook resumes after compaction
+- **Just-In-Time Context** — agents read only what's needed for current task
+- **Retrospective** — lessons learned embedded back into skills after each feature
+
+### Model Tiers
+
+| Tier | Model | Use |
+|------|-------|-----|
+| `tier_opus` | `gpt-5.4` | Complex architecture, security-critical work |
+| `tier_sonnet` | `gpt-5.4-mini` | Reviewers, validators, medium tasks |
+| `tier_haiku` | `gpt-5.4-mini` (low reasoning) | Simple checks, formatting |
+
+### Skills & Agents
+
+**Skills** contain methodology (WHAT to do). **Agents** add isolation + output contracts (HOW to deliver).
+
+| Category | Skills | Agents |
+|----------|--------|--------|
+| Planning | user-spec-planning, tech-spec-planning, task-decomposition, project-planning | interview-completeness-checker, task-creator |
+| Execution | code-writing, feature-execution, pre-deploy-qa, post-deploy-qa | code-researcher |
+| Quality | code-reviewing, security-auditor, test-master | code-reviewer, security-auditor, test-reviewer, prompt-reviewer |
+| Validation | — | userspec-quality-validator, userspec-adequacy-validator, tech-spec-validator, skeptic, completeness-validator, task-validator, reality-checker |
+| Meta | methodology, retrospective, documentation-writing, skill-master | documentation-reviewer, deploy-reviewer, infrastructure-reviewer, skill-checker |
+
+For full details on any skill, read its `SKILL.md` directly:
+```
+cat ~/.agents/skills/{skill-name}/SKILL.md
 ```
 
 ## Codex Runtime Compatibility
 
-This fork uses a Codex-compatible shim instead of Claude-specific `Skill(...)` runtime calls.
+This framework uses a Codex-compatible shim for skill alias resolution:
 
-- Skill alias dispatcher: `shared/scripts/dispatch-skill.ps1`
-- MCP alias mapping: `shared/runtime/mcp-aliases.json`
-- Compatibility smoke check: `shared/scripts/smoke-codex-compat.ps1`
+- **Skill dispatcher**: `shared/scripts/dispatch-skill.ps1` — maps `/new-user-spec` → `user-spec-planning`, etc.
+- **MCP aliases**: `shared/runtime/mcp-aliases.json` — Context7 tool name mapping
+- **Smoke test**: `shared/scripts/smoke-codex-compat.ps1` — checks for legacy Claude Code patterns
 
-Run smoke check:
+## Based on
 
-```powershell
-pwsh -File shared/scripts/smoke-codex-compat.ps1
-```
+Evolved fork of [molyanov-ai-dev](https://github.com/pavel-molyanov/molyanov-ai-dev) by Pavel Molyanov (MIT License).
 
-## License
+## Changelog
 
-Based on [molyanov-ai-dev](https://github.com/pavel-molyanov/molyanov-ai-dev) (MIT License).
+<details>
+<summary>v1.1 changes</summary>
+
+- Fixed deploy task skill reference (`infrastructure` → `deploy-pipeline`)
+- Fixed dimension count inconsistency (10 → 11) — Resource Management was missing
+- Fixed validator count mismatch (6 → 5) in task-decomposition
+- Added team protocol override note in code-writing skill
+- Replaced documentation-writing reviewer mapping
+- Removed TypeScript/JavaScript ecosystem bias (now language-agnostic)
+- Added wave-conflicts to methodology validator
+- Fixed Context Files paths (`$AGENTS_HOME/` → `.agents/` relative paths)
+- Added LOC budget rationale, `estimated_loc` documentation
+- Full Codex CLI adaptation: paths, models, frontmatter, hooks, smoke test
+</details>
