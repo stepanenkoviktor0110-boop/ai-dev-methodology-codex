@@ -6,16 +6,16 @@ feature_dir: work/design-pipeline
 execution_plan: work/design-pipeline/logs/execution-plan.md
 team_name: design-pipeline
 
-last_completed_wave: 0
+last_completed_wave: 2
 total_waves: 5
 
 tasks:
-  1: planned
-  2: planned
-  3: planned
-  4: planned
-  5: planned
-  6: planned
+  1: done
+  2: done
+  3: done
+  4: done
+  5: done
+  6: done
   7: planned
   8: planned
   9: planned
@@ -23,8 +23,8 @@ tasks:
   11: planned
   12: planned
 
-next_wave: 1
+next_wave: 3
 
-current_session: 1
+current_session: 3
 total_sessions: 3
 session_plan: work/design-pipeline/logs/session-plan.md
