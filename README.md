@@ -226,7 +226,7 @@ max_depth = 2       # worker (depth 1) can spawn reviewer (depth 2)
 | Tier | Model | Use |
 |------|-------|-----|
 | `tier_high` | `gpt-5.4` | Workers, complex architecture, security-critical work |
-| `tier_medium` | `gpt-5.4-mini` | Reviewers, validators, medium tasks |
+| `tier_medium` | `gpt-5.3-codex` | Reviewers, validators, medium tasks (specialized coding model) |
 | `tier_low` | `gpt-5.4-mini` (low reasoning) | Simple checks, formatting |
 
 ### Skills & Agents

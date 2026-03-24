@@ -92,13 +92,15 @@ Launch both in parallel:
 
 After individual validation passes, run a final cross-task check:
 
-1. Launch both validators on ALL tasks in a single batch (not split into smaller batches):
-   - `task-validator` — focus: shared resource ownership (one owner, consumers depend_on owner), no competing instances in same wave
+1. **depends_on vs wave consistency — MANDATORY check.** For every task, verify: if `depends_on` lists task X, then task X MUST be in an earlier wave (lower wave number). A task CANNOT depend on another task in the same wave — same-wave tasks run in parallel and cannot guarantee execution order. If found — move the dependent task to the next wave or remove the dependency. This check is non-negotiable.
+
+2. Launch both validators on ALL tasks in a single batch (not split into smaller batches):
+   - `task-validator` — focus: shared resource ownership (one owner, consumers depend_on owner), no competing instances in same wave, **depends_on vs wave conflicts**
    - `reality-checker` — focus: duplicate heavy resource init, hidden dependencies, inconsistent approaches across tasks
 
-2. If issues found → launch `task-creator` in fix mode for affected tasks. Re-validate fixed tasks.
+3. If issues found → launch `task-creator` in fix mode for affected tasks. Re-validate fixed tasks.
 
-3. Max 2 iterations for cross-task check (on top of the 3 individual iterations).
+4. Max 2 iterations for cross-task check (on top of the 3 individual iterations).
 
 **Checkpoint:**
 - [ ] Both validators: status=approved OR user resolved remaining issues

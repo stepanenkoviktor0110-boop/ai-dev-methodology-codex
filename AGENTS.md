@@ -11,9 +11,17 @@ These instructions are written for Codex agents that default to the laziest inte
 ## Skill Execution: No Scripts
 
 - **NEVER search for, read, or run helper scripts** (dispatch-skill.ps1, init-feature-folder.sh, smoke-codex-compat.ps1, etc.). Legacy scripts exist in `~/.agents/shared/scripts/` but are DEPRECATED and BROKEN — they require `/bin/bash` which is unavailable in most Windows environments. Their logic is already inlined in SKILL.md files. If you catch yourself about to run a `.sh` or `.ps1` from `shared/scripts/` — STOP. Read the SKILL.md instead — it has the same steps written as inline instructions. Use your built-in tools (mkdir, file-write, file-copy) to create folders and files.
-- When a shim skill (e.g., `decompose-tech-spec`) says "Read and follow {target SKILL.md}" — load that file and execute its instructions step by step. Do NOT improvise a replacement procedure.
-- If a SKILL.md references `$AGENTS_HOME` — resolve it to the actual agents home path and read the file. If a referenced file doesn't exist, tell the user — do NOT invent a workaround.
+- **Shim (proxy) skills** redirect to another skill. This is normal, not an error. When a shim skill (e.g., `decompose-tech-spec` → `task-decomposition`) says "Read and follow {target SKILL.md}" — load that file and execute its instructions step by step. Do NOT improvise a replacement procedure. Do NOT complain about the redirect — just follow it.
+- If a SKILL.md references `$AGENTS_HOME` — resolve it to the actual agents home path (`~/.agents/`) and read the file. **The global framework lives in `~/.agents/` (a git repo).** The project-local `.agents/` directory is project-specific knowledge only — it is NOT the framework source. Do NOT confuse them.
 - **Integrity check:** before executing any SKILL.md, verify it has no git conflict markers (`<<<<<<<`, `=======`, `>>>>>>>`). If found — do NOT execute, tell user to resolve the conflict first.
+
+## Recovery After Interruption
+
+If a turn is aborted, the user sends a message mid-operation, or an agent crashes:
+1. **Do NOT assume prior writes succeeded.** Read back every file you were modifying and verify its current state.
+2. Re-check `git status` to see what is staged, modified, or untracked.
+3. Resume from the last verified state — do NOT re-run steps that already completed successfully.
+4. If a sub-agent returned `not_found` on `wait_agent` — it crashed or was cleaned up. Do NOT retry the same agent ID. Spawn a new agent for the remaining work.
 
 ## ⛔ Parallel Agent Limit: MAX 4
 
@@ -39,6 +47,11 @@ This rule overrides `max_threads` in config.toml. Even if config says `max_threa
 ## Git: Known Pitfalls
 
 - **`work/{feature}/logs/` is gitignored** by most `.gitignore` configs (global `logs/` rule). For methodology artifacts in this directory (session-plan.md, review reports, etc.) use `git add -f` when committing. Otherwise phase-gate commits will silently skip these files.
+- **Pre-commit hooks (husky/lint-staged) WILL block methodology commits.** When committing task files, session plans, or other methodology artifacts, lint-staged may try to run prettier/eslint on unrelated staged files and fail. Solutions:
+  - Stage ONLY methodology files for the commit: `git add work/{feature}/tasks/*.md` — do NOT use `git add .`
+  - If lint-staged still fails on unrelated files — commit with `--no-verify` ONLY for pure methodology artifacts (no code). Log this in decisions.md.
+- **Atomic commits are MANDATORY.** Each commit MUST contain only files related to one logical change. Before every `git commit`, run `git diff --cached --name-only` and verify the file list. If unrelated files are staged — unstage them first. A commit that "accidentally" includes extra files corrupts git history and makes rollback impossible.
+- **Verify file state after every write.** After writing or editing any file (especially YAML frontmatter), immediately read it back and confirm the content is correct. PowerShell, encoding issues, and interrupted operations can silently corrupt files. If frontmatter is wrong after write — fix it immediately, do NOT proceed with stale state.
 
 ## Communication
 - Общаться с пользователем только по-русски. Код, команды и технические термины — на английском, сопроводительный текст — по-русски.

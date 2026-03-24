@@ -27,8 +27,8 @@ Before starting, check [lessons-learned.md](references/lessons-learned.md) for k
 
 Use model tiers from [model-profiles.md](../tech-spec-planning/references/model-profiles.md):
 - Worker default: `tier_high` (`gpt-5.4`, fallback `gpt-5.3-codex`)
-- Reviewer default: `tier_medium` (`gpt-5.4-mini`, fallback `gpt-5.3-codex`)
-- Cheap routine work: `tier_low` (`gpt-5.4-mini` with `reasoning_effort: low`, fallback `gpt-5.1-codex-max`)
+- Reviewer default: `tier_medium` (`gpt-5.3-codex`, fallback `gpt-5.4-mini`)
+- Cheap routine work: `tier_low` (`gpt-5.4-mini` with `reasoning_effort: low`, fallback `gpt-5.1-codex-mini`)
 
 ## Phase 0: Pre-flight Checks — BLOCKING GATE
 

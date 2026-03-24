@@ -9,7 +9,7 @@ These fields are NOT required for most skills. Use only when needed.
 | `argument-hint` | None | Autocomplete hint shown after skill name |
 | `disable-model-invocation` | `false` | If `true`, skill only triggers manually via `/skill-name` |
 | `user-invocable` | `true` | If `false`, skill hidden from `/` menu, only Codex can invoke |
-| `model` | `inherit` | Override model: `gpt-5.4`, `gpt-5.4-mini`, `gpt-5.3-codex`, `gpt-5.1-codex-max`, `inherit` |
+| `model` | `inherit` | Override model: `gpt-5.4`, `gpt-5.4-mini`, `gpt-5.4-nano`, `gpt-5.3-codex`, `inherit` |
 
 ## When to Use Each Field
 
@@ -59,20 +59,20 @@ Overrides the model used for this skill.
 ```yaml
 ---
 name: quick-lookup
-model: gpt-5.1-codex-max
+model: gpt-5.4-mini
 ---
 ```
 
-Options:
+Options (only models available in Codex CLI):
 - `inherit` — use orchestrator's model (default, recommended)
-- `gpt-5.4-mini` — fast, good for most tasks
-- `gpt-5.4` — best quality, use for complex reasoning
-- `gpt-5.3-codex` — strong code generation, fallback for opus
-- `gpt-5.1-codex-max` — budget option for simple lookups
+- `gpt-5.4` — flagship, best quality (tier_high)
+- `gpt-5.3-codex` — specialized coding model, best for agentic coding tasks (tier_medium)
+- `gpt-5.4-mini` — fast, low cost (tier_low with `reasoning_effort: low`)
+- `gpt-5.1-codex-mini` — budget fallback for tier_low
 
 Recommended profile mapping:
 - `tier_high`: `gpt-5.4` (fallback `gpt-5.3-codex`)
-- `tier_medium`: `gpt-5.4-mini` (fallback `gpt-5.3-codex`)
-- `tier_low`: `gpt-5.4-mini` with low reasoning (fallback `gpt-5.1-codex-max`)
+- `tier_medium`: `gpt-5.3-codex` (fallback `gpt-5.4-mini`)
+- `tier_low`: `gpt-5.4-mini` with `reasoning_effort: low` (fallback `gpt-5.1-codex-mini`)
 
 Use sparingly. `inherit` is usually best.

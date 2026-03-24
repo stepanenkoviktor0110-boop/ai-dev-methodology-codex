@@ -44,8 +44,8 @@ Per scenario:
 
 Model selection:
 - complex/coding scenarios -> `tier_high` (`gpt-5.4`)
-- medium scenarios -> `tier_medium` (`gpt-5.4-mini`)
-- simple deterministic scenarios -> `tier_low` (`gpt-5.4-mini`, low reasoning)
+- medium scenarios -> `tier_medium` (`gpt-5.3-codex`)
+- simple deterministic scenarios -> `tier_low` (`gpt-5.4-mini`, `reasoning_effort: low`)
 
 ## Phase 3: Run Scenario
 

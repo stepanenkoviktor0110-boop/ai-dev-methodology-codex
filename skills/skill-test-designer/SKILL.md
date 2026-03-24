@@ -75,8 +75,8 @@ Discuss with the user to define the test scope:
 
 5. **Model profile**: choose one profile for each scenario:
    - `tier_high` -> `gpt-5.4` for complex tasks (coding, architecture)
-   - `tier_medium` -> `gpt-5.4-mini` for standard tasks
-   - `tier_low` -> `gpt-5.4-mini` with low reasoning for simple deterministic checks
+   - `tier_medium` -> `gpt-5.3-codex` for standard tasks
+   - `tier_low` -> `gpt-5.4-mini` with `reasoning_effort: low` for simple deterministic checks
 
 6. **Persona**: Keep the default persona from
    [scenario-format.md](references/scenario-format.md) as-is. Modify only
