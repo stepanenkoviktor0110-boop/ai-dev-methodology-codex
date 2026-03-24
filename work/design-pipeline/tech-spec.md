@@ -1,100 +1,236 @@
 ---
-created: YYYY-MM-DD
-status: draft | approved
-branch: dev | feature/{feature-name}
-size: S | M | L
+created: 2026-03-25
+status: draft
+branch: dev
+size: L
 ---
 
-# Tech Spec: {Feature Name}
+# Tech Spec: design-pipeline
 
 ## Solution
 
-Technical approach. (Длина зависит от задачи — без ограничений.)
+Create a Design Pipeline — a framework of 4 MVP skills for visual aesthetics work in web projects. The pipeline operates as a design assistant: initializes design systems through interview, generates HTML+SVG mockups, reviews UI code against design tokens, and learns from feedback through retrospective.
+
+The pipeline migrates and replaces the existing `like-figma` monolithic skill, splitting it into focused skills with enriched design knowledge (color psychology, color principles, grid techniques, font pairing). Integration with the development methodology is minimal (~5 lines in do-task) to keep token cost low.
+
+All design artifacts are stored as code in the project's `.design-system/` directory — no Figma API, no external tools.
 
 ## Architecture
 
 ### What we're building/modifying
 
-- **Component A** — purpose
-- **Component B** — purpose
+- **`skills/design-system-init/`** — procedural skill: project scan → interview (mood, palette, typography, spacing, components) → generates `.design-system/tokens.json` + component HTML files. Migrates like-figma Phase 1-2 with color psychology and font pairing enrichment.
+- **`skills/design-generate/`** — procedural skill: parses user request → selects layout → assembles components → generates HTML + SVG. Migrates like-figma Phase 3 with advanced grid techniques.
+- **`skills/design-review/`** — informational skill: reads `tokens.json` + changed UI files → gives 2-3 concrete token-based recommendations. Lightweight (~500-1000 tokens overhead).
+- **`skills/design-retrospective/`** — procedural skill: collects design session feedback → identifies aesthetic patterns → writes lessons → promotes repeated lessons to principles → generates next-session prompt.
+- **`shared/design-references/`** — shared reference directory for files used by multiple design skills (design-tokens.md, color-psychology.md, color-principles.md).
+- **`skills/do-task/SKILL.md`** — minimal modification (~5 lines): after code commit, check for `.design-system/tokens.json` + UI files → call design-review subagent.
+- **`skills/design-system-init/references/font-pairing.md`** — new reference: font pairing rules, classic combinations, weight contrasts, typographic scale.
 
 ### How it works
 
-Data flow, interactions, sequence.
+**Design System Init flow:**
+1. Scan project for existing colors/fonts/spacing (Tailwind config > CSS vars > SCSS > hardcoded)
+2. Interview: project context & mood (using color-psychology.md emotional map) → palette proposal → typography pairs (using font-pairing.md) → spacing (golden ratio/Fibonacci options from grid-techniques) → components
+3. Build: generate `tokens.json` (per design-tokens.md schema) + component HTML files (per component-patterns.md) → each opens standalone in browser
+4. Verify: validate JSON, check CSS custom properties usage, contrast ratio ≥ 4.5:1
+
+**Design Generate flow:**
+1. Read `.design-system/tokens.json` + component files
+2. Parse user description → select layout from 15 patterns (5 basic from generation-guide + 10 advanced from grid-techniques)
+3. Assemble page from components, apply tokens
+4. Generate HTML (interactive, uses preview-template.html) + SVG (static, 1440x900 or 390x844)
+5. Present → user sends screenshot with feedback → iterate. If context exhausted → generate continuation prompt
+
+**Design Review flow (from do-task):**
+1. Check: `.design-system/tokens.json` exists AND task changed UI files (.tsx/.vue/.html/.css/.scss)
+2. Read only `tokens.json` (not full DS — token economy)
+3. Scan changed files for hardcoded values, non-DS colors/spacing/fonts
+4. Output 2-3 concrete recommendations: "color #3B82F6 → use --color-primary-500", "gap 8px → DS minimum --space-4 (16px)"
+5. Apply fixes → commit
+
+**Design Retrospective flow:**
+1. Collect evidence: user feedback during session, corrections made, files changed
+2. Identify patterns: repeated color corrections, rejected font pairs, spacing adjustments, layout reworks
+3. Write lessons to `.design-system/lessons-learned.md` (Problem/Cause/Solution/Rule format)
+4. Count occurrences — if lesson appears 3+ times → promote to `.design-system/design-principles.md`
+5. Generate next-session prompt (self-contained, no prior context needed)
 
 ### Shared resources
 
-Heavy resources shared across components (ML models, DB connection pools, browser instances, API clients).
-If none — write "None".
-
-| Resource | Owner (creates) | Consumers | Instance count |
-|----------|----------------|-----------|----------------|
-| example: FastEmbedEmbedding | main.py | Indexer, QueryEngine | 1 (singleton) |
+None.
 
 ## Decisions
 
-### Decision 1: [topic]
-**Decision:** what we chose
-**Rationale:** why
-**Alternatives considered:** what else, why rejected
+### Decision 1: Shared design-references directory
+**Decision:** Create `shared/design-references/` for references used by multiple design skills.
+**Rationale:** design-tokens.md is needed by init, generate, and review. color-principles.md by init and review. Duplicating violates DRY; cross-skill path references are fragile. `shared/` directory pattern already exists (`shared/work-templates/`).
+**Alternatives considered:** (1) Duplicate references in each skill — simple but maintenance burden. (2) Cross-reference via `$AGENTS_HOME/skills/{other-skill}/references/` — fragile coupling.
 
-### Decision 2: ...
+### Decision 2: No interview template file
+**Decision:** Interview logic embedded directly in design-system-init SKILL.md, not in `shared/interview-templates/design.yml`.
+**Rationale:** Interview templates (`feature.yml`, `skill.yml`) are used by `user-spec-planning` which has a generic interview loop. Design-system-init has a domain-specific interview flow with topic-by-topic progression (scan → mood → palette → typography → spacing → components). This doesn't fit the generic template structure.
+**Alternatives considered:** Creating `design.yml` template — adds indirection without benefit since no other skill would reuse it.
+
+### Decision 3: No shim skills for MVP
+**Decision:** Each design-* skill is its own canonical skill with full procedural content. No shims.
+**Rationale:** Shims exist when a user-facing command (`/new-user-spec`) redirects to a deeper skill (`user-spec-planning`). MVP design skills are invoked directly (`/design-system-init`, `/design-generate`, etc.) — there's no deeper layer to redirect to.
+**Alternatives considered:** Creating `/design` umbrella command with shims — premature abstraction for 4 independent skills.
+
+### Decision 4: design-review is informational, not procedural
+**Decision:** design-review uses informational skill type (sections by logic, decision frameworks) rather than procedural (strict phases).
+**Rationale:** Review has no strict phase sequence — it reads tokens, scans files, applies criteria, outputs recommendations. The order is flexible. Contrast with design-system-init which must follow scan → interview → build → verify strictly.
+**Alternatives considered:** Procedural with 3 phases — overcomplicates a straightforward check.
+
+### Decision 5: Minimal do-task integration
+**Decision:** Add ~5 lines to do-task SKILL.md between Step 2.3 (git commit) and Step 2.4 (reviewers) for design-review hook.
+**Rationale:** User-spec explicitly requires token economy (~500-1000 tokens overhead). Reading only `tokens.json` + scanning only changed files keeps cost at ~1-2% of task budget. Full DS analysis, mockup generation, and component creation are post-MVP.
+**Alternatives considered:** (1) Hook at write-code level — too invasive, harder to control. (2) Separate post-review step — adds latency without benefit.
+
+### Decision 6: Reference deployment — copy, not symlink
+**Decision:** Copy reference files from like-figma and work/design-pipeline/references/ to their target locations. Delete originals after migration verified.
+**Rationale:** Skills must be self-contained. Symlinks are fragile on Windows. File copies are simple, verified by skill-checker.
+**Alternatives considered:** Git symlinks or relative paths — platform-dependent, adds complexity.
+
+### Decision 7: design-principles.md lives in project, not in skill
+**Decision:** `.design-system/design-principles.md` is a project-level file, populated by design-retrospective. Not a skill reference.
+**Rationale:** Design principles are project-specific taste accumulated from user feedback. Different projects have different aesthetic profiles. Skill references contain universal design knowledge.
+**Alternatives considered:** Skill-level reference — would mix universal knowledge with project-specific taste.
 
 ## Data Models
 
-DB schemas, interfaces, types. Skip if N/A.
+### tokens.json schema (from design-tokens.md)
+
+```json
+{
+  "colors": {
+    "primary": { "50": "#hex", "100": "#hex", ..., "900": "#hex" },
+    "secondary": { "50-900": "..." },
+    "neutral": { "0-1000": "..." },
+    "semantic": { "success": "#hex", "warning": "#hex", "error": "#hex", "info": "#hex" },
+    "background": { "default": "#hex", "surface": "#hex", "elevated": "#hex" },
+    "text": { "primary": "#hex", "secondary": "#hex", "disabled": "#hex", "inverse": "#hex" }
+  },
+  "typography": {
+    "families": { "heading": "font", "body": "font", "mono": "font" },
+    "sizes": { "xs": "rem", ..., "4xl": "rem" },
+    "weights": { "regular": 400, "medium": 500, "semibold": 600, "bold": 700 },
+    "lineHeights": { "tight": 1.25, "normal": 1.5, "relaxed": 1.75 }
+  },
+  "spacing": { "1": "4px", "2": "8px", ..., "16": "64px" },
+  "radii": { "sm": "4px", "md": "8px", "lg": "16px", "full": "9999px" },
+  "shadows": { "sm": "...", "md": "...", "lg": "..." },
+  "breakpoints": { "sm": "640px", "md": "768px", "lg": "1024px", "xl": "1280px" }
+}
+```
+
+### .design-system/ directory structure (in user's project)
+
+```
+.design-system/
+├── tokens.json                    # design tokens
+├── design-principles.md           # accumulated taste (from retrospective)
+├── lessons-learned.md             # raw lessons (from retrospective)
+├── components/
+│   ├── button.html                # standalone component showcase
+│   ├── card.html
+│   ├── input.html
+│   └── ...
+└── pages/
+    ├── {name}.html                # generated page (interactive)
+    └── {name}.svg                 # generated page (static)
+```
 
 ## Dependencies
 
 ### New packages
-- `package-name` — purpose
+
+None — skills are markdown instructions, no runtime dependencies.
 
 ### Using existing (from project)
-- `module-name` — how
+
+- `skills/like-figma/references/design-tokens.md` — token schema, copied to shared/design-references/
+- `skills/like-figma/references/component-patterns.md` — component catalog, copied to design-generate/references/
+- `skills/like-figma/references/generation-guide.md` — page assembly guide, copied and enriched to design-generate/references/
+- `skills/like-figma/assets/preview-template.html` — HTML template, copied to design-generate/assets/
+- `work/design-pipeline/references/color-psychology.md` — emotional color map, moved to shared/design-references/
+- `work/design-pipeline/references/color-principles.md` — 10 color principles, moved to shared/design-references/
+- `work/design-pipeline/references/grid-techniques.md` — 10 grid techniques, moved to design-generate/references/
 
 ## Testing Strategy
 
-**Feature size:** S / M / L
+**Feature size:** L
 
 ### Unit tests
-- Scenario 1: what we test
-- Scenario 2: ...
+
+Not applicable — skills are markdown instructions, not executable code.
 
 ### Integration tests
-- Scenario 1 (if M/L feature, or if needed)
-- "None" (if S feature and agreed with user)
+
+Not applicable — no runtime code to integrate.
 
 ### E2E tests
-- Critical flow 1 (if L feature)
-- "None" (if S/M and not needed)
+
+Not applicable — skills don't have a testable runtime.
+
+### Scenario tests (primary method)
+
+Via skill-test-designer → skill-tester pipeline:
+
+- **design-system-init:** (1) Fresh project with no styles — creates tokens.json from scratch. (2) Project with Tailwind config — extracts existing values. (3) `.design-system/` already exists — asks update/recreate/cancel. (4) Non-web project — refuses with explanation.
+- **design-generate:** (1) Valid DS exists — generates HTML+SVG from description. (2) No DS — refuses, suggests `/design-system-init`. (3) Missing component — creates simple on-the-fly, decomposes complex. (4) Context exhaustion — stops, generates continuation prompt.
+- **design-review:** (1) UI files with hardcoded colors — gives concrete token recommendations. (2) Files already using DS tokens — reports "styles match DS". (3) No `.design-system/tokens.json` — skips silently. (4) No UI files changed — skips silently.
+- **design-retrospective:** (1) Session with corrections — creates lessons in lessons-learned.md. (2) Lesson repeated 3+ times — promotes to design-principles.md. (3) Generates next-session prompt.
+
+### Manual verification
+
+On a real web project (e.g., hookah webapp):
+- User opens HTML components in browser — visually correct and aesthetic
+- User opens generated page — layout matches description, colors/fonts consistent
+- User sends screenshot with feedback — agent iterates appropriately
+- User checks retrospective lessons — meaningful, not boilerplate
 
 ## Agent Verification Plan
 
 **Source:** user-spec "Как проверить" section.
 
 ### Verification approach
-How agent verifies beyond automated tests.
-Per-task smoke checks are specified in each task's Verify-smoke / Verify-user fields in Implementation Tasks.
-Post-deploy checks are described in the Post-deploy verification task description.
+
+1. After design-system-init: validate `tokens.json` with `node -e "JSON.parse(require('fs').readFileSync('.design-system/tokens.json'))"` — must parse without errors, contain colors/typography/spacing sections.
+2. After design-system-init: grep component HTML files for hardcoded hex/px values — must use CSS custom properties (`--color-*`, `--space-*`, `--font-*`).
+3. After design-system-init: run contrast ratio check script on text/background color pairs — all must be ≥ 4.5:1.
+4. After design-review: verify recommendations contain specific token names (not generic "make it prettier").
+5. After design-generate: validate generated HTML references tokens from DS.
 
 ### Tools required
-Playwright MCP, Telegram MCP, curl, bash — which are needed.
+
+bash (node, grep, contrast check script). No MCP tools needed — all verification is local.
 
 ## Risks
 
 | Risk | Mitigation |
 |------|-----------|
-| Risk 1 | What we do |
+| Generated HTML/SVG looks bad without browser rendering feedback | User sends screenshots with comments, agent iterates. design-retrospective accumulates taste profile. |
+| Token budget exceeded on large projects | MVP integration reads only tokens.json (~500-1000 tokens). Large pages decomposed into sessions. |
+| Subjective "beauty" disagreements | User provides references, retrospective accumulates project-specific taste, lessons promote to principles. |
+| font-pairing.md quality — new reference, no existing source | Create based on established typography knowledge (Google Fonts combinations, contrast/concordance principles). Validate with skill-checker. |
+| like-figma deletion breaks existing users | Delete only after all 4 skills verified. like-figma stays until Final Wave QA passes. |
+| Windows path issues with shared references | Use forward slashes in all skill references. Tested by smoke check on creation. |
 
 ## Acceptance Criteria
 
-Технические критерии приёмки (дополняют пользовательские из user-spec):
+Technical acceptance criteria (complement user-spec criteria):
 
-- [ ] API возвращает корректные коды ответов (200, 201, 400, 404, 500)
-- [ ] Миграции БД применяются и откатываются без ошибок
-- [ ] Все тесты проходят (unit, integration если есть)
-- [ ] Нет регрессий в существующих тестах
-- [ ] ...
+- [ ] 4 skill directories created: `skills/design-system-init/`, `skills/design-generate/`, `skills/design-review/`, `skills/design-retrospective/`
+- [ ] Each SKILL.md passes skill-checker validation (frontmatter, <500 lines, Pattern A/B links, procedural phases/checkpoints where applicable)
+- [ ] `shared/design-references/` contains design-tokens.md, color-psychology.md, color-principles.md
+- [ ] `design-system-init/references/font-pairing.md` created with concrete font pair recommendations
+- [ ] `design-generate/references/` contains component-patterns.md, generation-guide.md (enriched), grid-techniques.md
+- [ ] `design-generate/assets/preview-template.html` copied from like-figma
+- [ ] do-task SKILL.md updated with design-review integration (~5 lines between Step 2.3 and 2.4)
+- [ ] All reference links in SKILL.md files resolve to existing files
+- [ ] like-figma skill directory deleted after migration verified
+- [ ] No regression in existing do-task flow (design-review is additive, skips silently when no DS)
 
 ## Implementation Tasks
 
@@ -106,71 +242,92 @@ Playwright MCP, Telegram MCP, curl, bash — which are needed.
      Verify-user: agent asks user to verify something (UI, behavior, experience).
      Both fields optional — omit if task is internal logic fully covered by tests. -->
 
-### Wave 1 (независимые)
+### Wave 1 (independent — shared references + font-pairing)
 
-#### Task 1: [Name]
-- **Description:** Создать REST-эндпоинт для регистрации пользователей. Нужен для MVP авторизации. Результат: POST /api/users возвращает 201.
+#### Task 1: Create shared design-references directory
+- **Description:** Create `shared/design-references/` and populate with design-tokens.md (from like-figma), color-psychology.md, color-principles.md (from work/design-pipeline/references/). These shared references are used by multiple design skills.
+- **Skill:** skill-master
+- **Reviewers:** skill-checker
+- **Verify-smoke:** check all 3 files exist and are non-empty: `ls -la shared/design-references/`
+- **Files to modify:** `shared/design-references/design-tokens.md` (new), `shared/design-references/color-psychology.md` (new), `shared/design-references/color-principles.md` (new)
+- **Files to read:** `skills/like-figma/references/design-tokens.md`, `work/design-pipeline/references/color-psychology.md`, `work/design-pipeline/references/color-principles.md`
+
+#### Task 2: Create font-pairing.md reference
+- **Description:** Write `font-pairing.md` — rules for heading+body font combinations using Google Fonts. Covers contrast vs concordance pairing, weight hierarchy, typographic scale ratios, classic combinations with rationale. Required by design-system-init for typography interview.
+- **Skill:** skill-master
+- **Reviewers:** skill-checker
+- **Files to modify:** `skills/design-system-init/references/font-pairing.md` (new)
+- **Files to read:** `shared/design-references/design-tokens.md` (typography section for schema alignment)
+
+### Wave 2 (depends on Wave 1 — core skills creation)
+
+#### Task 3: Create design-system-init skill
+- **Description:** Procedural skill for design system creation through project scan and interview. Migrates like-figma Phase 1-2, enriched with color psychology (palette by mood), font pairing guidance, and golden ratio/Fibonacci spacing options. Outputs `.design-system/tokens.json` + component HTML files.
+- **Skill:** skill-master
+- **Reviewers:** skill-checker
+- **Verify-smoke:** spawn agent with prompt "create design system for a calm spa website" → verify it follows skill phases
+- **Files to modify:** `skills/design-system-init/SKILL.md` (new)
+- **Files to read:** `skills/like-figma/SKILL.md` (Phase 1-2), `shared/design-references/design-tokens.md`, `shared/design-references/color-psychology.md`, `shared/design-references/color-principles.md`, `skills/design-system-init/references/font-pairing.md`, `skills/skill-master/SKILL.md`
+
+#### Task 4: Create design-generate skill
+- **Description:** Procedural skill for generating HTML+SVG mockups from text descriptions. Migrates like-figma Phase 3 with enriched layout selection (15 patterns: 5 basic + 10 advanced grids). Assembles pages from DS components, uses preview template, supports iteration via user screenshots.
+- **Skill:** skill-master
+- **Reviewers:** skill-checker
+- **Verify-smoke:** spawn agent with prompt "generate a login page" (with mock DS) → verify it follows skill phases
+- **Files to modify:** `skills/design-generate/SKILL.md` (new), `skills/design-generate/references/component-patterns.md` (new, from like-figma), `skills/design-generate/references/generation-guide.md` (new, enriched from like-figma), `skills/design-generate/references/grid-techniques.md` (new, from work/), `skills/design-generate/assets/preview-template.html` (new, from like-figma)
+- **Files to read:** `skills/like-figma/SKILL.md` (Phase 3), `skills/like-figma/references/component-patterns.md`, `skills/like-figma/references/generation-guide.md`, `skills/like-figma/assets/preview-template.html`, `work/design-pipeline/references/grid-techniques.md`, `shared/design-references/design-tokens.md`, `skills/skill-master/SKILL.md`
+
+#### Task 5: Create design-review skill
+- **Description:** Informational skill for lightweight UI code review against design tokens. Reads only tokens.json and changed files, gives 2-3 concrete token-based recommendations. Designed for minimal token overhead (~500-1000 tokens) when called from do-task.
+- **Skill:** skill-master
+- **Reviewers:** skill-checker
+- **Files to modify:** `skills/design-review/SKILL.md` (new)
+- **Files to read:** `shared/design-references/design-tokens.md`, `shared/design-references/color-principles.md`, `skills/skill-master/SKILL.md`
+
+#### Task 6: Create design-retrospective skill
+- **Description:** Procedural skill for design session retrospective. Collects user feedback and corrections, identifies aesthetic patterns, writes lessons to `.design-system/lessons-learned.md`, promotes lessons repeated 3+ times to `design-principles.md`, generates self-contained next-session prompt.
+- **Skill:** skill-master
+- **Reviewers:** skill-checker
+- **Files to modify:** `skills/design-retrospective/SKILL.md` (new)
+- **Files to read:** `skills/retrospective/SKILL.md` (pattern to mirror), `skills/skill-master/SKILL.md`
+
+### Wave 3 (depends on Wave 2 — integration + cleanup)
+
+#### Task 7: Integrate design-review into do-task
+- **Description:** Add design-review hook to do-task SKILL.md between Step 2.3 (git commit) and Step 2.4 (reviewers). Check `.design-system/tokens.json` existence + UI file changes → call design-review subagent. ~5 lines addition, no existing flow disruption.
+- **Skill:** skill-master
+- **Reviewers:** skill-checker
+- **Files to modify:** `skills/do-task/SKILL.md`
+- **Files to read:** `skills/design-review/SKILL.md`
+
+#### Task 8: Delete like-figma skill
+- **Description:** Remove `skills/like-figma/` directory after verifying all content has been migrated to new skills. This is the final cleanup — all references, assets, and logic are now in design-system-init, design-generate, and shared/design-references.
 - **Skill:** code-writing
-- **Reviewers:** code-reviewer, security-auditor, test-reviewer
-- **Verify-smoke:** `curl -X POST localhost:3000/api/users -d '{"name":"test","email":"test@test.com"}' -H 'Content-Type: application/json'` → 201
-- **Files to modify:** `src/api/users.ts`, `src/models/user.ts`
-- **Files to read:** `src/api/index.ts`, `src/middleware/auth.ts`
-
-#### Task 2: [Name]
-- **Description:** Добавить форму создания пользователя (name, email, role). Связывает UI с API из Task 1. Результат: заполненная форма отправляет POST /api/users.
-- **Skill:** code-writing
-- **Reviewers:** code-reviewer, test-reviewer
-- **Verify-user:** open localhost:3000/users → form renders, submit creates user
-- **Files to modify:** `src/components/UserForm.tsx`
-- **Files to read:** `src/components/BaseForm.tsx`, `src/hooks/useValidation.ts`
-
-### Wave 2 (зависит от Wave 1)
-
-#### Task 3: [Name]
-- **Description:** Интегрировать отправку welcome-email при создании пользователя. Асинхронно, не блокирует основной flow. Результат: после POST /api/users уходит email.
-- **Skill:** code-writing
-- **Reviewers:** code-reviewer, security-auditor, test-reviewer
-- **Files to modify:** `src/services/notification.ts`
-- **Files to read:** `src/api/users.ts`, `src/config/services.ts`
+- **Reviewers:** code-reviewer
+- **Verify-smoke:** verify like-figma directory no longer exists; verify all 4 new skills + shared references exist
+- **Files to modify:** `skills/like-figma/` (delete entire directory)
+- **Files to read:** `skills/design-system-init/SKILL.md`, `skills/design-generate/SKILL.md`, `skills/design-review/SKILL.md`, `skills/design-retrospective/SKILL.md`, `shared/design-references/`
 
 ### Audit Wave
 
-<!-- Full-feature audit: 3 auditors review all code in parallel. Always present. -->
-<!-- Auditors read code and write reports. If issues found — lead spawns a fixer, auditors become reviewers. -->
-
-#### Task N-2: Code Audit
-- **Description:** Full-feature code quality audit. Read all source files created/modified in this feature (from decisions.md + tech-spec "Files to modify"). Review holistically for cross-component issues: duplicate resource initialization, shared resources compliance with Architecture decisions, architectural consistency. Write audit report.
+#### Task 9: Code Audit
+- **Description:** Full-feature code quality audit. Read all SKILL.md files and references created/modified in this feature. Review holistically for cross-skill consistency: reference links validity, naming conventions, tone consistency, structural patterns compliance with skill-master. Write audit report.
 - **Skill:** code-reviewing
 - **Reviewers:** none
 
-#### Task N-1: Security Audit
-- **Description:** Full-feature security audit. Read all source files created/modified in this feature. Analyze for OWASP Top 10 across all components, cross-component auth/data flow. Write audit report.
+#### Task 10: Security Audit
+- **Description:** Full-feature security audit. Read all SKILL.md files for potential prompt injection vectors, unsafe command patterns in verify-smoke instructions, path traversal risks in file operations. Write audit report.
 - **Skill:** security-auditor
 - **Reviewers:** none
 
-#### Task N: Test Audit
-- **Description:** Full-feature test quality audit. Read all test files created in this feature. Verify coverage, meaningful assertions, test pyramid balance across all components. Write audit report.
+#### Task 11: Test Audit
+- **Description:** Full-feature test quality audit. Review scenario test coverage across all 4 skills: edge cases, error paths, boundary conditions. Verify testing strategy adequacy for L-size feature. Write audit report.
 - **Skill:** test-master
 - **Reviewers:** none
 
 ### Final Wave
 
-<!-- QA is always present. Deploy and Post-deploy — only if applicable for this feature. -->
-
-#### Task N: Pre-deploy QA
-- **Description:** Acceptance testing: run all tests, verify acceptance criteria from user-spec and tech-spec
+#### Task 12: Pre-deploy QA
+- **Description:** Acceptance testing: verify all acceptance criteria from user-spec and tech-spec. Run skill-checker on all 4 skills. Validate all reference file links. Verify do-task integration doesn't break existing flow.
 - **Skill:** pre-deploy-qa
-- **Reviewers:** none
-
-#### Task N+1: Deploy (if applicable)
-- **Description:** Deploy + verify logs
-- **Skill:** deploy-pipeline
-- **Reviewers:** none
-
-#### Task N+2: Post-deploy verification (if applicable)
-- **Description:** Live environment verification:
-  - [verification step 1] — tool: [Telegram MCP / curl / bash]
-  - [verification step 2] — tool: [tool]
-  Tools: [list of required MCP tools / curl / bash]
-- **Skill:** post-deploy-qa
 - **Reviewers:** none
