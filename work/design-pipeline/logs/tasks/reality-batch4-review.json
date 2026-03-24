@@ -1,0 +1,50 @@
+{
+  "validator": "reality-checker",
+  "batch": [10, 11, 12],
+  "iteration": 1,
+  "status": "changes_required",
+  "findings": [
+    {
+      "severity": "critical",
+      "category": "missing_file",
+      "task": 10,
+      "issue": "All 7 skill/asset links in task 10 use incorrect relative depth '../../skills/' which resolves to 'work/skills/' (does not exist). Correct depth from 'work/design-pipeline/tasks/' is '../../../skills/'. Affected links: security-auditor/SKILL.md (Required Skills + Context), design-system-init/SKILL.md, design-generate/SKILL.md, design-review/SKILL.md, design-retrospective/SKILL.md, do-task/SKILL.md, design-generate/assets/preview-template.html.",
+      "fix": "Replace all '../../skills/' with '../../../skills/' in task 10.md. Compare with task 11 and task 12 which correctly use '../../../skills/'."
+    },
+    {
+      "severity": "major",
+      "category": "cross-task-integration",
+      "task": 11,
+      "issue": "Task 11 instructs the agent to write its audit report to 'decisions.md' (a shared feature-level file), while task 9 writes to 'logs/working/task-9/code-audit-report.json' and task 10 writes to 'logs/working/task-10/security-audit.md'. The pattern is inconsistent: task 11 pollutes the shared decisions file with a large test audit report instead of using a dedicated log file. Additionally, task 12 expects to consume the Test Audit report from '../logs/working/task-11/' — but that directory will not be created if task 11 writes to decisions.md.",
+      "fix": "Change task 11 output location to 'logs/working/task-11/test-audit-report.md' (or .json), consistent with tasks 9 and 10. Keep decisions.md Post-completion entry as the brief summary only. Update step 6 and all AC references accordingly."
+    },
+    {
+      "severity": "major",
+      "category": "cross-task-integration",
+      "task": 12,
+      "issue": "Task 12 references '[Test Audit report](../logs/working/task-11/)' in Context Files, expecting a file at work/design-pipeline/logs/working/task-11/. However, task 11 (as written) writes its report to decisions.md, not to that directory. This will cause task 12 to fail to locate the test audit report.",
+      "fix": "This finding is resolved together with the task 11 fix: once task 11 is corrected to write to logs/working/task-11/, the task 12 reference will resolve correctly. No change needed in task 12 itself."
+    },
+    {
+      "severity": "minor",
+      "category": "feasibility",
+      "task": 12,
+      "issue": "Step 9 specifies the QA report output as 'logs/working/qa-report.json' without a full feature-relative prefix. All other task output paths in this feature use full paths (e.g., 'work/design-pipeline/logs/working/task-10/security-audit.md'). The ambiguity could cause the agent to write the file relative to its cwd rather than to the feature directory.",
+      "fix": "Change to explicit path: 'work/design-pipeline/logs/working/qa-report.json' or use the feature-relative form 'work/design-pipeline/logs/working/task-12/qa-report.json' for consistency with other audit tasks."
+    }
+  ],
+  "stats": {
+    "tasks_checked": 3,
+    "claims_verified": 28,
+    "issues_found": 4
+  },
+  "notes": {
+    "future_files": "Tasks 10, 11, 12 all reference files created by tasks 3-8 (design-system-init/SKILL.md, design-generate/SKILL.md, etc.) and task 1 (shared/design-references/). These do not yet exist in the codebase. This is expected given wave ordering and is NOT flagged as a finding.",
+    "task10_depends_on": "depends_on: [3,4,5,6,7,8] is correct — covers all tasks that create the files to be audited.",
+    "task11_depends_on": "depends_on: [3,4,5,6,7,8] is correct — covers all tasks that create the SKILL.md files to be audited.",
+    "task12_depends_on": "depends_on: [9,10,11] is correct — Final Wave depends on all Audit Wave tasks.",
+    "task11_scenario_count": "22 scenarios total (6+7+4+5) matches the tech-spec. No discrepancy.",
+    "task10_security_coverage": "Security vectors (prompt injection, path traversal, XSS/CSP, unsafe commands, information disclosure) are well-defined and concrete. Audit scope is appropriate.",
+    "task12_ac_count": "Task 12 lists 13 acceptance criteria matching tech-spec exactly. Coverage is complete."
+  }
+}

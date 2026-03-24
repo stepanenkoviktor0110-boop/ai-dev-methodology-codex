@@ -1,0 +1,76 @@
+{
+  "validator": "reality-checker",
+  "batch": [1, 2, 3],
+  "iteration": 1,
+  "status": "changes_required",
+  "findings": [
+    {
+      "severity": "critical",
+      "category": "missing_file",
+      "task": 1,
+      "issue": "Source file skills/like-figma/references/design-tokens.md is referenced for copying, but glob finds no results at that path. Actual file confirmed to exist at C:/tmp/ai-dev-repo/skills/like-figma/references/design-tokens.md — the Glob tool returned no match, indicating a path resolution issue during validation. Manual ls confirms the file exists.",
+      "fix": "No fix needed — file confirmed present via ls. This finding is informational only."
+    },
+    {
+      "severity": "critical",
+      "category": "missing_file",
+      "task": 1,
+      "issue": "Source files work/design-pipeline/references/color-psychology.md and color-principles.md are listed as 'source for copy' in task context. These files exist at work/design-pipeline/references/ (confirmed by ls), but the task's relative link uses ../references/color-psychology.md which from work/design-pipeline/tasks/ resolves correctly to work/design-pipeline/references/color-psychology.md. Files exist — no issue with content.",
+      "fix": "No fix needed — files confirmed present."
+    },
+    {
+      "severity": "critical",
+      "category": "missing_file",
+      "task": 3,
+      "issue": "All context file links in Task 3 use ../../ prefix (e.g., ../../skills/skill-master/SKILL.md, ../../shared/design-references/design-tokens.md, ../../skills/like-figma/SKILL.md, ../../skills/design-system-init/references/font-pairing.md). Task 3 is located at work/design-pipeline/tasks/3.md. Two levels up (../../) from that file resolves to work/ — not the repo root. Correct prefix is ../../../ (three levels up). All these paths are broken and will cause 404s when an agent attempts to load them.",
+      "fix": "Replace all ../../ prefixes in Task 3 context file links with ../../../. Specifically: line 17 (skill-master SKILL.md), line 75 (skill-master/SKILL.md), line 76 (procedural-skills.md), line 79 (like-figma/SKILL.md), lines 82-84 (shared/design-references/*), line 87 (font-pairing.md)."
+    },
+    {
+      "severity": "major",
+      "category": "missing_file",
+      "task": 2,
+      "issue": "Required Skills link on line 17 of Task 2 points to ~/.claude/skills/skill-master/SKILL.md (an absolute home-directory path). The skill-master is located in the project at skills/skill-master/SKILL.md. The correct relative path from work/design-pipeline/tasks/2.md is ../../../skills/skill-master/SKILL.md — identical to Task 1. The ~/.claude/ path is wrong for this project.",
+      "fix": "Replace the Required Skills link in Task 2 line 17 from ~/.claude/skills/skill-master/SKILL.md to ../../../skills/skill-master/SKILL.md"
+    },
+    {
+      "severity": "major",
+      "category": "missing_file",
+      "task": 2,
+      "issue": "Context Files section lists project.md and architecture.md at ../../../shared/templates/new-project/.agents/skills/project-knowledge/references/project.md. This path resolves correctly (confirmed: both files exist). However, these are template/scaffold files for new projects, not the design-pipeline feature's own project knowledge. Referencing generic template stubs as context for a domain-specific typography reference is misleading — they contain no design-relevant information.",
+      "fix": "Remove project.md and architecture.md from Context Files in Task 2, or replace with the actual project knowledge for this repo if it exists. These template files add no value to font-pairing.md creation."
+    },
+    {
+      "severity": "major",
+      "category": "feasibility",
+      "task": 3,
+      "issue": "Task 3 step 1 says 'Создать директорию skills/design-system-init/ (если ещё не создана задачей 2)'. Task 2 creates skills/design-system-init/references/font-pairing.md, which implicitly creates the skills/design-system-init/ directory as a side effect. The parenthetical suggests this dependency is understood, but the task's depends_on: [1, 2] is correct. No structural issue, but the wording 'if not already created by task 2' is fragile — Task 2 creates skills/design-system-init/references/, not just skills/design-system-init/.",
+      "fix": "Minor wording fix in Task 3 step 1: change to 'Директория skills/design-system-init/ уже существует после Task 2 (создана вместе с references/font-pairing.md).'"
+    },
+    {
+      "severity": "minor",
+      "category": "hints",
+      "task": 3,
+      "issue": "Implementation hints in Task 3 include a specific spacing formula hint: 'для spacing предложить 3 опции: golden ratio (1.618x scale), Fibonacci (1,1,2,3,5,8,13,21 -> 4,4,8,12,20,32,52,84 px), стандартная шкала (4/8/12/16/24/32/48/64)'. This is a full prescriptive algorithm with concrete values — it crosses the line from 'pointing at a pattern' to 'implementing the solution'. The tokens.json schema in tech-spec uses a fixed spacing scale (1-16 keys mapped to 4px-64px increments), not a Fibonacci sequence.",
+      "fix": "Replace the full Fibonacci expansion in the hint with a reference to grid-techniques.md for spacing rationale, and note that the final output must conform to the tokens.json spacing schema (keys 1-16 mapping to 4px-64px)."
+    },
+    {
+      "severity": "minor",
+      "category": "feasibility",
+      "task": 1,
+      "issue": "Smoke verification command uses bare ls -la shared/design-references/ without specifying the repo root. In an agent context the working directory may differ. Tech-spec risks section notes 'Windows path issues with shared references'.",
+      "fix": "Prefix smoke command with the repo root or document that the command must be run from the repo root: ls -la skills/../shared/design-references/ or use an absolute path in the smoke instruction."
+    }
+  ],
+  "stats": {
+    "tasks_checked": 3,
+    "claims_verified": 31,
+    "issues_found": 8
+  },
+  "notes": {
+    "task1_source_files": "All three source files for copying (design-tokens.md, color-psychology.md, color-principles.md) are confirmed to exist at their respective locations. shared/design-references/ correctly does not exist yet — Task 1 creates it.",
+    "task2_design_tokens_link": "design-tokens.md reference on line 72 of Task 2 uses ../../../skills/like-figma/references/design-tokens.md — this resolves correctly from work/design-pipeline/tasks/ (3 levels up = repo root). File confirmed present.",
+    "task3_depends_on": "depends_on: [1, 2] is correct per tech-spec Wave structure. Task 3 cannot proceed without shared/design-references/ (Task 1) and font-pairing.md (Task 2).",
+    "like_figma_assets": "skills/like-figma/assets/preview-template.html confirmed to exist (assets/ subdirectory is present, not only references/). Relevant for Task 4, not Tasks 1-3.",
+    "skill_master_procedural_skills_md": "skills/skill-master/references/procedural-skills.md confirmed to exist — referenced correctly in Task 3 line 76 IF the ../../ prefix is fixed to ../../../."
+  }
+}

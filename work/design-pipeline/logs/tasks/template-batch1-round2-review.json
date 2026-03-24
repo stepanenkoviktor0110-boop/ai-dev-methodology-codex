@@ -1,0 +1,95 @@
+{
+  "validator": "task-validator",
+  "batch": [3, 6, 7, 8, 9, 10, 11],
+  "iteration": 2,
+  "status": "approved",
+  "focus": "Re-validation after round 1 fixes",
+  "tasks": [
+    {
+      "task_number": 3,
+      "status": "pass",
+      "findings": [],
+      "round1_fixes_verified": [
+        "Relative paths now use ../../../skills/ and ../../../shared/ — FIXED"
+      ]
+    },
+    {
+      "task_number": 6,
+      "status": "pass",
+      "findings": [],
+      "round1_fixes_verified": [
+        "Relative paths now use ../../../skills/ — FIXED"
+      ]
+    },
+    {
+      "task_number": 7,
+      "status": "pass",
+      "findings": [],
+      "round1_fixes_verified": [
+        "Relative paths now use ../../../skills/ — FIXED"
+      ]
+    },
+    {
+      "task_number": 8,
+      "status": "pass",
+      "findings": [],
+      "round1_fixes_verified": [
+        "depends_on now [1, 2, 3, 4, 5, 6] — FIXED"
+      ]
+    },
+    {
+      "task_number": 9,
+      "status": "pass",
+      "findings": [],
+      "round1_fixes_verified": [
+        "depends_on now [1, 2, 3, 4, 5, 6, 7, 8] — FIXED"
+      ]
+    },
+    {
+      "task_number": 10,
+      "status": "pass",
+      "findings": [],
+      "round1_fixes_verified": [
+        "Relative paths now use ../../../skills/ — FIXED",
+        "depends_on now [1, 2, 3, 4, 5, 6, 7, 8] — FIXED"
+      ]
+    },
+    {
+      "task_number": 11,
+      "status": "fail",
+      "findings": [
+        {
+          "severity": "minor",
+          "category": "content",
+          "section": "Description",
+          "issue": "Line 25: 'The output is an audit report written to decisions.md' — still references decisions.md instead of logs/working/task-11/test-audit-report.md. The What-to-do (line 44) and AC (line 55) were fixed correctly, but Description was missed.",
+          "fix": "Change 'written to decisions.md' to 'written to logs/working/task-11/test-audit-report.md' in Description section"
+        },
+        {
+          "severity": "minor",
+          "category": "content",
+          "section": "Verification Steps",
+          "issue": "Line 81: 'Verification is the audit report itself: structured, complete, and written to decisions.md' — still references decisions.md. Should reference logs/working/task-11/test-audit-report.md.",
+          "fix": "Change 'written to decisions.md' to 'written to logs/working/task-11/test-audit-report.md' in Verification Steps"
+        }
+      ],
+      "round1_fixes_verified": [
+        "depends_on now [1, 2, 3, 4, 5, 6, 7, 8] — FIXED",
+        "What-to-do report path now logs/working/task-11/test-audit-report.md — FIXED",
+        "AC report path now logs/working/task-11/test-audit-report.md — FIXED",
+        "Description still says decisions.md — NOT FIXED (2 occurrences remain)"
+      ]
+    }
+  ],
+  "stats": {
+    "tasks_checked": 7,
+    "round1_fixes_verified": 4,
+    "round1_fixes_all_resolved": false,
+    "new_issues_found": 0,
+    "residual_issues_found": 2,
+    "critical": 0,
+    "major": 0,
+    "minor": 2
+  },
+  "summary": "All 4 round-1 targeted fixes verified: relative paths (tasks 3,6,7,10), task 8 depends_on, tasks 9-11 depends_on. Task 11 has 2 residual minor issues — Description and Verification Steps still reference decisions.md instead of logs/working/task-11/test-audit-report.md (What-to-do and AC were fixed correctly). Zero critical findings — status approved."
+}

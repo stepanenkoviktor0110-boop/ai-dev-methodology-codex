@@ -1,0 +1,91 @@
+{
+  "validator": "task-validator",
+  "batch": [11, 12],
+  "status": "changes_required",
+  "findings": [
+    {
+      "severity": "critical",
+      "category": "content",
+      "task": 11,
+      "section": "Context Files",
+      "issue": "Missing mandatory PK files: project.md and architecture.md are not listed in Context Files. Template requires these as mandatory present (critical if missing)",
+      "fix": "Add links: [project.md](.claude/skills/project-knowledge/references/project.md) and [architecture.md](.claude/skills/project-knowledge/references/architecture.md)"
+    },
+    {
+      "severity": "critical",
+      "category": "content",
+      "task": 12,
+      "section": "Context Files",
+      "issue": "Missing mandatory PK files: project.md and architecture.md are not listed in Context Files. Template requires these as mandatory present (critical if missing)",
+      "fix": "Add links: [project.md](.claude/skills/project-knowledge/references/project.md) and [architecture.md](.claude/skills/project-knowledge/references/architecture.md)"
+    },
+    {
+      "severity": "major",
+      "category": "content",
+      "task": 11,
+      "section": "Details",
+      "issue": "Details section missing required subsection headers. Template expects **Files**, **Dependencies**, **Edge cases**, **Implementation hints** subsections. Task has Dependencies and scenario baseline but lacks **Files**, **Edge cases**, and **Implementation hints** subsections",
+      "fix": "Add **Files:** subsection (list SKILL.md and test files to read). Add **Edge cases:** (e.g., audit findings from tasks 9-10 may have changed skills; SKILL.md files missing if earlier tasks failed). Add **Implementation hints:** (methodology guidance for systematic coverage evaluation)"
+    },
+    {
+      "severity": "minor",
+      "category": "content",
+      "task": 12,
+      "section": "Details",
+      "issue": "Details section missing **Implementation hints** subsection. Has file listings, dependencies, and edge cases but no hints",
+      "fix": "Add **Implementation hints:** subsection with QA execution approach guidance"
+    },
+    {
+      "severity": "minor",
+      "category": "content",
+      "task": 11,
+      "section": "Verification Steps",
+      "issue": "Verification Steps lacks template subsection structure (### Automated, ### Smoke, ### User). Contains only free-form prose. Template expects structured subsections even for non-code tasks",
+      "fix": "Restructure with ### Automated subsection containing 'N/A -- audit task, no executable code to test'. Omit Smoke/User subsections since verify: [] in frontmatter"
+    },
+    {
+      "severity": "minor",
+      "category": "content",
+      "task": 12,
+      "section": "Verification Steps",
+      "issue": "Verification Steps lacks template subsection structure (### Automated, ### Smoke, ### User). Contains only free-form prose",
+      "fix": "Restructure with ### Automated subsection containing 'N/A -- QA task produces qa-report.json as output'. Omit Smoke/User subsections since verify: [] in frontmatter"
+    },
+    {
+      "severity": "minor",
+      "category": "content",
+      "task": 11,
+      "section": "Reviewers",
+      "issue": "Reviewers section uses free-form prose ('No reviewers -- this is an audit task...') instead of template structured format ('- **{name}** -> path')",
+      "fix": "Format as: '- **none** -- audit task produces its own review report in decisions.md'"
+    },
+    {
+      "severity": "minor",
+      "category": "content",
+      "task": 12,
+      "section": "Reviewers",
+      "issue": "Reviewers section uses free-form prose instead of template structured format",
+      "fix": "Format as: '- **none** -- QA task is the final verification step, produces qa-report.json'"
+    },
+    {
+      "severity": "minor",
+      "category": "content",
+      "task": 11,
+      "section": "Context Files",
+      "issue": "patterns.md from project knowledge is missing from Context Files",
+      "fix": "Add: [patterns.md](.claude/skills/project-knowledge/references/patterns.md)"
+    },
+    {
+      "severity": "minor",
+      "category": "content",
+      "task": 12,
+      "section": "Context Files",
+      "issue": "patterns.md from project knowledge is missing from Context Files",
+      "fix": "Add: [patterns.md](.claude/skills/project-knowledge/references/patterns.md)"
+    }
+  ],
+  "stats": {
+    "tasks_checked": 2,
+    "issues_found": 10
+  }
+}

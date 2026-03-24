@@ -1,0 +1,55 @@
+{
+  "validator": "reality-checker",
+  "batch": [7, 8, 9],
+  "iteration": 1,
+  "status": "changes_required",
+  "findings": [
+    {
+      "severity": "critical",
+      "category": "cross-task-integration",
+      "task": 8,
+      "issue": "Task 8 depends_on: [3, 4, 5, 6] but does NOT declare dependency on Task 1 (which creates shared/design-references/) and Task 2 (which creates font-pairing.md). Task 8 step 2 explicitly verifies shared/design-references/ contents — design-tokens.md, color-psychology.md, color-principles.md, library-catalog.md — all created by Task 1. Without depends_on: [1], Task 8 could execute before Task 1 completes.",
+      "fix": "Add tasks 1 and 2 to Task 8 depends_on: change to depends_on: [1, 2, 3, 4, 5, 6]"
+    },
+    {
+      "severity": "critical",
+      "category": "cross-task-integration",
+      "task": 9,
+      "issue": "Task 9 depends_on: [3, 4, 5, 6, 7, 8] but does NOT declare dependency on Task 1 (creates shared/design-references/: design-tokens.md, color-psychology.md, color-principles.md, library-catalog.md) and Task 2 (creates skills/design-system-init/references/font-pairing.md). Task 9 explicitly reads and audits all these files (listed in 'Files to audit — shared references' and 'Files to audit — skill-specific references'). Without these dependencies, Task 9 can be scheduled before Tasks 1-2 complete.",
+      "fix": "Add tasks 1 and 2 to Task 9 depends_on: change to depends_on: [1, 2, 3, 4, 5, 6, 7, 8]"
+    },
+    {
+      "severity": "major",
+      "category": "missing_file",
+      "task": 9,
+      "issue": "Task 9 audits skills/design-generate/assets/preview-template.html (CSP header check) and all design-generate/references/ files. These are created by Task 4 which IS in depends_on. However, Task 9 also explicitly audits shared/design-references/ and skills/design-system-init/references/font-pairing.md (created by Tasks 1-2) without declaring those dependencies. At execution time these files will be missing if Task 9 is scheduled in a session before Tasks 1-2.",
+      "fix": "Add tasks 1 and 2 to depends_on (see critical finding above). The missing_file risk is resolved by fixing the dependency chain."
+    },
+    {
+      "severity": "major",
+      "category": "feasibility",
+      "task": 7,
+      "issue": "Task 7 Details section states exact line numbers: 'Пункт 3 (строка 44): Load each skill', 'Пункт 2 (строка 47): Follow loaded skill', 'Пункт 3 (строка 48): Git commit', 'Пункт 4 (строка 49): For each reviewer'. The actual do-task SKILL.md has Step 2 starting at line 42 (## Step 2: Execute), with items at lines 44, 47, 48, 49. The line numbers in the task are accurate as of the current file state. However, if any prior task (e.g., a task modifying do-task) runs before Task 7, line numbers will shift. The task also mentions current Step 4 becomes Step 5 after insertion — this is correct per the actual file structure (4 items in Step 2). Line-number-based navigation is fragile.",
+      "fix": "Navigation by line number is acceptable as an implementation hint only. The actual instruction (find Step 2.3 and Step 2.4, insert between them) is robust. No blocking issue, but note that the executor should rely on content patterns not line numbers."
+    },
+    {
+      "severity": "minor",
+      "category": "hints",
+      "task": 7,
+      "issue": "Implementation hint states 'Формат вызова субагента: аналогичен вызову reviewer (spawn subagent), но с agent_type = design-review'. This is correct — do-task SKILL.md line 50 confirms the spawn_agent pattern with agent_type. However, the hint says this is 'analogous to reviewer', implying a full reviewer invocation pattern. The guard requirement (no full pipeline, no mockups) may need explicit wording in the hook text to differentiate from a reviewer call. This is a content quality concern, not an implementation error.",
+      "fix": "Add a note in the hint: the hook text inside SKILL.md must include the guard comment explicitly, not just the spawn_agent call."
+    },
+    {
+      "severity": "minor",
+      "category": "feasibility",
+      "task": 8,
+      "issue": "Task 8 smoke verification grep excludes 'decisions.md', 'tech-spec.md', 'user-spec.md', and 'tasks/' from stale reference check. However, the tech-spec.md Dependencies section (line 175-182) explicitly lists like-figma as the source of migration — these are valid historical references. The grep exclusion pattern `grep -v tasks/` would miss stale references in task files outside work/design-pipeline/tasks/. The verification command may produce false negatives if other feature task files reference like-figma.",
+      "fix": "Minor: the grep exclusion is adequate for the primary use case. Optionally scope the grep to skills/ and shared/ only (as the implementation hint already suggests), which avoids the issue entirely."
+    }
+  ],
+  "stats": {
+    "tasks_checked": 3,
+    "claims_verified": 31,
+    "issues_found": 6
+  }
+}

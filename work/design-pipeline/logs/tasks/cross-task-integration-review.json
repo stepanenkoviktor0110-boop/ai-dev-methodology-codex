@@ -1,0 +1,71 @@
+{
+  "validator": "task-validator",
+  "scope": "cross-task-integration",
+  "batch": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12],
+  "status": "pass",
+  "findings": [
+    {
+      "severity": "minor",
+      "category": "resource-sharing",
+      "tasks_involved": [6],
+      "issue": "Task 6 (design-retrospective) declares depends_on: [1] but does not reference any files from shared/design-references/ created by Task 1. Task 6 Details explicitly states: 'скилл не ссылается на shared references напрямую' and 'фактически design-retrospective автономен'. The dependency is unnecessary.",
+      "fix": "Remove 1 from Task 6 depends_on, changing it to depends_on: []. Task 6 is truly independent. This does not affect wave assignment since Wave 2 tasks can still have empty depends_on — wave is a scheduling hint independent of depends_on. Alternatively, keep as-is if conservative dependency tracking is preferred (harmless but misleading)."
+    },
+    {
+      "severity": "minor",
+      "category": "decomposition",
+      "tasks_involved": [2, 3],
+      "issue": "Task 2 creates skills/design-system-init/references/font-pairing.md, which implicitly creates the skills/design-system-init/ and skills/design-system-init/references/ directories. Task 3 then creates skills/design-system-init/SKILL.md. Task 3 What to do step 1 says 'Создать директорию skills/design-system-init/ (если ещё не создана задачей 2)' — the conditional is correct but this means directory ownership is split: T2 creates the references/ subdirectory, T3 creates SKILL.md in the parent. This is properly handled via depends_on: [1, 2] in T3.",
+      "fix": "No action needed — the conditional in T3 step 1 correctly handles this. Noting for awareness only."
+    }
+  ],
+  "checks_performed": {
+    "shared_resource_ownership": {
+      "status": "pass",
+      "details": {
+        "shared/design-references/": "Owner: Task 1 (Wave 1). Consumers: T3, T4, T5 — all declare depends_on including T1.",
+        "skills/design-system-init/references/font-pairing.md": "Owner: Task 2 (Wave 1). Consumer: T3 — declares depends_on: [1, 2].",
+        "skills/design-system-init/SKILL.md": "Owner: Task 3 (Wave 2). No other task modifies it.",
+        "skills/design-generate/ (SKILL.md + refs + assets)": "Owner: Task 4 (Wave 2). No other task modifies it.",
+        "skills/design-review/SKILL.md": "Owner: Task 5 (Wave 2). Consumer: T7 (reads, depends_on: [5]).",
+        "skills/design-retrospective/SKILL.md": "Owner: Task 6 (Wave 2). No other task modifies it.",
+        "skills/do-task/SKILL.md modification": "Owner: Task 7 (Wave 3). Depends_on: [5].",
+        "skills/like-figma/ deletion": "Owner: Task 8 (Wave 3). Depends_on: [1,2,3,4,5,6] — all migration tasks."
+      }
+    },
+    "no_competing_instances_same_wave": {
+      "status": "pass",
+      "details": {
+        "wave_1": "T1 (shared/design-references/) and T2 (skills/design-system-init/references/font-pairing.md) — different directories, no conflict.",
+        "wave_2": "T3 (design-system-init/SKILL.md), T4 (design-generate/), T5 (design-review/), T6 (design-retrospective/) — all different skill directories, no conflict.",
+        "wave_3": "T7 (do-task/SKILL.md) and T8 (delete like-figma/) — different targets, no conflict.",
+        "wave_4": "T9, T10, T11 — all read-only audit tasks, no modification conflicts.",
+        "wave_5": "T12 — read-only QA task."
+      }
+    },
+    "dependency_completeness": {
+      "status": "pass",
+      "details": "All tasks that read files created by other tasks declare appropriate depends_on. T3 depends on T1+T2 (shared refs + font-pairing). T4 depends on T1 (shared refs). T5 depends on T1 (shared refs). T7 depends on T5 (design-review SKILL.md). T8 depends on all creation tasks [1-6]. T9/T10/T11 depend on all implementation tasks [1-8]. T12 depends on all audit tasks [9-11]."
+    },
+    "dependency_cycles": {
+      "status": "pass",
+      "details": "Directed acyclic graph verified. No cycles found. Topological order: [1,2] → [3,4,5,6] → [7,8] → [9,10,11] → [12]."
+    },
+    "wave_consistency": {
+      "status": "pass",
+      "details": "Every task's wave is strictly greater than the wave of all its dependencies. Verified for all 12 tasks."
+    },
+    "shared_resources_completeness": {
+      "status": "pass",
+      "details": "Tech-spec Shared Resources table lists shared/design-references/ with owner Task 1 and consumers design-system-init, design-generate, design-review. All consumers have correct depends_on declarations."
+    }
+  },
+  "stats": {
+    "tasks_checked": 12,
+    "cross_checks_performed": 6,
+    "issues_found": 2,
+    "critical": 0,
+    "major": 0,
+    "minor": 2
+  }
+}

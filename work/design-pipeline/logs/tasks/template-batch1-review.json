@@ -1,0 +1,115 @@
+{
+  "validator": "task-validator",
+  "batch": [1, 2, 3, 4, 5],
+  "status": "changes_required",
+  "findings": [
+    {
+      "severity": "critical",
+      "category": "content",
+      "task": 1,
+      "section": "Context Files",
+      "issue": "Missing mandatory project knowledge files: project.md and architecture.md are not listed in Context Files. Task-creator rules require these always be present.",
+      "fix": "Add [project.md]({PK path}/project.md) and [architecture.md]({PK path}/architecture.md) links. Discover actual PK paths via Glob."
+    },
+    {
+      "severity": "critical",
+      "category": "content",
+      "task": 2,
+      "section": "Context Files",
+      "issue": "project.md and architecture.md links point to template paths (shared/templates/new-project/.agents/skills/project-knowledge/references/) rather than actual project knowledge paths. Task-creator rules say 'Use actual discovered paths, not hardcoded ones'.",
+      "fix": "Replace template paths with actual PK paths from the project. Discover via Glob '.claude/skills/project-knowledge/' and use those paths."
+    },
+    {
+      "severity": "critical",
+      "category": "content",
+      "task": 3,
+      "section": "Context Files",
+      "issue": "Missing mandatory project knowledge files: project.md and architecture.md are not listed in Context Files. Task-creator rules require these always be present.",
+      "fix": "Add [project.md]({PK path}/project.md) and [architecture.md]({PK path}/architecture.md) to Context Files section."
+    },
+    {
+      "severity": "critical",
+      "category": "content",
+      "task": 3,
+      "section": "Context Files",
+      "issue": "Relative paths use ../../skills/ and ../../shared/ (2 levels up from tasks/3.md). Correct path from work/design-pipeline/tasks/3.md to repo root requires 3 levels up (../../../). All skill-master, like-figma, shared references links are broken.",
+      "fix": "Change all ../../skills/ to ../../../skills/ and ../../shared/ to ../../../shared/ in Context Files."
+    },
+    {
+      "severity": "critical",
+      "category": "content",
+      "task": 4,
+      "section": "Context Files",
+      "issue": "Missing mandatory project knowledge files: project.md and architecture.md are not listed in Context Files. Task-creator rules require these always be present.",
+      "fix": "Add [project.md]({PK path}/project.md) and [architecture.md]({PK path}/architecture.md) to Context Files section."
+    },
+    {
+      "severity": "critical",
+      "category": "content",
+      "task": 4,
+      "section": "Context Files",
+      "issue": "Relative paths use ../../skills/ and ../../shared/ (2 levels up from tasks/4.md). Correct path from work/design-pipeline/tasks/4.md to repo root requires 3 levels up (../../../). All skill-master, like-figma, shared references links are broken.",
+      "fix": "Change all ../../skills/ to ../../../skills/ and ../../shared/ to ../../../shared/ in Context Files."
+    },
+    {
+      "severity": "critical",
+      "category": "content",
+      "task": 5,
+      "section": "Context Files",
+      "issue": "Missing mandatory project knowledge files: project.md and architecture.md are not listed in Context Files. Task-creator rules require these always be present.",
+      "fix": "Add [project.md]({PK path}/project.md) and [architecture.md]({PK path}/architecture.md) to Context Files section."
+    },
+    {
+      "severity": "major",
+      "category": "decomposition",
+      "task": 4,
+      "section": "Atomicity",
+      "issue": "Task 4 modifies 5 files (SKILL.md + 3 references + 1 asset). This exceeds the 1-3 files scope guideline. Logical cohesion is strong — all files belong to one skill directory, and splitting would create incomplete results.",
+      "fix": "Accept as-is with acknowledgment. All 5 files form one logical unit (design-generate skill with its references and assets). Splitting would break atomicity."
+    },
+    {
+      "severity": "minor",
+      "category": "content",
+      "task": 2,
+      "section": "Verification Steps",
+      "issue": "Verification Steps only has Automated subsection with a simple file existence check. No content structure verification.",
+      "fix": "Add check that file contains expected sections: grep for 'Pairing Principles', 'Weight Hierarchy', 'Typographic Scale', 'Classic Combinations'."
+    },
+    {
+      "severity": "minor",
+      "category": "content",
+      "task": 3,
+      "section": "Details",
+      "issue": "Implementation hints reference like-figma SKILL.md by line numbers ('строки 152-195') — line numbers are fragile and may change.",
+      "fix": "Reference by phase/section name instead: 'Phase 1 (Project Scan) and Phase 2 (Build Design System) from like-figma SKILL.md'."
+    },
+    {
+      "severity": "minor",
+      "category": "content",
+      "task": 4,
+      "section": "Details",
+      "issue": "Implementation hints reference like-figma SKILL.md by line numbers ('Phase 3 like-figma, строки 152-195') — line numbers are fragile.",
+      "fix": "Reference by phase name: 'Phase 3 (Generate Design) from like-figma SKILL.md'."
+    },
+    {
+      "severity": "minor",
+      "category": "content",
+      "task": 1,
+      "section": "Verification Steps",
+      "issue": "Smoke verification only checks file existence via ls -la. Does not verify content integrity after copy (files could be empty or truncated).",
+      "fix": "Add content checks: grep for key markers in each copied file to confirm content was preserved (e.g., grep 'colors' design-tokens.md)."
+    },
+    {
+      "severity": "minor",
+      "category": "content",
+      "task": 5,
+      "section": "Context Files",
+      "issue": "Path depth inconsistency: Task 5 uses ../../../skills/ (correct — 3 levels up) while Tasks 3 and 4 use ../../skills/ (incorrect — only 2 levels up). Inconsistency suggests one pattern was wrong.",
+      "fix": "Tasks 3 and 4 need path correction (see separate findings). Task 5 paths are correct."
+    }
+  ],
+  "stats": {
+    "tasks_checked": 5,
+    "issues_found": 13
+  }
+}

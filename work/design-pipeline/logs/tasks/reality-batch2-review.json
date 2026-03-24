@@ -1,0 +1,93 @@
+{
+  "validator": "reality-checker",
+  "batch": [4, 5, 6],
+  "iteration": 1,
+  "status": "approved",
+  "findings": [
+    {
+      "severity": "minor",
+      "category": "hints",
+      "task": 4,
+      "issue": "Implementation hint says 'Phase 3 like-figma (строки 152-195 SKILL.md) — основа для фаз 1-4 нового скилла'. Phase 3 content is lines 152-195 (accurate), but the new skill's Phase 0 (Readiness Check: validate tokens.json) maps to like-figma's Mode Detection block (lines 56-70), not Phase 3. The hint omits this relevant source section.",
+      "fix": "Extend the hint: 'Mode Detection (строки 56-70) содержит логику проверки DS (Mode B path) для Phase 0; Phase 3 (строки 152-195) — основа для фаз 1-4'"
+    },
+    {
+      "severity": "minor",
+      "category": "feasibility",
+      "task": 6,
+      "issue": "Task 6 declares depends_on: [1] but its Details section explicitly states 'design-retrospective автономен — он работает с проектными файлами .design-system/, а не с reference-файлами скиллов'. The skill references only skills/retrospective/SKILL.md and skills/skill-master/SKILL.md, both of which exist independently of Task 1. The declared dependency is technically harmless but creates a false serialization constraint in Wave 2.",
+      "fix": "Either remove depends_on: [1] (Task 6 has no actual dependency on Task 1 output) or add a comment explaining the dependency is a wave-ordering convention, not a file dependency."
+    }
+  ],
+  "stats": {
+    "tasks_checked": 3,
+    "claims_verified": 41,
+    "issues_found": 2
+  },
+  "task_results": [
+    {
+      "task_number": 4,
+      "status": "pass",
+      "checks": {
+        "files_to_read": {
+          "skills/like-figma/SKILL.md": "EXISTS — 232 lines, Phase 3 at lines 151-195 matches hint claim of lines 152-195",
+          "skills/like-figma/references/component-patterns.md": "EXISTS — 143 lines (task says ~144, acceptable)",
+          "skills/like-figma/references/generation-guide.md": "EXISTS — 177 lines (task says ~178+, acceptable)",
+          "skills/like-figma/assets/preview-template.html": "EXISTS — 99 lines, contains {{PAGE_TITLE}}, {{PAGE_STYLES}}, {{PAGE_CONTENT}} placeholders as described",
+          "work/design-pipeline/references/grid-techniques.md": "EXISTS — 227 lines (task says ~228, acceptable), contains 10 grid techniques with CSS examples as described",
+          "shared/design-references/design-tokens.md": "NOT YET CREATED — created by Task 1, Wave 1. Correctly documented as runtime dependency. depends_on: [1] declared.",
+          "skills/skill-master/SKILL.md": "EXISTS"
+        },
+        "files_to_modify": {
+          "skills/design-generate/SKILL.md": "NEW — directory does not exist yet, will be created",
+          "skills/design-generate/references/component-patterns.md": "NEW",
+          "skills/design-generate/references/generation-guide.md": "NEW",
+          "skills/design-generate/references/grid-techniques.md": "NEW",
+          "skills/design-generate/assets/preview-template.html": "NEW"
+        },
+        "security": {
+          "path_traversal": "Decision 9 referenced correctly — filename validation /^[a-z0-9-]+$/ for .design-system/pages/ files",
+          "csp": "Decision 8 referenced correctly — CSP meta tag placement after viewport meta, before title is accurate per actual preview-template.html structure (line 4=viewport, line 5=title)"
+        },
+        "cross_task": "depends_on: [1] declared; like-figma source files exist at time of task execution"
+      }
+    },
+    {
+      "task_number": 5,
+      "status": "pass",
+      "checks": {
+        "files_to_read": {
+          "shared/design-references/design-tokens.md": "NOT YET CREATED — created by Task 1. depends_on: [1] declared.",
+          "shared/design-references/color-principles.md": "NOT YET CREATED — created by Task 1. depends_on: [1] declared.",
+          "skills/skill-master/SKILL.md": "EXISTS",
+          "skills/skill-master/references/informational-skills.md": "EXISTS"
+        },
+        "files_to_modify": {
+          "skills/design-review/SKILL.md": "NEW — directory does not exist yet, will be created"
+        },
+        "relative_paths_in_generated_skill": "From skills/design-review/SKILL.md, path to shared/design-references/ = ../../shared/design-references/ — correct. Implementation hints confirm this.",
+        "skill_type": "informational (Decision 4) — correctly described, no phases with checkpoints needed",
+        "token_economy": "Constraint ~500-1000 tokens overhead correctly propagated from tech-spec",
+        "scope_guard": "5 prohibited actions correctly listed matching tech-spec Decision 5"
+      }
+    },
+    {
+      "task_number": 6,
+      "status": "pass",
+      "checks": {
+        "files_to_read": {
+          "skills/retrospective/SKILL.md": "EXISTS — phase structure (Collect Evidence → Identify Problems → Write Lessons) confirmed, mirrors the pattern task intends to adapt",
+          "skills/skill-master/SKILL.md": "EXISTS",
+          "skills/skill-master/references/procedural-skills.md": "EXISTS"
+        },
+        "files_to_modify": {
+          "skills/design-retrospective/SKILL.md": "NEW — directory does not exist yet, will be created"
+        },
+        "lesson_format": "Problem/Cause/Solution/Rule matches retrospective/SKILL.md established pattern",
+        "output_paths": ".design-system/lessons-learned.md and .design-system/design-principles.md are project-level files per Decision 11 — correctly described",
+        "phase_count": "5 phases declared (Collect Evidence, Identify Patterns, Write Lessons, Promote Principles, Generate Next-Session Prompt) — feasible, each has defined checkpoint logic",
+        "promotion_logic": "3+ occurrences rule clearly specified with duplicate detection"
+      }
+    }
+  ]
+}
