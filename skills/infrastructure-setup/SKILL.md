@@ -45,15 +45,17 @@ Example format:
 
 ## Phase 1: Framework Initialization
 
-**Non-empty directory handling:** Many scaffolding tools (Vite, Next.js, CRA) refuse to init in a non-empty directory. If the project root already has files (e.g., `work/`, `.agents/`, `.gitignore`):
+**Non-empty directory handling — MANDATORY when project root has ANY files.** Scaffolding tools (Vite, Next.js, CRA) WILL refuse to init in a non-empty directory. If the project root already has files (e.g., `work/`, `.agents/`, `.gitignore`), you MUST:
 1. Create the scaffold in a temporary subdirectory (e.g., `_scaffold_tmp/`).
 2. Move runtime files (src/, package.json, tsconfig.json, vite.config.ts, etc.) from `_scaffold_tmp/` to the project root.
 3. Delete `_scaffold_tmp/`.
-4. Merge any generated `.gitignore` entries into the existing `.gitignore` instead of overwriting it.
+4. Merge generated `.gitignore` entries into the existing `.gitignore` — do NOT overwrite it.
+
+Do NOT attempt to scaffold directly into a non-empty directory. It will fail.
 
 Init framework from confirmed stack. Use Context7 for up-to-date init commands and flags.
 
-**Dev server verification:** Run `npm run dev` (or equivalent) and confirm the process starts. If the environment does not support long-running process stdout (timeouts, restricted terminals), verify the toolchain via `npm run build` instead — a successful build confirms the framework is functional.
+**Dev server verification:** Run `npm run dev` (or equivalent) and confirm the process starts. If the environment does not support long-running process stdout (timeouts, restricted terminals), verify via `npm run build` instead — a successful build confirms the framework is functional. One of these MUST succeed before moving on.
 
 **Checkpoint:** dev server starts or build succeeds.
 
@@ -97,7 +99,7 @@ Create `.env.example` with required variable names (no values).
 
 Convention: gitleaks for secret scanning. Target: total pre-commit time under 10 seconds.
 
-**Gitleaks installation:** Ensure gitleaks is available before configuring the hook:
+**Gitleaks installation — MUST complete before configuring the hook.** Install and verify `gitleaks version` succeeds:
 - macOS: `brew install gitleaks`
 - Windows: `winget install gitleaks` (binary may land outside PATH — check `$LOCALAPPDATA\Microsoft\WinGet\Links\` or `$HOME\AppData\Local\Microsoft\WinGet\Packages\*gitleaks*`)
 - Linux / CI: download from GitHub releases or use `go install github.com/gitleaks/gitleaks/v8@latest`
@@ -105,7 +107,7 @@ Convention: gitleaks for secret scanning. Target: total pre-commit time under 10
 
 The pre-commit hook template includes a fallback path search — see `husky-pre-commit-gitleaks.sh`.
 
-**Custom rules (.gitleaks.toml):** The default gitleaks ruleset may not catch all test patterns. Place a `.gitleaks.toml` in the project root with explicit rules for the project's secret formats. Use the template from `$AGENTS_HOME/shared/templates/infrastructure/static/.gitleaks.toml`.
+**Custom rules (.gitleaks.toml) — ALWAYS create.** The default gitleaks ruleset does NOT catch all secret patterns. Copy `$AGENTS_HOME/shared/templates/infrastructure/static/.gitleaks.toml` to the project root and adjust rules for the project's secret formats. Without this file, the checkpoint test WILL fail.
 
 Pre-commit scope (fast, staged files only):
 - gitleaks (~2-5 seconds)
@@ -114,14 +116,12 @@ Pre-commit scope (fast, staged files only):
 
 Full test suites, integration tests, builds belong in CI.
 
-**Checkpoint — clean testing approach:** Verify gitleaks blocks secrets WITHOUT polluting git history:
-1. Create a temp file with a test secret: `echo "AKIA1234567890EXAMPLE" > _gitleaks_test.txt`
-2. Stage it: `git add _gitleaks_test.txt`
-3. Attempt commit: `git commit -m "test: gitleaks check"` — must be BLOCKED.
-4. **Clean up immediately:** `git reset HEAD _gitleaks_test.txt && rm _gitleaks_test.txt`
-5. Do NOT leave test secrets in committed history.
-
-If gitleaks does not block the test secret, check `.gitleaks.toml` rules — the default ruleset may require `AKIA` patterns to have 20+ alphanumeric characters.
+**Checkpoint — clean testing approach.** Verify gitleaks blocks secrets WITHOUT polluting git history. Follow these steps EXACTLY:
+1. `echo "AKIA1234567890EXAMPLE" > _gitleaks_test.txt`
+2. `git add _gitleaks_test.txt`
+3. `git commit -m "test: gitleaks check"` — MUST be BLOCKED by gitleaks.
+4. **Clean up immediately — do NOT skip:** `git reset HEAD _gitleaks_test.txt && rm _gitleaks_test.txt`
+5. If gitleaks did NOT block — your `.gitleaks.toml` is misconfigured. Fix rules and retry. Do NOT proceed to Phase 6 until this checkpoint passes.
 
 ## Phase 6: Testing Infrastructure
 

@@ -17,8 +17,8 @@ These instructions are written for Codex agents that default to the laziest inte
 
 ## Environment: Known Pitfalls
 
-- **`rg` (ripgrep) may be blocked** on some Windows environments (`Access denied` on `rg.exe`). If `rg` fails, fall back to `Get-ChildItem -Recurse | Select-String` (PowerShell) or `findstr /S` (cmd). Performance will be lower — narrow search scope with explicit paths.
-- **`npm install` with heavy packages** (e.g., `pdfjs-dist`, `sharp`, `prisma`) can exceed default terminal timeouts. Use `timeout_ms: 300000` (5 min) or higher for install commands. If it still times out, retry — npm caches partial downloads.
+- **`rg` (ripgrep) may be blocked** on some Windows environments (`Access denied` on `rg.exe`). If `rg` fails, you MUST fall back to `Get-ChildItem -Recurse | Select-String` (PowerShell) or `findstr /S` (cmd). Narrow search scope with explicit paths to compensate for lower performance. Do NOT give up on code search — always use a fallback.
+- **`npm install` with heavy packages** (e.g., `pdfjs-dist`, `sharp`, `prisma`) WILL exceed default terminal timeouts. Use `timeout_ms: 300000` (5 min) or higher for install commands. If it times out, retry — npm caches partial downloads. Do NOT report "install failed" after a single timeout.
 
 ## Git: Known Pitfalls
 
