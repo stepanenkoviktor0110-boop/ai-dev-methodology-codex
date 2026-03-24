@@ -143,6 +143,42 @@ On Windows, `npm test -- <pattern>` is unreliable. Always prefer `npx <runner> r
 
 **Checkpoint:** test command passes (`npx vitest run` or equivalent).
 
+## Phase 6b: Multi-Agent Verification — MANDATORY if project uses `/do-feature`
+
+This phase verifies that Codex CLI's multi-agent orchestration actually works: subagents spawn, models switch, and config is respected. Do NOT skip — without this, `/do-feature` will silently run all agents on the default model, wasting budget or losing quality.
+
+**Step 1: Verify Codex agent config exists.** Check `~/.codex/config.toml` contains:
+```toml
+[agents]
+max_threads = 10
+max_depth = 2
+job_max_runtime_seconds = 3600
+```
+If missing → add it. Without `max_depth >= 2`, workers cannot spawn reviewer subagents.
+
+**Step 2: Test spawn_agent with explicit model override.** Run in Codex:
+```
+Spawn a test agent with model gpt-5.4-mini. Ask it to respond with its model name in one word. Then close it.
+```
+Expected: agent spawns, responds, closes. If spawn fails → check `max_threads` and `max_depth` config.
+
+**Step 3: Verify model switching in OpenAI Usage Dashboard.**
+1. Open dashboard.openai.com → Usage.
+2. Check the time window of Step 2.
+3. You MUST see calls to `gpt-5.4-mini` (the override model), NOT only the default model.
+4. If only the default model appears → model switching is broken. Check Codex CLI version and `spawn_agent` parameter support.
+
+**Step 4: Record results in `decisions.md`:**
+```markdown
+## Multi-Agent Setup Verification
+- spawn_agent: ✅/❌ (agent spawned and responded)
+- model override: ✅/❌ (Usage Dashboard shows gpt-5.4-mini calls)
+- config: max_threads={N}, max_depth={N}
+- Codex CLI version: {version}
+```
+
+**Checkpoint:** ALL 3 checks pass (spawn works, model switches, config present). If model switching is broken, document the limitation and note that all agents will run on the default model — this affects cost estimates.
+
 ## Cross-platform Notes
 
 **Windows / PowerShell gotchas:**
@@ -173,12 +209,18 @@ Verify before commit: `git status` shows no `.env` files (only `.env.example`).
 
 ## Final Validation
 
-- [ ] Framework runs locally
+ALL items MUST be checked. Do NOT mark as done without actual verification.
+
+- [ ] Framework runs locally (dev server or build)
 - [ ] Folder structure matches convention
-- [ ] gitleaks blocks test secret
+- [ ] gitleaks blocks test secret (clean test approach from Phase 5)
 - [ ] `.gitignore` covers `.env`, `*.key`, secrets
 - [ ] `.env.example` exists (if project uses env vars)
-- [ ] Smoke test passes
-- [ ] Documentation updated
+- [ ] Smoke test passes (`npx vitest run` or equivalent)
+- [ ] Multi-agent: `spawn_agent` works with model override
+- [ ] Multi-agent: Usage Dashboard confirms model switching
+- [ ] Multi-agent: `[agents]` config in `~/.codex/config.toml`
+- [ ] Results recorded in `decisions.md`
+- [ ] Documentation updated (project-knowledge)
 - [ ] All infrastructure committed
 - [ ] Docker works (if applicable)
