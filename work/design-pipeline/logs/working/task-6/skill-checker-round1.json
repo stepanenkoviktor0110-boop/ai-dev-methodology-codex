@@ -1,0 +1,5 @@
+{
+  "status": "approved",
+  "issues": [],
+  "summary": "design-retrospective skill passes all checks. Frontmatter: name is kebab-case (22 chars), description is 379 chars with 7 trigger phrases in Russian and English. Body: 167 lines (well under 500 limit). Procedural structure: 5 phases with numbered steps, checkpoint after each phase, self-verification section at end. No emphasis words. No external file references (skill operates on project .design-system/ files). No extra files in directory. Positive instructions throughout. Edge cases covered: missing .design-system/, empty session, first run, duplicate lessons, already-promoted rules."
+}
