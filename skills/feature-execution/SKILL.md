@@ -91,22 +91,22 @@ Wait for explicit **"да"**. Do NOT start execution without it.
 
 ## Phase 2: Execute Wave
 
-### ⛔ HARD LIMIT: NEVER spawn more than 5 agents at the same time.
+### ⛔ HARD LIMIT: NEVER spawn more than 4 agents at the same time.
 
-This is a NON-NEGOTIABLE environment constraint. Violating it WILL crash agents or cause silent failures.
+This is a NON-NEGOTIABLE environment constraint. Violating it WILL freeze the host machine, crash agents, or cause silent failures. There is NO queue — excess agents run simultaneously and kill the system.
 
-**Before EVERY `spawn_agent` call, count currently running agents.** If count >= 5 — STOP. Wait for running agents to finish and close them BEFORE spawning new ones.
+**Before EVERY `spawn_agent` call, count currently running agents.** If count >= 4 — STOP. Wait for running agents to finish and close them BEFORE spawning new ones.
 
-**Batching is MANDATORY when total agents > 5:**
+**Batching is MANDATORY when total agents > 4:**
 - Count all agents needed for this wave (workers + reviewers).
-- Split into batches of max 5: Batch 1 → spawn, wait, close ALL. Batch 2 → spawn, wait, close ALL.
+- Split into batches of max 4: Batch 1 → spawn, wait, close ALL. Batch 2 → spawn, wait, close ALL.
 - Do NOT spawn batch 2 while any agent from batch 1 is still running.
-- Log batch plan in decisions.md: "Wave {W}: {total} agents needed, limit 5, running in {B} batches."
+- Log batch plan in decisions.md: "Wave {W}: {total} agents needed, limit 4, running in {B} batches."
 
 **Examples of what is FORBIDDEN:**
-- 6 workers at once ❌ (split: 5 + 1)
-- 3 workers + 3 reviewers at once ❌ (split: 3 workers → close → 3 reviewers, or 5 + 1)
-- "I'll spawn 7 and they'll queue" ❌ — there is no queue, it will break
+- 5 workers at once ❌ (split: 4 + 1)
+- 3 workers + 2 reviewers at once ❌ (split: 3 workers → close → 2 reviewers)
+- "I'll spawn 6 and they'll queue" ❌ — there is no queue, it will freeze the machine
 
 1. Select tasks for current wave: `status: planned` and dependencies done.
 2. **File existence check — MANDATORY before starting any worker.** For each selected task, read "Files to modify" and verify target files/directories exist. If files are listed as "modify" but don't exist yet (e.g., tech-spec assumed a prior wave would create them), the worker MUST **create** them from scratch — do NOT fail or ask the user. Log in decisions.md: "Created {path} from scratch — tech-spec listed as modify but file didn't exist." This is normal when waves have cross-dependencies.
