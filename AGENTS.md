@@ -8,6 +8,15 @@
 - После завершения каждого этапа: проверить документацию, зафиксировать шаги, дать рекомендацию начать новую сессию с конкретным промтом для копирования.
 - Сначала искать ответы в документации проекта (project knowledge, backlog, code-research, skills), не спрашивать пользователя то, что можно найти самостоятельно.
 
+## Intermediate Summaries
+
+After completing each phase/checkpoint WITHIN a skill (not just at the end), ALWAYS show a brief summary:
+- What was done in this phase (1-2 sentences)
+- Key decisions or artifacts created
+- What comes next within the current skill
+
+This applies to every checkpoint marked in skill instructions. Do NOT silently proceed to the next phase — the user must see progress between steps.
+
 ## Pipeline Navigation
 
 After completing any pipeline step, ALWAYS tell the user the next step. This is the standard flow:
