@@ -1,0 +1,84 @@
+{
+  "status": "changes_required",
+  "findings": [
+    {
+      "category": "sizing",
+      "severity": "critical",
+      "issue": "MVP scope includes 4 scenarios but only 3 skills, with retrospective AC mixed into MVP criteria",
+      "why_matters": "The user-spec declares MVP as 3 skills (design-system-init, design-generate, design-review) but acceptance criteria 10-12 cover retrospective behavior (lessons-learned.md, promotion to design-principles.md, session prompt generation). Scenario G (retrospective) is described as a full user flow with AC, yet retrospective is post-MVP v1. This creates ambiguity: is retrospective in MVP or not? Implementers will either build too much in MVP or fail acceptance criteria.",
+      "fix": "Move AC items 10-12 (retrospective, promotion, session prompt) to a separate 'Post-MVP v1 acceptance criteria' section, or explicitly mark them as post-MVP in the AC list. Keep MVP AC strictly to the 3 skills."
+    },
+    {
+      "category": "sizing",
+      "severity": "major",
+      "issue": "Size L is correct but MVP alone is still large: 3 skills + 5 shared references + like-figma migration + do-task integration",
+      "why_matters": "Each skill is a markdown document with its own references, but design-system-init requires: interview logic, project scanning logic, token generation, component generation, browser-preview setup. design-generate requires: layout selection, component assembly, HTML+SVG output, iteration flow. design-review requires: token reading, file scanning, recommendation engine, do-task integration point. Plus 5 shared reference documents and migration from like-figma. This is substantial even for markdown-only output.",
+      "fix": "Consider whether MVP can be split into two increments: (1) design-system-init + shared references + like-figma migration, (2) design-generate + design-review + do-task integration. Each increment is independently deliverable and testable."
+    },
+    {
+      "category": "overengineering",
+      "severity": "major",
+      "issue": "SVG generation in design-generate adds significant complexity with questionable value",
+      "why_matters": "The spec requires generating both HTML and SVG for every page. HTML is the primary deliverable (interactive, viewable in browser, uses CSS custom properties). SVG is static and harder to generate correctly (text positioning, responsive behavior doesn't apply). The spec doesn't explain why SVG is needed alongside HTML. If it's for documentation/sharing, a screenshot of HTML serves the same purpose.",
+      "fix": "Either justify why SVG is needed (what use case HTML alone doesn't cover) or move SVG generation to post-MVP. This reduces scope of design-generate significantly."
+    },
+    {
+      "category": "overengineering",
+      "severity": "minor",
+      "issue": "Contrast ratio check (AC #6: >= 4.5:1) requires color computation logic in markdown skill instructions",
+      "why_matters": "Verifying WCAG AA contrast ratio programmatically requires parsing colors from tokens, computing relative luminance, and checking ratios for all text/background combinations. For a markdown skill file, the instruction would need to include the algorithm or reference a script. This is achievable but adds complexity to what should be a concise skill instruction.",
+      "fix": "Specify whether this is a generation constraint (agent should pick colors that meet contrast) or a verification step (agent runs a check after generation). If verification, add a script to the skill's scripts/ directory rather than embedding the algorithm in SKILL.md."
+    },
+    {
+      "category": "underengineering",
+      "severity": "critical",
+      "issue": "Edge cases are generic and not mapped to specific user flows",
+      "why_matters": "The spec lists 6 edge cases but they are high-level (no DS, not-web, contradictory feedback). Missing per-flow edge cases: (A) design-system-init: What if project has conflicting color definitions across files? What if Tailwind config and CSS variables define different palettes? What if project has no existing styles at all (greenfield)? What about partial interview (user abandons mid-interview)? (B) design-generate: What if requested page needs components not in DS? What if description is too vague? What about responsive breakpoints — does generated HTML work at different widths? (C) design-review in do-task: What if tokens.json is malformed? What if the task changes non-UI files only but was tagged as UI? What if review recommendations conflict with existing code patterns?",
+      "fix": "Add edge cases section per scenario (A, B, C at minimum for MVP). Each scenario should have 3-5 specific edge cases with expected behavior."
+    },
+    {
+      "category": "underengineering",
+      "severity": "major",
+      "issue": "No specification for how design-review integrates with do-task mechanically",
+      "why_matters": "Scenario C says 'do-task sees UI task + .design-system/ exists' but doesn't specify: Where in do-task's flow does design-review trigger? Before code writing? After? During review phase? Does do-task's SKILL.md need modification? Is it a conditional reference? A subagent call? This is the MVP's key integration point and the mechanism is unspecified.",
+      "fix": "Add a subsection to Scenario C specifying the integration mechanism: at what point in do-task flow, what triggers it (condition check), what the output format is (inline recommendations vs separate report), and whether do-task's SKILL.md needs a modification to reference design-review."
+    },
+    {
+      "category": "underengineering",
+      "severity": "major",
+      "issue": "No specification for how design-system-init interview works",
+      "why_matters": "The spec says 'conducts interview: proposes specific values, user confirms/corrects' but doesn't specify: How many interview rounds? What if user doesn't know what they want? Does it use the existing interview template pattern (shared/interview-templates/) or a new one? What's the interview state persistence format? The methodology has a well-defined interview pattern (3 cycles, scoring, completeness checker) but the spec doesn't say whether to reuse it or create something simpler.",
+      "fix": "Specify whether design-system-init reuses the methodology's interview pattern (interview-templates, scoring, completeness checker) or uses a simpler approach. If simpler, describe the flow: how many rounds, what persistence, what completeness criteria."
+    },
+    {
+      "category": "underengineering",
+      "severity": "minor",
+      "issue": "No mention of what happens when design-system evolves over time",
+      "why_matters": "After initial creation, tokens and components will need updates. The spec covers creation (design-system-init) but not evolution. What if user wants to add a new color to the palette? Change the font pairing? Add new components? The like-figma skill had an 'Evolve' mode for this. Without this, users have to re-run init or manually edit tokens.json.",
+      "fix": "Either add an 'evolve' scenario to MVP (design-system-init can update existing DS) or explicitly note this as post-MVP and describe the interim workaround (user edits tokens.json manually)."
+    },
+    {
+      "category": "better_alternative",
+      "severity": "major",
+      "issue": "Existing retrospective skill already handles lessons-learned and promotion — design-retrospective may duplicate it",
+      "why_matters": "The existing /retrospective skill (retrospective/SKILL.md) already: reads decisions.md + git log, identifies problems, writes entries to {skill}/references/lessons-learned.md with Problem/Cause/Solution/Rule format, links lessons-learned.md in target SKILL.md. The post-MVP v1 'design-retrospective' appears to replicate this with design-specific semantics (visual quality feedback, taste profile). However, the MVP acceptance criteria (10-12) describe basic retrospective behavior that the existing skill already supports.",
+      "fix": "Clarify what design-retrospective adds beyond the existing /retrospective skill. If post-MVP v1 needs design-specific retrospective (taste profile, visual pattern analysis), state that explicitly. For MVP, consider whether the existing /retrospective skill can be used as-is for the design pipeline, with design-specific extensions in post-MVP."
+    },
+    {
+      "category": "better_alternative",
+      "severity": "minor",
+      "issue": "Library catalog (library-catalog.md) could be a shared reference rather than design-pipeline-specific",
+      "why_matters": "A catalog of free icon/element libraries is useful beyond design pipeline — code-writing skill could reference it for UI tasks, project-planning could use it during tech stack decisions. Making it design-pipeline-specific limits reuse.",
+      "fix": "Consider placing library-catalog.md in shared/references/ or as a project-knowledge reference rather than a design-pipeline-only resource."
+    },
+    {
+      "category": "feasibility",
+      "severity": "minor",
+      "issue": "like-figma skill directory exists but code-research references its files as reusable — migration/deletion needs sequencing",
+      "why_matters": "The spec says 'delete like-figma after migration' and code-research identifies 5 reusable files (design-tokens.md, component-patterns.md, generation-guide.md, preview-template.html, interview structure). The tech-spec needs to ensure migration happens before deletion, and that no other projects reference like-figma directly.",
+      "fix": "This is a tech-spec concern, but user-spec should mention that like-figma remains available until all its content is migrated to the new skills. Add a constraint or note about migration sequencing."
+    }
+  ],
+  "worst_category": "underengineering",
+  "summary": "The spec has a solid vision and good problem framing, but has two critical issues: (1) MVP scope is ambiguous — retrospective AC items are mixed into MVP criteria despite retrospective being post-MVP v1, and (2) edge cases are too generic and not mapped per user flow, which for an L-sized feature is insufficient. The do-task integration mechanism (the key MVP value proposition) is underspecified. SVG generation adds unjustified complexity. These issues should be resolved before moving to tech-spec."
+}
