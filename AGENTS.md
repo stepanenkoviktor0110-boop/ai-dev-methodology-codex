@@ -55,3 +55,31 @@ After completing any pipeline step, ALWAYS tell the user the next step. This is 
 **After each step, say:** "Следующий шаг: `/command-name` — краткое описание. Запустить?"
 
 If unsure where the user is in the pipeline, check `work/` directory for existing specs/tasks and their statuses to determine the current stage.
+
+## Framework Update Protocol
+
+When user says "обнови фреймворк", "обновили скиллы", "pull agents", or similar:
+
+**Step 1: Save context anchor BEFORE touching anything.**
+Write down (in your response, not in a file) a context snapshot:
+- Current project path
+- Current feature name and pipeline stage (e.g., "health-dashboard-mvp, session 2 of /do-feature")
+- Current/next task number
+- Any in-progress work or pending decisions
+
+**Step 2: Update framework — minimal scope.**
+```bash
+cd ~/.agents && git pull origin master
+```
+Then re-read ONLY `~/.agents/AGENTS.md`. Do NOT re-read all skills — they are loaded on demand when needed.
+
+**Step 3: Report changes briefly.**
+Show `git log --oneline @{1}..HEAD` output — just commit titles. Do NOT read each changed file.
+
+**Step 4: Return to project using the context anchor from Step 1.**
+`cd` back to the project directory. Re-read the project's `AGENTS.md` (not the global one — the project-level one). State explicitly: "Возвращаюсь к {feature}, {stage}. Продолжаем."
+
+**Critical rules:**
+- The project's `work/` directory, specs, tasks, decisions.md are UNTOUCHED by framework updates. Do not re-read them unless you need to — you already have them in context.
+- Do NOT start exploring updated skill files out of curiosity. Updated skills take effect next time they are loaded by a pipeline step.
+- Total time on framework update: under 30 seconds. If it takes longer — you are doing too much.
