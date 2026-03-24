@@ -85,15 +85,16 @@ Wait for explicit **"да"**. Do NOT start execution without it.
 ## Phase 2: Execute Wave
 
 1. Select tasks for current wave: `status: planned` and dependencies done.
-2. Set each selected task to `in_progress`.
-3. For each task, run worker flow:
+2. **File existence check:** For each selected task, read "Files to modify" and verify target directories exist. If files are listed as "modify" but don't exist yet (e.g., tech-spec assumed prior wave would create them), the worker must **create** them — not fail. Log this in decisions.md: "Created {path} from scratch — tech-spec listed as modify but file didn't exist."
+3. Set each selected task to `in_progress`.
+4. For each task, run worker flow:
    - Spawn worker (`agent_type: worker`, model from `tier_opus`).
    - Pass task path and feature context files.
    - Worker performs implementation and local verification, then reports:
      - modified files
      - commits made
      - unresolved risks
-4. Review flow per task (if `reviewers` not empty):
+5. Review flow per task (if `reviewers` not empty):
    - Coordinator gets `git diff` for task changes.
    - Spawn all reviewer agents in parallel (`tier_sonnet`), pass:
      - task path
@@ -103,8 +104,8 @@ Wait for explicit **"да"**. Do NOT start execution without it.
      - output path: `logs/working/task-{N}/{reviewer}-round{R}.json`
    - Collect reports, apply valid findings, rerun tests.
    - Repeat up to 3 rounds.
-5. If `reviewers` is empty, mark task self-verified after worker checks.
-6. Ensure worker writes a concise decisions entry to `work/{feature}/decisions.md`.
+6. If `reviewers` is empty, mark task self-verified after worker checks.
+7. Ensure worker writes a concise decisions entry to `work/{feature}/decisions.md`.
 
 ## Audit Wave
 
@@ -115,6 +116,8 @@ Audit Wave tasks use `reviewers: []` and run as independent auditors:
 
 Spawn all auditors in parallel (`tier_opus`).
 If findings exist, spawn a fixer worker (`tier_opus`) and re-run only affected auditors as reviewers (`tier_sonnet`), max 3 rounds.
+
+**When Audit Wave is in a different session:** If session-plan.md places the Audit Wave in a later session (e.g., final session), do NOT run it in the current session. Record in decisions.md: "Audit wave (code-reviewer, security-auditor, test-reviewer): not run — scheduled for session {N}." This is expected behavior, not a failure.
 
 ## Phase 3: Wave Transition
 

@@ -15,6 +15,11 @@ These instructions are written for Codex agents that default to the laziest inte
 - If a SKILL.md references `$AGENTS_HOME` — resolve it to the actual agents home path and read the file. If a referenced file doesn't exist, tell the user — do NOT invent a workaround.
 - **Integrity check:** before executing any SKILL.md, verify it has no git conflict markers (`<<<<<<<`, `=======`, `>>>>>>>`). If found — do NOT execute, tell user to resolve the conflict first.
 
+## Environment: Known Pitfalls
+
+- **`rg` (ripgrep) may be blocked** on some Windows environments (`Access denied` on `rg.exe`). If `rg` fails, fall back to `Get-ChildItem -Recurse | Select-String` (PowerShell) or `findstr /S` (cmd). Performance will be lower — narrow search scope with explicit paths.
+- **`npm install` with heavy packages** (e.g., `pdfjs-dist`, `sharp`, `prisma`) can exceed default terminal timeouts. Use `timeout_ms: 300000` (5 min) or higher for install commands. If it still times out, retry — npm caches partial downloads.
+
 ## Git: Known Pitfalls
 
 - **`work/{feature}/logs/` is gitignored** by most `.gitignore` configs (global `logs/` rule). For methodology artifacts in this directory (session-plan.md, review reports, etc.) use `git add -f` when committing. Otherwise phase-gate commits will silently skip these files.
@@ -98,7 +103,8 @@ cd ~/.agents && git pull origin master
 Then re-read ONLY `~/.agents/AGENTS.md`. Do NOT re-read all skills — they are loaded on demand when needed.
 
 **Step 3: Report changes briefly.**
-Show `git log --oneline @{1}..HEAD` output — just commit titles. Do NOT read each changed file.
+Show `git log --oneline "HEAD@{1}..HEAD"` output — just commit titles. Do NOT read each changed file.
+Note: quotes around `"HEAD@{1}..HEAD"` are required — `@{}` syntax conflicts with PowerShell.
 
 **Step 4: Return to project using the context anchor from Step 1.**
 `cd` back to the project directory. Re-read the project's `AGENTS.md` (not the global one — the project-level one). State explicitly: "Возвращаюсь к {feature}, {stage}. Продолжаем."
