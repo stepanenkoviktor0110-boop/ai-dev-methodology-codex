@@ -134,3 +134,35 @@ Review details — in JSON files via links. QA report — in logs/working/.
 - All 5 referenced files exist and resolve correctly
 - CSP meta tag present in preview-template.html
 - Zero emphasis words in SKILL.md
+
+## Task 7: Integrate design-review into do-task
+
+**Status:** Done
+**Commit:** f450e2d
+**Agent:** main agent
+**Summary:** Добавлен design-review hook в `skills/do-task/SKILL.md` как пункт 4 в Step 2: Execute (между git commit и reviewers). Хук проверяет два условия: наличие `.design-system/tokens.json` и UI-файлов среди изменённых (.tsx/.vue/.html/.css/.scss). При выполнении обоих — вызывает design-review субагент. Silent skip при невыполнении. Guard: хук вызывает ТОЛЬКО design-review, не полный пайплайн.
+**Deviations:** None
+
+**Reviews:** Выполнено main agent, ревью не требовалось (минимальная вставка ~2 строки).
+
+**Verification:**
+- do-task SKILL.md: hook на строке 49, между step 3 (commit) и step 5 (reviewers) → PASS
+- Нумерация Step 2: 1-5 последовательна → PASS
+- Оба условия (tokens.json + UI files) присутствуют → PASS
+
+## Task 8: Delete like-figma skill
+
+**Status:** Done
+**Commit:** 221f345
+**Agent:** main agent
+**Summary:** Удалена директория `skills/like-figma/` (5 файлов, 764 строки). Перед удалением верифицировано: 4 новых скилла существуют (SKILL.md в каждом), 4 shared references на месте, 3 migrated references + preview-template.html в design-generate. Grep подтвердил отсутствие внешних ссылок на like-figma. Decision 6 (copy, not symlink — delete originals after migration verified) выполнен.
+**Deviations:** None
+
+**Reviews:** Выполнено main agent. Верификация миграции — 14 файлов проверены до удаления.
+
+**Verification:**
+- `test ! -d skills/like-figma` → PASS: like-figma deleted
+- All 4 new skills exist → PASS
+- All 4 shared references exist → PASS
+- All 3 design-generate references + template exist → PASS
+- `grep -r "like-figma" skills/ shared/` (excluding specs) → no stale references → PASS
