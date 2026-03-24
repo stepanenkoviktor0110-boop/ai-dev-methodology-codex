@@ -66,13 +66,12 @@ model: gpt-5.4-mini
 Options (only models available in Codex CLI):
 - `inherit` — use orchestrator's model (default, recommended)
 - `gpt-5.4` — flagship, best quality (tier_high)
-- `gpt-5.3-codex` — specialized coding model, best for agentic coding tasks (tier_medium)
+- `gpt-5.3-codex` — specialized coding model (tier_medium)
 - `gpt-5.4-mini` — fast, low cost (tier_low with `reasoning_effort: low`)
-- `gpt-5.1-codex-mini` — budget fallback for tier_low
 
-Recommended profile mapping:
-- `tier_high`: `gpt-5.4` (fallback `gpt-5.3-codex`)
-- `tier_medium`: `gpt-5.3-codex` (fallback `gpt-5.4-mini`)
-- `tier_low`: `gpt-5.4-mini` with `reasoning_effort: low` (fallback `gpt-5.1-codex-mini`)
+Tier mapping — NO FALLBACKS:
+- `tier_high`: `gpt-5.4`
+- `tier_medium`: `gpt-5.3-codex`
+- `tier_low`: `gpt-5.4-mini` with `reasoning_effort: low`
 
 Use sparingly. `inherit` is usually best.
