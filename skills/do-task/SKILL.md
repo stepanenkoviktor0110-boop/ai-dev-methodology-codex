@@ -10,6 +10,14 @@ description: |
 
 Execute a spec-driven task with validation and status tracking.
 
+## Step 0: Pre-flight Checks
+
+1. Determine feature path from task file location (`work/{feature}/tasks/{N}.md`).
+2. Check `work/{feature}/logs/session-plan.md` exists and has `status: approved` in frontmatter.
+   - If missing or not approved → **STOP**: "Session plan не утверждён. Сначала `/decompose-tech-spec` и подтверди план сессий."
+3. Check that the requested task belongs to the current session (compare with session-plan.md).
+   - If task is in a future session → **WARN**: "Задача {N} относится к сессии {M}, текущая сессия — {K}. Выполнить досрочно? (да/нет)"
+
 ## Step 1: Read Task
 
 1. Read task file (user provides path or task number)

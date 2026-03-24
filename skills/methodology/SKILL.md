@@ -86,14 +86,19 @@ The full path from idea to production. Each step has a command, a skill behind i
   - `reality-checker` — validates against actual codebase (file existence, feasibility)
 - Cross-task integration check: both validators re-run on all tasks together — catches shared resource conflicts, duplicate heavy resource init, hidden dependencies (max 2 extra iterations)
 - Git commit after each validation round
-- User approves → git commit approval
+- **BLOCKING GATE 1:** User approves task decomposition → git commit approval
 - **Session planning:** groups waves into sessions by LOC budget (~1200 lines per session). Generates `session-plan.md` with session boundaries, tasks per session, and context files. Audit Wave + Final Wave are always the last session.
+- **BLOCKING GATE 2:** User approves session plan → session-plan.md `status: approved` → git commit
 
-**Output:** `work/{feature}/tasks/*.md` (validated) + `work/{feature}/logs/session-plan.md`
+**Output:** `work/{feature}/tasks/*.md` (validated) + `work/{feature}/logs/session-plan.md` (status: approved)
 
 **Skill:** `task-decomposition`
 
-### Step 4: Implementation
+> **Important:** `/decompose-tech-spec` ends after session plan approval. It does NOT auto-transition to implementation. The user must explicitly invoke `/do-feature` or `/do-task`.
+
+### Step 4: Implementation — requires approved session plan
+
+**Pre-flight:** Both `/do-feature` and `/do-task` verify that `session-plan.md` exists and has `status: approved`. If not — they stop and tell user to run `/decompose-tech-spec` first.
 
 **Choose `/do-task` when:** single task, manual control, debugging, iterating on one piece.
 **Choose `/do-feature` when:** multiple tasks ready, standard feature work, want parallel execution.

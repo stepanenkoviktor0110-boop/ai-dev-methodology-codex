@@ -104,18 +104,30 @@ After individual validation passes, run a final cross-task check:
 - [ ] Both validators: status=approved OR user resolved remaining issues
 - [ ] Cross-task integration check: no cross-task conflicts
 
-## Phase 3: Present to User
+## Phase 3: Present to User — BLOCKING GATE
 
-1. Summary: task count, waves, dependencies, validation results (iterations, issues found/fixed).
-2. Wait for user approval.
-3. Git commit: `chore(tasks): task decomposition approved for {feature}`
+> **HARD STOP.** Do NOT proceed to Session Planning until user gives explicit approval.
+
+1. Present summary as a table:
+
+   | # | Task | Wave | depends_on | estimated_loc | Description |
+   |---|------|------|------------|---------------|-------------|
+   | 1 | ... | 1 | — | 200 | ... |
+
+2. Show totals: task count, total estimated LOC, wave count, validation results (iterations, issues found/fixed).
+3. Ask user explicitly: **"Декомпозиция готова. Подтверждаешь задачи? (да/нет/правки)"**
+4. Wait for one of:
+   - **"да"** → proceed to Phase 4
+   - **"нет"** / corrections → apply changes, re-validate affected tasks, re-present
+   - No response → do NOT proceed. Remind user that approval is required.
+5. Only after explicit approval: Git commit `chore(tasks): task decomposition approved for {feature}`
 
 **Checkpoint:**
-- [ ] Summary presented to user
-- [ ] User approved task decomposition
+- [ ] Summary table presented to user
+- [ ] User explicitly approved (not assumed)
 - [ ] Approval committed
 
-## Phase 4: Session Planning
+## Phase 4: Session Planning — BLOCKING GATE
 
 After user approves task decomposition, calculate session grouping for predictable execution.
 
@@ -130,16 +142,39 @@ After user approves task decomposition, calculate session grouping for predictab
 3. For each session, collect unique Context Files from all tasks in that session (deduplicate).
 4. Give each session a short descriptive title based on its tasks' descriptions.
 5. Generate `work/{feature}/logs/session-plan.md` from template `$AGENTS_HOME/shared/work-templates/session-plan.md.template`.
-6. Present session plan to user as a table: session number, title, waves, tasks, estimated LOC.
-7. Git commit: `chore(tasks): session plan for {feature} — {N} sessions`
-8. Suggest next step: `/do-feature {feature}` to start session 1, or `/do-task` for manual execution.
+6. Present session plan to user as a table:
+
+   | Session | Title | Waves | Tasks | Estimated LOC |
+   |---------|-------|-------|-------|---------------|
+   | 1 | ... | 1-2 | 1,2,3 | 950 |
+
+7. Ask user explicitly: **"План сессий готов. Подтверждаешь? (да/нет/правки)"**
+8. Wait for explicit approval. Do NOT suggest running `/do-feature` until user confirms.
+9. Only after explicit approval:
+   - Git commit: `chore(tasks): session plan approved for {feature} — {N} sessions`
+   - Update `session-plan.md` frontmatter: `status: approved`
+10. After approval, inform user:
+
+    ```
+    Декомпозиция и план сессий утверждены.
+
+    Следующий шаг: `/do-feature {feature}` для запуска сессии 1,
+    или `/do-task` для ручного выполнения отдельной задачи.
+
+    ⚠️ Реализация НЕ начнётся, пока вы явно не запустите одну из этих команд.
+    ```
+
+> **HARD STOP.** This is the end of `/decompose-tech-spec`. Do NOT auto-transition to `/do-feature` or `/do-task`. The user must explicitly invoke the next command in a separate action.
 
 **Checkpoint:**
 - [ ] session-plan.md created and committed
-- [ ] User saw session grouping
+- [ ] User explicitly approved session plan
+- [ ] status: approved set in session-plan.md frontmatter
+- [ ] User informed about next step (no auto-transition)
 
 ## Final Check
 
-- [ ] All phases completed (tasks created, validation passed)
+- [ ] All phases completed (tasks created, validation passed, session plan approved)
 - [ ] All tasks match template (frontmatter: status, depends_on, wave, skills, reviewers, worker_name)
 - [ ] Validation: both validators passed or user confirmed remaining issues
+- [ ] Session plan: approved by user, committed

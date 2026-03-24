@@ -22,15 +22,30 @@ Use model tiers from [model-profiles.md](../tech-spec-planning/references/model-
 - Reviewer default: `tier_sonnet` (`gpt-5.4-mini`, fallback `gpt-5.3-codex`)
 - Cheap routine work: `tier_haiku` (`gpt-5.4-mini` with `reasoning_effort: low`, fallback `gpt-5.1-codex-max`)
 
+## Phase 0: Pre-flight Checks — BLOCKING GATE
+
+Before any execution, verify the pipeline was followed correctly:
+
+1. Read `work/{feature}/tech-spec.md`. Check frontmatter `status: approved`.
+   - If not → **STOP**: "Tech-spec не утверждён. Сначала `/new-tech-spec`."
+2. Read `work/{feature}/logs/session-plan.md`.
+   - If missing → **STOP**: "Session plan отсутствует. Сначала `/decompose-tech-spec`."
+   - If frontmatter `status` is not `approved` → **STOP**: "Session plan не утверждён. Сначала `/decompose-tech-spec` и подтверди план сессий."
+3. Read all task files in `work/{feature}/tasks/`. If no tasks exist → **STOP**: "Задачи не созданы. Сначала `/decompose-tech-spec`."
+4. Verify at least one task has `status: planned`. If all tasks are `done` → inform user, stop.
+
+> **Do NOT proceed if any pre-flight check fails.** These checks ensure the user approved each prior stage.
+
 ## Phase 1: Initialization
 
-1. Read `work/{feature}/tech-spec.md` and `work/{feature}/user-spec.md`.
-2. Read `work/{feature}/logs/session-plan.md` if it exists. If missing, treat all waves as one session.
-3. Read all task frontmatters in `work/{feature}/tasks/`:
+1. Read `work/{feature}/user-spec.md`.
+2. Read all task frontmatters in `work/{feature}/tasks/`:
    - `status`, `wave`, `depends_on`, `skills`, `reviewers`, `verify`, optional `worker_name`.
-4. Build execution plan from `$AGENTS_HOME/shared/work-templates/execution-plan.md.template`.
-5. Save plan to `work/{feature}/logs/execution-plan.md`, show user, wait for approval.
-6. Initialize/update `work/{feature}/logs/checkpoint.yml` with `total_waves`, `current_session`, `total_sessions`.
+3. Build execution plan from `$AGENTS_HOME/shared/work-templates/execution-plan.md.template`.
+4. Save plan to `work/{feature}/logs/execution-plan.md`.
+5. Present execution plan to user. Ask explicitly: **"Execution plan готов. Подтверждаешь запуск сессии {N}? (да/нет)"**
+6. Wait for explicit approval. Do NOT start execution without it.
+7. Initialize/update `work/{feature}/logs/checkpoint.yml` with `total_waves`, `current_session`, `total_sessions`.
 
 ## Phase 2: Execute Wave
 
