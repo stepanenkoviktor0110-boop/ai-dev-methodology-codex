@@ -12,7 +12,13 @@ These instructions are written for Codex agents that default to the laziest inte
 
 - **NEVER search for, read, or run helper scripts** (dispatch-skill.ps1, init-feature-folder.sh, smoke-codex-compat.ps1, etc.). Legacy scripts exist in `~/.agents/shared/scripts/` but are DEPRECATED and BROKEN — they require `/bin/bash` which is unavailable in most Windows environments. Their logic is already inlined in SKILL.md files. If you catch yourself about to run a `.sh` or `.ps1` from `shared/scripts/` — STOP. Read the SKILL.md instead — it has the same steps written as inline instructions. Use your built-in tools (mkdir, file-write, file-copy) to create folders and files.
 - **Shim (proxy) skills** redirect to another skill. This is normal, not an error. When a shim skill (e.g., `decompose-tech-spec` → `task-decomposition`) says "Read and follow {target SKILL.md}" — load that file and execute its instructions step by step. Do NOT improvise a replacement procedure. Do NOT complain about the redirect — just follow it.
-- If a SKILL.md references `$AGENTS_HOME` — resolve it to the actual agents home path (`~/.agents/`) and read the file. **The global framework lives in `~/.agents/` (a git repo).** The project-local `.agents/` directory is project-specific knowledge only — it is NOT the framework source. Do NOT confuse them.
+- If a SKILL.md references `$AGENTS_HOME` — resolve it to the actual agents home path (`~/.agents/`) and read the file.
+- **TWO SEPARATE REPOS — do NOT confuse them:**
+  - `~/.agents/` — the **global methodology framework** (its own git repo, remote: ai-dev-methodology-codex). Skills, agents, templates live here. Framework updates (`git pull`) happen here.
+  - `{project}/.agents/` — **project-local knowledge** (part of the project's git repo). Project docs, patterns, architecture live here.
+  - Committing methodology changes? → `cd ~/.agents && git add && git commit && git push`
+  - Committing project work? → `cd {project} && git add work/... && git commit`
+  - A framework commit hash (e.g., `92d725c`) will NOT be found in the project repo. That is expected — it lives in `~/.agents/`.
 - **Integrity check:** before executing any SKILL.md, verify it has no git conflict markers (`<<<<<<<`, `=======`, `>>>>>>>`). If found — do NOT execute, tell user to resolve the conflict first.
 
 ## Recovery After Interruption
@@ -47,9 +53,12 @@ This rule overrides `max_threads` in config.toml. Even if config says `max_threa
 ## Git: Known Pitfalls
 
 - **`work/{feature}/logs/` is gitignored** by most `.gitignore` configs (global `logs/` rule). For methodology artifacts in this directory (session-plan.md, review reports, etc.) use `git add -f` when committing. Otherwise phase-gate commits will silently skip these files.
-- **Pre-commit hooks (husky/lint-staged) WILL block methodology commits.** When committing task files, session plans, or other methodology artifacts, lint-staged may try to run prettier/eslint on unrelated staged files and fail. Solutions:
-  - Stage ONLY methodology files for the commit: `git add work/{feature}/tasks/*.md` — do NOT use `git add .`
-  - If lint-staged still fails on unrelated files — commit with `--no-verify` ONLY for pure methodology artifacts (no code). Log this in decisions.md.
+- **Pre-commit hooks (husky/lint-staged) WILL block methodology commits.** lint-staged runs prettier/eslint on ALL staged files, not just yours. If ANY staged file has formatting issues — the entire commit fails. MANDATORY procedure for every commit:
+  1. Stage ONLY your files: `git add work/{feature}/tasks/*.md` — NEVER `git add .`
+  2. Run `npx prettier --write` on staged code files BEFORE committing (not on .md methodology files).
+  3. Re-stage after prettier: `git add <fixed files>`
+  4. Only then: `git commit`
+  5. If lint-staged STILL fails on files outside your scope — use `--no-verify` ONLY for pure methodology artifacts (no code files). Log this in decisions.md.
 - **Atomic commits are MANDATORY.** Each commit MUST contain only files related to one logical change. Before every `git commit`, run `git diff --cached --name-only` and verify the file list. If unrelated files are staged — unstage them first. A commit that "accidentally" includes extra files corrupts git history and makes rollback impossible.
 - **Verify file state after every write.** After writing or editing any file (especially YAML frontmatter), immediately read it back and confirm the content is correct. PowerShell, encoding issues, and interrupted operations can silently corrupt files. If frontmatter is wrong after write — fix it immediately, do NOT proceed with stale state.
 
