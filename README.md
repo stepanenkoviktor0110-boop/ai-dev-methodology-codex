@@ -1,4 +1,4 @@
-# AI-First Development Methodology v1.2 — Codex Version
+# AI-First Development Methodology v1.3 — Codex Version
 
 Structured AI-First development methodology for [OpenAI Codex CLI](https://github.com/openai/codex). Every feature goes through a spec-driven pipeline with automated validators and quality gates at each stage.
 
@@ -17,9 +17,9 @@ A complete development framework where AI agents handle the full cycle: requirem
 ### Prerequisites
 
 - [Codex CLI](https://github.com/openai/codex) installed and configured
-- [PowerShell 7+](https://github.com/PowerShell/PowerShell) (`pwsh`) for skill dispatcher
 - [GitHub CLI](https://cli.github.com/) (`gh`) for project initialization
-- Git Bash on Windows (for shell scripts)
+- [gitleaks](https://github.com/gitleaks/gitleaks) for pre-commit secret scanning
+- Git Bash on Windows (for shell hooks)
 
 ### Step 1: Clone the framework
 
@@ -60,9 +60,11 @@ args = ["-y", "@upstash/context7-mcp"]
 
 ### Step 4: Verify installation
 
-```powershell
-pwsh -File ~/.agents/shared/scripts/smoke-codex-compat.ps1
-# Expected output: PASS
+```bash
+# Check framework structure
+ls ~/.agents/skills/ ~/.agents/AGENTS.md
+# Check gitleaks
+gitleaks version
 ```
 
 ## Usage
@@ -246,11 +248,11 @@ cat ~/.agents/skills/{skill-name}/SKILL.md
 
 ## Codex Runtime Compatibility
 
-This framework uses a Codex-compatible shim for skill alias resolution:
+Skills are resolved directly from SKILL.md files — no dispatcher scripts needed:
 
-- **Skill dispatcher**: `shared/scripts/dispatch-skill.ps1` — maps `/new-user-spec` → `user-spec-planning`, etc.
+- **Shim skills** (e.g., `do-feature/SKILL.md`) redirect to the full procedure in the target skill
+- **AGENTS.md** enforces "No Scripts" rule — agents read and follow SKILL.md files directly
 - **MCP aliases**: `shared/runtime/mcp-aliases.json` — Context7 tool name mapping
-- **Smoke test**: `shared/scripts/smoke-codex-compat.ps1` — checks for legacy Claude Code patterns
 
 ## Based on
 
@@ -258,7 +260,39 @@ Evolved fork of [molyanov-ai-dev](https://github.com/pavel-molyanov/molyanov-ai-
 
 ## Changelog
 
-### v1.2 — Blocking Gates (2026-03-24)
+### v1.3 — Battle-Tested on Real Project (2026-03-24)
+
+All fixes from running the full pipeline on health-dashboard-mvp (Windows, Codex CLI). Every issue found during real sessions → fixed in the framework.
+
+**Cross-platform & Environment:**
+- **Non-empty directory handling** in `/infrastructure-setup` — scaffold in tmp dir, move files (Vite/Next.js refuse non-empty dirs)
+- **Cross-platform gitleaks**: install instructions for macOS/Windows/Linux, fallback path search in pre-commit hook
+- **`.gitleaks.toml` template** — default rules don't catch all patterns, custom rules now mandatory
+- **Clean pre-commit testing** — verify gitleaks WITHOUT polluting git history (stage → test → cleanup)
+- **Windows/PowerShell section** — execution policy workarounds, `npm pkg set` over PSCustomObject, husky path config
+- **`rg` Access denied fallback** — mandatory fallback to `Get-ChildItem | Select-String`
+- **npm install timeout guidance** — heavy packages need 5+ min timeout, retry on failure
+- **Dev server verification** — `npm run build` as alternative when stdout is unavailable
+- **PowerShell-safe git commands** — `"HEAD@{1}..HEAD"` quoted for `@{}` syntax
+
+**Pipeline & Execution:**
+- **File existence check** before each wave — if tech-spec says "modify" but file doesn't exist, worker MUST create it
+- **Audit Wave clarity** — when scheduled for a later session, record "not run" in decisions.md (not a failure)
+- **`git add -f` for logs/ artifacts** — explicit force-add in all feature-execution commits (wave, session sync, session end)
+- **`.gitignore` template** — `!work/*/logs/` exception for methodology artifacts
+- **Mandatory Session End Protocol** — copy-paste prompt for next session at every pipeline step end
+
+**Agent Discipline:**
+- **Strict instruction tone** — all "should/consider/if needed" → MUST/ALWAYS/MANDATORY
+- **Propose-first interview style** — agents propose answers from context, don't ask obvious questions
+- **Shim skills fixed** — no more `dispatch-skill.ps1` references, direct SKILL.md execution
+- **Intermediate summaries** at every checkpoint within skills
+- **Documentation discipline** — decisions.md updated immediately, not batched
+- **Framework update protocol** — save context anchor, minimal update, return to work in <30 seconds
+- **Pipeline navigation** — auto-redirect to correct next step, `/infrastructure-setup` before `/do-feature` for new projects
+
+<details>
+<summary>v1.2 — Blocking Gates (2026-03-24)</summary>
 
 Found during real-world testing: agents skipped approval steps, ran sessions without stopping, ignored LOC budgets.
 
@@ -268,6 +302,7 @@ Found during real-world testing: agents skipped approval steps, ran sessions wit
 - **Pre-flight checks** in `/do-feature` and `/do-task`: verify session-plan approved, task in current session
 - **No auto-transition**: `/decompose-tech-spec` ends with STOP, user must explicitly invoke execution
 - `session-plan.md` now has `status: draft/approved` frontmatter
+</details>
 
 <details>
 <summary>v1.1 changes</summary>
