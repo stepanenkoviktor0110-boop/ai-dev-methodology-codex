@@ -91,12 +91,22 @@ Wait for explicit **"да"**. Do NOT start execution without it.
 
 ## Phase 2: Execute Wave
 
-**Parallel agent limit — max 5 concurrent agents.** Even if `max_threads` allows more, limit to 5 parallel agents to stay within safe environment bounds. If the wave has more tasks than 4, split into **batches**:
-- Batch 1: tasks 1–N (up to limit), wait for all, close agents.
-- Batch 2: tasks N+1–M, wait, close.
-- Continue until all tasks in the wave are done.
-- Same applies to reviewers: if 3 tasks × 3 reviewers = 9 agents > limit, review in batches.
-- Log batch plan in decisions.md: "Wave {W}: {total} agents, limit {N}, running in {B} batches."
+### ⛔ HARD LIMIT: NEVER spawn more than 5 agents at the same time.
+
+This is a NON-NEGOTIABLE environment constraint. Violating it WILL crash agents or cause silent failures.
+
+**Before EVERY `spawn_agent` call, count currently running agents.** If count >= 5 — STOP. Wait for running agents to finish and close them BEFORE spawning new ones.
+
+**Batching is MANDATORY when total agents > 5:**
+- Count all agents needed for this wave (workers + reviewers).
+- Split into batches of max 5: Batch 1 → spawn, wait, close ALL. Batch 2 → spawn, wait, close ALL.
+- Do NOT spawn batch 2 while any agent from batch 1 is still running.
+- Log batch plan in decisions.md: "Wave {W}: {total} agents needed, limit 5, running in {B} batches."
+
+**Examples of what is FORBIDDEN:**
+- 6 workers at once ❌ (split: 5 + 1)
+- 3 workers + 3 reviewers at once ❌ (split: 3 workers → close → 3 reviewers, or 5 + 1)
+- "I'll spawn 7 and they'll queue" ❌ — there is no queue, it will break
 
 1. Select tasks for current wave: `status: planned` and dependencies done.
 2. **File existence check — MANDATORY before starting any worker.** For each selected task, read "Files to modify" and verify target files/directories exist. If files are listed as "modify" but don't exist yet (e.g., tech-spec assumed a prior wave would create them), the worker MUST **create** them from scratch — do NOT fail or ask the user. Log in decisions.md: "Created {path} from scratch — tech-spec listed as modify but file didn't exist." This is normal when waves have cross-dependencies.
