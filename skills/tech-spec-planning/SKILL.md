@@ -6,7 +6,7 @@ description: |
   Use when: "сделай техспек", "составь техспек", "техническая спецификация",
   "tech spec", "создай тз", "составь тз", "new-tech-spec", "/new-tech-spec"
 
-  Requires existing user-spec.md as input (create with user-spec-planning skill first if missing).
+  Requires existing user-spec.md as input. If missing — auto-redirects to /new-user-spec.
 ---
 
 # Tech Spec Planning
@@ -23,7 +23,7 @@ Before starting, check [lessons-learned.md](references/lessons-learned.md) for k
 
 1. Ask user for feature name if not provided. Check `work/{feature}/` exists, create if needed.
 
-2. Read `work/{feature}/user-spec.md`. If missing — ask user to describe the task or create user-spec first.
+2. Read `work/{feature}/user-spec.md`. If missing — **STOP and redirect:** tell user "User-spec отсутствует. Запускаю `/new-user-spec` для создания." and execute `/new-user-spec` skill. Do NOT offer alternatives, do NOT ask user to describe the task inline — the pipeline requires user-spec.md as input.
    Extract `size: S|M|L` from user-spec frontmatter — it determines testing strategy depth in tech-spec.
 
 3. Read all files in `.agents/skills/project-knowledge/references/` (project.md, architecture.md, patterns.md, deployment.md, ux-guidelines.md, and any custom domain files). Missing files are fine — not all projects have all guides.
