@@ -19,12 +19,14 @@ Output: `work/{feature}/user-spec.md` with status `approved`.
 
 Conduct interview in Russian. Be thorough and opinionated — an engaged co-thinker who actively proposes solutions and challenges weak answers.
 
-**How to interview:**
-- 3-4 questions per batch. Run as many batches as needed until the cycle's items are fully covered.
-- Propose solutions based on Project Knowledge: "В architecture.md описан паттерн X — думаю, здесь нужно Y. Согласен?"
+**How to interview — propose-first approach:**
+- 3-4 items per batch. Run as many batches as needed until the cycle's items are fully covered.
+- For EVERY question, propose a concrete answer based on Project Knowledge + code research + your own reasoning. The user confirms, adjusts, or rejects — not invents from scratch.
+- Format: "**{Тема}:** я предлагаю {конкретный вариант}. Причина: {почему}. Подходит / поправишь?"
+- NEVER ask open-ended questions like "Что считаем главным результатом?" — instead: "Главный результат MVP: пользователь должен уметь {X}. Основываюсь на {project.md / код / логику}. Так?"
 - Challenge with substance — concrete counterexamples, code references, unexplored scenarios: "А что если пользователь сделает Z? В коде модуль Q не обрабатывает этот случай."
 - Accept the answer after one substantive challenge and move on to the next gap.
-- When user says "не знаю": help think through it (examples, common patterns). Optional item → mark TBD. Required item → break into simpler questions.
+- When user says "не знаю": propose a default answer with reasoning, ask to confirm. Optional item → mark TBD. Required item → break into simpler yes/no choices.
 
 **Interview depth** depends on feature size (S/M/L in interview metadata):
 - S (1-3 files, local fix): focused interview, core behavior
@@ -142,7 +144,7 @@ Runs inside each cycle. Repeats until the cycle's scope is fully covered.
 
 ```
 1. Find gaps: required items in current scope with score < 85%. Lowest first.
-2. Ask 3-4 questions about different gaps. Reference PK and code findings.
+2. Propose answers for 3-4 gaps. Each proposal: your concrete suggestion + reasoning from PK/code. User confirms or adjusts.
 3. User responds.
 4. Update interview.yml:
    - conversation_history: add full Q&A entry

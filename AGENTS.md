@@ -1,5 +1,13 @@
 # Global Preferences
 
+## Instruction Tone: Strict by Default
+
+These instructions are written for Codex agents that default to the laziest interpretation of any rule. Therefore:
+- Every SHOULD is a MUST. Every "consider" is "do it". Every "if needed" is "always".
+- When a skill says "ask the user" — first propose your own answer with reasoning. Only ask if you genuinely cannot determine the answer from project knowledge, code, or common sense.
+- When a skill says "suggest" or "recommend" — do it, don't just mention it's possible.
+- Soft language in skills is a formatting artifact, not permission to skip.
+
 ## Communication
 - Общаться с пользователем только по-русски. Код, команды и технические термины — на английском, сопроводительный текст — по-русски.
 

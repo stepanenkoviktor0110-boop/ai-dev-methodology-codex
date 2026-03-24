@@ -51,10 +51,10 @@ If during later phases a gap is discovered — launch `code-researcher` again wi
 
 Analyze if additional information is needed based on user-spec and code research.
 
-- Ask technical questions if gaps exist. No limit on question count — ask as many as needed.
+- For each gap, propose a concrete technical decision with reasoning. User confirms or adjusts. NEVER ask open-ended questions like "How should we handle X?" — instead: "Предлагаю {решение}. Причина: {почему}. Подходит?"
 - Focus: technical constraints, integration points, data sources, external dependencies.
-- If gaps found in user-spec requirements — discuss with user and update user-spec too (via subagent or directly).
-- If requirements are fundamentally unclear — suggest creating user-spec first.
+- If gaps found in user-spec requirements — propose a fix and update user-spec (via subagent or directly). Discuss with user only if the fix changes scope.
+- If requirements are fundamentally unclear — STOP and redirect to `/new-user-spec`.
 
 **Checkpoint:**
 - [ ] All technical gaps clarified (or none existed)

@@ -25,22 +25,25 @@ Conduct adaptive interview → make tech decisions → fill all project document
 
 ## Interview Methodology
 
-**One question at a time.** Ask one question, wait for the answer, then form the next question based on the response.
+**Propose-first approach.** For every topic, propose a concrete answer based on what you already know (codebase, user's description, common patterns). The user confirms, adjusts, or rejects — not invents from scratch. Format: "**{Тема}:** предлагаю {вариант}. Причина: {почему}. Подходит / поправишь?"
 
-**Build on answers.** If user mentioned a domain — ask domain-relevant follow-ups. If they said something vague — clarify that specific point.
+**NEVER ask open-ended questions.** Wrong: "Какой стек хочешь использовать?" Right: "Предлагаю Next.js + Supabase — у тебя веб-приложение с авторизацией, это покроет и фронт, и бэк, и БД. Подходит?"
 
-**Confirm understanding.** After 3-5 questions, briefly summarize what you understood. Catches misunderstandings early.
+**One topic at a time.** Propose answer for one topic, wait for response, then next.
+
+**Build on answers.** If user mentioned a domain — propose domain-relevant solutions. If they said something vague — propose a specific interpretation and ask to confirm.
+
+**Confirm understanding.** After 3-5 topics, briefly summarize what you understood. Catches misunderstandings early.
 
 **Help when stuck.** When user says "not sure" or "don't know":
-1. Say it's OK
-2. Offer 2-3 common approaches for their type of project
-3. Ask which is closer
-4. If still uncertain and optional — mark TBD, move on
-5. If still uncertain and required — break into simpler sub-questions
+1. Propose a default answer with reasoning
+2. If user doesn't like it — offer 2 alternatives with tradeoffs
+3. If still uncertain and optional — mark TBD, move on
+4. If still uncertain and required — break into yes/no choices
 
 **Recount on scope changes.** If user suddenly adds many features or reveals unexpected complexity — stop and recount total scope. Show the updated list, confirm you understood correctly.
 
-**If code exists.** Scan the codebase in parallel with the interview to pre-fill technical decisions and ask more targeted questions.
+**If code exists.** Scan the codebase BEFORE the interview to pre-fill as many answers as possible. Present findings as proposals, not questions.
 
 ## Phase 1: Project Discovery
 
