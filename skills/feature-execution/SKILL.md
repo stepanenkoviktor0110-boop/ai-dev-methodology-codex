@@ -151,12 +151,30 @@ If findings exist, spawn a fixer worker (`tier_opus`) and re-run only affected a
 - (если есть — технический долг, открытые вопросы, блокеры)
 ```
 
-**Step 2: Next Session Prompt.** Generate from `$AGENTS_HOME/shared/work-templates/session-prompt.md.template`. Save to `work/{feature}/logs/next-session-prompt.md`.
+**Step 2: Sync documentation artifacts.** Before generating handoff:
 
-**Step 3: Present handoff package.** Show user:
+1. **decisions.md** — verify all tasks completed in this session have entries. If any entry is missing or incomplete, write it now. Each entry must include: what was done, verification results, risks/trade-offs.
+2. **Task files** — verify every task touched in this session has correct frontmatter:
+   - Completed tasks: `status: done`
+   - Incomplete tasks: `status: in_progress` with note explaining what remains
+   - Checklists in task body: all completed items checked off
+3. **tech-spec.md** — update Implementation Tasks checkboxes (`- [ ]` → `- [x]`) for all completed tasks.
+4. **checkpoint.yml** — update with current state.
+5. Git commit: `chore: sync docs for session {N} — decisions, task statuses, tech-spec checkboxes`
+
+> Do NOT skip this step. Documentation drift is a real problem — if docs are not synced, the next session starts with stale context.
+
+**Step 3: Next Session Prompt.** Generate from `$AGENTS_HOME/shared/work-templates/session-prompt.md.template`. Save to `work/{feature}/logs/next-session-prompt.md`.
+
+**Step 4: Present handoff package.** Show user:
 
 ```
 Сессия {N} из {total} завершена. Отчёт выше.
+
+Документация синхронизирована:
+- decisions.md: {N} записей обновлено
+- Задачи: статусы актуальны
+- tech-spec: чеклисты обновлены
 
 Скопируй этот промт для старта следующей сессии:
 
@@ -167,7 +185,7 @@ If findings exist, spawn a fixer worker (`tier_opus`) and re-run only affected a
 ⚠️ Следующая сессия НЕ начнётся, пока ты явно не запустишь её.
 ```
 
-**Step 4: STOP.** Do not execute any more waves, tasks, or code. Wait for user to start a new session with the provided prompt.
+**Step 5: STOP.** Do not execute any more waves, tasks, or code. Wait for user to start a new session with the provided prompt.
 
 Git commit: `chore: complete session {N} — checkpoint and handoff prompt`
 

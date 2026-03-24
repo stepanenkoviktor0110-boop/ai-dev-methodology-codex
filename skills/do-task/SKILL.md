@@ -95,12 +95,24 @@ Execute a spec-driven task with validation and status tracking.
       - (если есть)
       ```
 
-   b. Generate next-session prompt from `$AGENTS_HOME/shared/work-templates/session-prompt.md.template`.
+   b. **Sync documentation artifacts** (do NOT skip):
+      - Verify `decisions.md` has entries for all tasks completed in this session
+      - Verify all completed task files have `status: done` and checklists checked off
+      - Update `tech-spec.md` checkboxes (`- [ ]` → `- [x]`) for completed tasks
+      - Update `checkpoint.yml` with current state
+      - Git commit: `chore: sync docs for session {N} — decisions, task statuses, tech-spec checkboxes`
+
+   c. Generate next-session prompt from `$AGENTS_HOME/shared/work-templates/session-prompt.md.template`.
       Save to `work/{feature}/logs/next-session-prompt.md`.
 
-   c. Present handoff:
+   d. Present handoff:
       ```
       Сессия {N} из {total} завершена. Отчёт выше.
+
+      Документация синхронизирована:
+      - decisions.md: записи актуальны
+      - Задачи: статусы обновлены
+      - tech-spec: чеклисты обновлены
 
       Скопируй этот промт для старта следующей сессии:
 
@@ -111,7 +123,7 @@ Execute a spec-driven task with validation and status tracking.
       ⚠️ Следующая сессия НЕ начнётся, пока ты явно не запустишь её.
       ```
 
-   d. Git commit: `chore: complete session {N} — checkpoint and handoff prompt`
+   e. Git commit: `chore: complete session {N} — checkpoint and handoff prompt`
    e. **STOP.** Do not execute any more tasks.
 
 ## Self-Verification
