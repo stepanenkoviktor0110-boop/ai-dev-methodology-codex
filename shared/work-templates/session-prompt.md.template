@@ -1,0 +1,14 @@
+Выполни фичу `{feature}` — сессия {next_session} из {total_sessions}.
+
+**Фича:** {one_line_description}
+**Прогресс:** Сессии 1-{current_session} завершены (waves 1-{last_completed_wave}).
+**Эта сессия:** waves {wave_start}-{wave_end} (tasks: {task_list}).
+
+Прочитай перед стартом:
+- `work/{feature}/logs/session-plan.md` — план сессий
+- `work/{feature}/logs/checkpoint.yml` — текущий прогресс
+- `work/{feature}/tech-spec.md` — секции: {relevant_tech_spec_sections}
+- `work/{feature}/decisions.md` — что уже сделано
+{context_files_block}
+
+Запусти `/do-feature {feature}` — подхватит checkpoint и продолжит с wave {wave_start}.

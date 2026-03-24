@@ -1,0 +1,22 @@
+# Credentials and secrets
+.credentials.json
+settings.json
+settings.local.json
+mcp-needs-auth-cache.json
+
+# Runtime state
+sessions/
+cache/
+telemetry/
+debug/
+statsig/
+stats-cache.json
+history.jsonl
+file-history/
+shell-snapshots/
+backups/
+plans/
+todos/
+ide/
+plugins/
+projects/
