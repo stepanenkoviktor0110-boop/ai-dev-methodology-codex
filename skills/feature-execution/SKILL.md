@@ -176,6 +176,14 @@ If findings exist, spawn a fixer worker (`tier_opus`) and re-run only affected a
 - Задачи: статусы актуальны
 - tech-spec: чеклисты обновлены
 
+## Дальше по общему плану
+
+Следующая сессия: {N+1} из {total} — "{session_title}"
+Задачи: {task_list} (waves {wave_start}-{wave_end})
+Estimated LOC: ~{loc}
+{если последняя сессия — "Это финальная сессия (Audit + QA)."}
+{если нужно что-то от пользователя — "Требуется от тебя: {что именно}"}
+
 Скопируй этот промт для старта следующей сессии:
 
 ---

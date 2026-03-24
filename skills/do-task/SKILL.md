@@ -114,6 +114,14 @@ Execute a spec-driven task with validation and status tracking.
       - Задачи: статусы обновлены
       - tech-spec: чеклисты обновлены
 
+      ## Дальше по общему плану
+
+      Следующая сессия: {N+1} из {total} — "{session_title}"
+      Задачи: {task_list} (waves {wave_start}-{wave_end})
+      Estimated LOC: ~{loc}
+      {если последняя — "Это финальная сессия (Audit + QA)."}
+      {если нужно от пользователя — "Требуется от тебя: {что именно}"}
+
       Скопируй этот промт для старта следующей сессии:
 
       ---
@@ -124,7 +132,7 @@ Execute a spec-driven task with validation and status tracking.
       ```
 
    e. Git commit: `chore: complete session {N} — checkpoint and handoff prompt`
-   e. **STOP.** Do not execute any more tasks.
+   f. **STOP.** Do not execute any more tasks.
 
 ## Self-Verification
 
