@@ -97,3 +97,22 @@ Review details — in JSON files via links. QA report — in logs/working/.
 **Verification:**
 - `wc -l skills/design-review/SKILL.md` → 111 lines (<500)
 - Referenced files exist: design-tokens.md, color-principles.md
+
+## Task 4: Create design-generate skill
+
+**Status:** Done
+**Commit:** 42182b3
+**Agent:** design-generator
+**Summary:** Создан процедурный скилл `skills/design-generate/SKILL.md` (149 строк) с 5 фазами: Readiness Check (валидация tokens.json), Parse Request (разбор описания), Select Layout (15 паттернов: 5 basic + 10 advanced), Assemble & Generate (HTML через preview-template.html + SVG), Present & Iterate (скриншоты, continuation prompt). Скопированы 3 reference-файла из like-figma и work/: component-patterns.md (as-is), grid-techniques.md (as-is), generation-guide.md (обогащён таблицей выбора лейаута для 15 паттернов и секцией Advanced Grid Patterns). preview-template.html скопирован с CSP meta tag (Decision 8). Валидация имён файлов `/^[a-z0-9-]+$/` (Decision 9).
+**Deviations:** None
+
+**Reviews:**
+
+*Round 1:*
+- skill-checker: approved, 0 findings → [logs/working/task-4/skill-checker-round1.json]
+
+**Verification:**
+- `wc -l skills/design-generate/SKILL.md` → 149 lines (<500)
+- All 5 referenced files exist and resolve correctly
+- CSP meta tag present in preview-template.html
+- Zero emphasis words in SKILL.md
