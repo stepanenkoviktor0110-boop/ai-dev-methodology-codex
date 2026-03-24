@@ -64,3 +64,36 @@ Review details — in JSON files via links. QA report — in logs/working/.
 
 **Verification:**
 - `test -s skills/design-system-init/references/font-pairing.md` → OK
+
+## Task 6: Create design-retrospective skill
+
+**Status:** Done
+**Commit:** 50a99db
+**Agent:** retro-builder
+**Summary:** Создан процедурный скилл `skills/design-retrospective/SKILL.md` (167 строк) с 5 фазами: Collect Evidence, Identify Patterns, Write Lessons, Promote Principles, Generate Next-Session Prompt. Зеркалирует структуру retrospective/SKILL.md для дизайн-домена. Уроки пишутся в проектный `.design-system/lessons-learned.md`, принципы промоутятся при 3+ повторениях в `.design-system/design-principles.md` (Decision 11). Покрыты edge cases: отсутствие `.design-system/`, первый запуск, пустая сессия, дубликаты.
+**Deviations:** None
+
+**Reviews:**
+
+*Round 1:*
+- skill-checker: pass, 0 findings → [logs/working/task-6/skill-checker-round1.json]
+
+**Verification:**
+- `wc -l skills/design-retrospective/SKILL.md` → 167 строк (< 500 лимит, в целевом диапазоне 200-280)
+
+## Task 5: Create design-review skill
+
+**Status:** Done
+**Commit:** 88fb560
+**Agent:** review-builder
+**Summary:** Создан informational skill `skills/design-review/SKILL.md` (111 строк) для lightweight ревью UI-кода на соответствие дизайн-токенам. Секции по логике: When to Activate (decision framework таблица), What to Read (только tokens.json), What to Check (colors/spacing/typography/non-DS properties), How to Report (формат "found X -> use Y", cap 3 рекомендации), Scope Guard (явный список чего скилл не делает). Ссылки на shared references через action-embedded Pattern A.
+**Deviations:** None
+
+**Reviews:**
+
+*Round 1:*
+- skill-checker: approved, 0 findings → [logs/working/task-5/skill-checker-round1.json]
+
+**Verification:**
+- `wc -l skills/design-review/SKILL.md` → 111 lines (<500)
+- Referenced files exist: design-tokens.md, color-principles.md
