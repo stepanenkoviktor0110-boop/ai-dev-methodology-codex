@@ -46,7 +46,8 @@ Execute a spec-driven task with validation and status tracking.
    - If task has no skill (frontmatter `skills: []` or absent) → read the task, execute "What to do" and "Verification Steps" directly. For tasks with user instructions → show the instruction to user, wait for confirmation.
 2. Follow loaded skill workflow
 3. Git commit implementation (code + tests pass): `feat|fix|refactor: task {N} — {brief description}`
-4. For each reviewer from the task's "Reviewers" section (if present):
+4. **Design review hook** — if `.design-system/tokens.json` exists in the project AND the task changed UI files (`.tsx`, `.vue`, `.html`, `.css`, `.scss`): spawn `design-review` subagent on changed UI files. If either condition is false — skip silently. This hook calls ONLY design-review, not the full design pipeline.
+5. For each reviewer from the task's "Reviewers" section (if present):
    1. Spawn subagent via spawn_agent tool (agent_type = reviewer name, e.g. `code-reviewer`)
    2. Pass: git diff of changes, path to task file, path to tech-spec, path to user-spec
    3. Reviewer loads its own skill automatically (via agent frontmatter `skills:`)
