@@ -59,7 +59,9 @@ All design artifacts are stored as code in the project's `.design-system/` direc
 
 ### Shared resources
 
-None.
+| Resource | Owner (creates) | Consumers | Instance count |
+|----------|----------------|-----------|----------------|
+| `shared/design-references/` (design-tokens.md, color-psychology.md, color-principles.md, library-catalog.md) | Task 1 (Wave 1) | design-system-init, design-generate, design-review | 1 directory, 4 files |
 
 ## Decisions
 
@@ -108,7 +110,12 @@ None.
 **Rationale:** Prevents path traversal (`../../etc/passwd`) when creating files in `.design-system/components/` and `.design-system/pages/`.
 **Alternatives considered:** Sanitizing paths — error-prone, validation is simpler and safer.
 
-### Decision 10: design-principles.md lives in project, not in skill
+### Decision 10: font-pairing.md is skill-specific, not shared
+**Decision:** `font-pairing.md` lives in `skills/design-system-init/references/`, not in `shared/design-references/`.
+**Rationale:** Only design-system-init uses font-pairing during the typography interview phase. design-generate uses already-chosen fonts from tokens.json. design-review checks token compliance, not font pairing quality. No cross-skill sharing needed.
+**Alternatives considered:** Placing in shared/ for consistency with other references — unnecessary since no other skill consumes it.
+
+### Decision 11: design-principles.md lives in project, not in skill
 **Decision:** `.design-system/design-principles.md` is a project-level file, populated by design-retrospective. Not a skill reference.
 **Rationale:** Design principles are project-specific taste accumulated from user feedback. Different projects have different aesthetic profiles. Skill references contain universal design knowledge.
 **Alternatives considered:** Skill-level reference — would mix universal knowledge with project-specific taste.
