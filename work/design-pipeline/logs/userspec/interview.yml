@@ -1,0 +1,383 @@
+# Interview Plan for Feature Planning
+
+# ============================================================================
+# Interview Metadata (Session Recovery)
+# ============================================================================
+interview_metadata:
+  started: "2026-03-24 22:15:00"
+  last_updated: "2026-03-24 23:00:00"
+  status: "in_progress"
+  can_resume: true
+  current_question_num: 11
+  feature_size: "L"
+
+# ============================================================================
+# Conversation History (for session recovery)
+# ============================================================================
+conversation_history:
+  - question_num: 0
+    timestamp: "2026-03-24 22:15:00"
+    topic: "initial_description"
+    agent_question: "(Pre-interview context)"
+    user_answer: "Design Pipeline — 9 скиллов, без Figma API, аналог dev-методологии."
+    summary: "Full design pipeline, 9 skills, no Figma API."
+
+  - question_num: 1
+    timestamp: "2026-03-24 22:25:00"
+    topic: "user_problem"
+    agent_question: "Агент показывает визуальный результат?"
+    user_answer: "Нет, включается для наведения красоты. Агент-стилист. Палитры, цвета."
+    summary: "Агент-стилист, фокус на красоте."
+
+  - question_num: 2
+    timestamp: "2026-03-24 22:25:00"
+    topic: "success_criteria"
+    agent_question: "Критерии: init, генерация, ретроспектива, пайплайн."
+    user_answer: "Да, нравится."
+    summary: "Критерии приняты."
+
+  - question_num: 3
+    timestamp: "2026-03-24 22:25:00"
+    topic: "constraints"
+    agent_question: "Шрифты, иконки, зависимости?"
+    user_answer: "Шрифты обязательны. Каталог библиотек — ссылки, не стоки."
+    summary: "Шрифты must-have. Каталог — ссылки."
+
+  - question_num: 4
+    timestamp: "2026-03-24 22:25:00"
+    topic: "testing_strategy"
+    agent_question: "Skill-tester + кальянка?"
+    user_answer: "Согласен."
+    summary: "Skill-tester + ручная проверка."
+
+  - question_num: 5
+    timestamp: "2026-03-24 22:40:00"
+    topic: "integration_points"
+    agent_question: "Три уровня интеграции: лёгкий/средний/полный."
+    user_answer: "MVP — только средний. Остальное post-MVP."
+    summary: "MVP = средний (design-review при UI-задачах)."
+
+  - question_num: 6
+    timestamp: "2026-03-24 22:40:00"
+    topic: "error_scenarios"
+    agent_question: "Нет DS? Не-веб? Противоречивый фидбек?"
+    user_answer: "Нет DS — нет работы. Не-веб — объяснить + альтернатива. Противоречия — мягко."
+    summary: "Strict: нет DS — нет. Не-веб — объяснить."
+
+  - question_num: 7
+    timestamp: "2026-03-24 22:40:00"
+    topic: "risks"
+    agent_question: "Качество, токены, вкусовщина."
+    user_answer: "Промежуточные скрины. Токены — аккуратно. Референсы от пользователя."
+    summary: "Скрины, экономия токенов, референсы."
+
+  - question_num: 8
+    timestamp: "2026-03-24 22:40:00"
+    topic: "verification_strategy"
+    agent_question: "Человек — визуальное, автоматика — структура."
+    user_answer: "Согласен."
+    summary: "Визуальное — человек, структура — авто."
+
+  - question_num: 9
+    timestamp: "2026-03-24 22:50:00"
+    topic: "user_stories"
+    agent_question: "4 сценария MVP: init DS, генерация, наведение красоты, ретроспектива."
+    user_answer: "Да."
+    summary: "4 сценария приняты."
+
+  - question_num: 10
+    timestamp: "2026-03-24 22:50:00"
+    topic: "acceptance_criteria"
+    agent_question: "12 пунктов чеклиста."
+    user_answer: "Оставь."
+    summary: "Все 12 AC приняты."
+
+  - question_num: 11
+    timestamp: "2026-03-24 22:50:00"
+    topic: "edge_cases"
+    agent_question: "Тёмная тема, отсутствующий компонент, длинная страница."
+    user_answer: |
+      Спрашивает обо всём где нарушается логика. По компонентам — зависит от
+      сложности. Большие задачи режем на композиции и делаем в разных сессиях
+      как в методологии.
+    summary: "Нарушение логики — спрашивать. Компоненты — по сложности. Большое — декомпозиция + сессии."
+
+  - question_num: 12
+    timestamp: "2026-03-24 22:55:00"
+    topic: "scope_narrowing"
+    agent_question: "(User initiated)"
+    user_answer: "MVP — только веб-проекты. Остальным отказываем. Не-веб — post-MVP."
+    summary: "MVP = только веб. Не-веб — post-MVP."
+
+# ============================================================================
+# Phase 1: High-Level Feature Understanding
+# ============================================================================
+phase1_feature_overview:
+
+  feature_name:
+    score: 95
+    status: "complete"
+    value: "design-pipeline"
+    gaps: ""
+    required: true
+
+  feature_description:
+    score: 90
+    status: "complete"
+    value: "Фреймворк из 9 скиллов для дизайн-задач. Агент-стилист: наводит красоту в реальном коде по запросу. Полный цикл от DS до ретроспективы. Без Figma API. MVP: только веб, средний уровень интеграции."
+    gaps: ""
+    required: true
+
+  work_type:
+    score: 95
+    status: "complete"
+    value: "feature"
+    gaps: ""
+    required: true
+
+  user_problem:
+    score: 85
+    status: "complete"
+    value: "Агент не концентрируется на эстетике. Нет инструмента для работы над красотой: палитры, цвета, согласованность. Агент-стилист включается по запросу."
+    gaps: ""
+    required: true
+
+  target_users:
+    score: 50
+    status: "partial"
+    value: "Разработчики с AI-first методологией"
+    gaps: ""
+    required: false
+
+  success_criteria:
+    score: 85
+    status: "complete"
+    value: |
+      1. /design-system-init → DS за одно интервью
+      2. По описанию → HTML + SVG
+      3. Ретроспектива → правила улучшения
+      4. Пайплайн аналогичен dev-методологии
+      5. Каталог бесплатных библиотек
+      6. Шрифты под контекст
+      7. MVP: design-review при UI-задачах
+    gaps: ""
+    required: true
+
+  constraints:
+    score: 85
+    status: "complete"
+    value: |
+      - Без Figma API, всё как код
+      - Шрифты обязательны
+      - Каталог библиотек — ссылки, не стоки
+      - MVP: только веб-проекты, не-веб — отказ
+      - Нет DS — нет работы
+      - Токены: максимальная экономия
+    gaps: ""
+    required: true
+
+  testing_strategy:
+    score: 85
+    status: "complete"
+    value: "Skill-tester + ручная проверка на реальном проекте"
+    gaps: ""
+    required: true
+
+# ============================================================================
+# Phase 2: User Experience & Scenarios
+# ============================================================================
+phase2_user_experience:
+
+  user_stories:
+    score: 85
+    status: "complete"
+    value: |
+      А: /design-system-init → интервью → tokens.json + компоненты → проверка в браузере
+      Б: /design-generate → описание → HTML+SVG → скрин → итерация
+      В: MVP-интеграция → do-task с UI → design-review → 2-3 рекомендации
+      Г: Ретроспектива → фидбек → уроки → промоушен → промт для следующей сессии
+    gaps: ""
+    required: true
+
+  acceptance_criteria:
+    score: 85
+    status: "complete"
+    value: |
+      1. /design-system-init создаёт tokens.json с цветами, шрифтами, spacing
+      2. /design-system-init создаёт минимум 3 компонента (button, card, input)
+      3. Каждый компонент открывается в браузере автономно
+      4. /design-generate создаёт pages/{name}.html и .svg
+      5. HTML использует токены из DS (нет hardcoded)
+      6. Contrast ratio ≥ 4.5:1
+      7. Нет DS → отказ с предложением /design-system-init
+      8. Не-веб проект → отказ с объяснением
+      9. Design-review даёт конкретные рекомендации
+      10. Ретроспектива после 3+ итераций → lessons-learned.md
+      11. Повторяющийся урок (3+) → промоушен в design-principles.md
+      12. Промт для следующей сессии при закрытии текущей
+    gaps: ""
+    required: true
+
+  edge_cases:
+    score: 85
+    status: "complete"
+    value: |
+      - Нет DS → отказ, предложить /design-system-init
+      - Не-веб → отказ (MVP), post-MVP — альтернатива
+      - Фидбек противоречит принципам → мягко предложить альтернативу
+      - Нарушение логики (тёмная тема без dark-токенов) → спросить пользователя
+      - Компонент не в DS → по сложности: простой — создать, сложный — декомпозиция
+      - Большая задача (длинная страница) → декомпозиция на композиции, разные сессии
+    gaps: ""
+    required: true
+
+  error_scenarios:
+    score: 85
+    status: "complete"
+    value: |
+      - Нет DS → строгий отказ + ссылка на init
+      - Не-веб → отказ + объяснение (MVP)
+      - Противоречивый фидбек → мягкая рекомендация
+      - Кривой SVG → запросить скрин, итерировать
+      - Нарушение логики → спросить пользователя
+      - Сложный компонент → декомпозиция + отдельные сессии
+      - Токены заканчиваются → остановиться, сгенерировать промт для продолжения
+    gaps: ""
+    required: true
+
+  verification_strategy:
+    score: 85
+    status: "complete"
+    value: |
+      - Визуальная: пользователь открывает HTML, оценивает, присылает скрины
+      - Промежуточные скрины с комментариями
+      - Автоматическая: токены, нет hardcoded, contrast ratio
+      - Красоту оценивает только человек
+    gaps: ""
+    required: true
+
+  ui_ux_requirements:
+    score: 0
+    status: "pending"
+    value: ""
+    gaps: ""
+    required: false
+
+  risks:
+    score: 85
+    status: "complete"
+    value: |
+      1. Качество без рендеринга → промежуточные скрины
+      2. Токены → экономия, средний режим в MVP
+      3. Вкусовщина → референсы, ретроспектива, профиль вкуса
+      4. Не-веб → отказ в MVP
+    gaps: ""
+    required: true
+
+  technical_decisions:
+    score: 60
+    status: "partial"
+    value: |
+      - 9 скиллов в skills/design-pipeline/
+      - Общие ресурсы в shared/
+      - DS в .design-system/
+      - MVP: средний уровень интеграции
+      - Большие задачи → декомпозиция + сессии
+    gaps: ""
+    required: false
+
+  deploy_approach:
+    score: 70
+    status: "partial"
+    value: "Скиллы в skills/ методологии. Markdown, не требует деплоя."
+    gaps: ""
+    required: false
+
+  manual_user_actions:
+    score: 70
+    status: "partial"
+    value: "Интервью, фидбек (скрины), референсы, оценка в браузере."
+    gaps: ""
+    required: false
+
+# ============================================================================
+# Phase 3: Integration & Technical Context
+# ============================================================================
+phase3_integration:
+
+  integration_points:
+    score: 85
+    status: "complete"
+    value: |
+      MVP: design-review при do-task с UI-задачами → 2-3 рекомендации.
+      Post-MVP: лёгкий (токены при write-code), полный (design-generate).
+    gaps: ""
+    required: true
+
+  dependencies:
+    score: 50
+    status: "partial"
+    value: "ai-dev-repo skills/, like-figma прототип, Google Fonts, библиотеки иконок."
+    gaps: ""
+    required: false
+
+  technical_constraints:
+    score: 50
+    status: "partial"
+    value: "HTML/CSS/SVG без браузерного рендеринга. Экономия токенов."
+    gaps: ""
+    required: false
+
+  data_requirements:
+    score: 50
+    status: "partial"
+    value: "tokens.json, компоненты HTML, pages, lessons-learned.md, design-principles.md, каталог библиотек"
+    gaps: ""
+    required: false
+
+  migration_needs:
+    score: 60
+    status: "partial"
+    value: "like-figma → разобрать на пайплайн. Переиспользовать references/assets."
+    gaps: ""
+    required: false
+
+# ============================================================================
+# Phase 4: Completion
+# ============================================================================
+phase4_completion:
+  userspec_file: ""
+  status: "pending"
+
+# ============================================================================
+# Decision Rules
+# ============================================================================
+decision_rules:
+  required_threshold: 85
+  optional_threshold: 50
+  stop_criteria:
+    - "All required items in current cycle scope score >= 85%"
+    - "Structural: every required item has non-empty value, no TBD, gaps empty"
+
+# ============================================================================
+# Interview Progress
+# ============================================================================
+progress:
+  current_phase: "phase2_user_experience"
+  questions_asked: 12
+  last_question: "edge_cases + scope_narrowing"
+  completion_estimate: "85%"
+  user_detail_level: "detailed"
+
+# ============================================================================
+# Notes
+# ============================================================================
+notes: |
+  - Агент-стилист, не визуализатор
+  - MVP: средний уровень интеграции, только веб
+  - Нет DS — нет работы (строго)
+  - Токены: ОЧЕНЬ аккуратно
+  - Большие задачи → декомпозиция + сессии (как в методологии)
+  - Нарушение логики → спрашивать пользователя
+  - Компоненты: простой — создать, сложный — декомпозиция
+  - Методология: https://github.com/stepanenkoviktor0110-boop/ai-dev-methodology
