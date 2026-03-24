@@ -10,7 +10,7 @@ These instructions are written for Codex agents that default to the laziest inte
 
 ## Skill Execution: No Scripts
 
-- **NEVER search for or run helper scripts** (dispatch-skill.ps1, init-feature-folder.sh, smoke-codex-compat.ps1, etc.). Legacy scripts exist in `~/.agents/shared/scripts/` but are DEPRECATED — they break on Windows, require specific shells, and duplicate logic already inlined in SKILL.md files. All skills are SKILL.md files — read and follow them directly. If a skill describes folder creation or file copying — do it inline using your tools, do NOT shell out to a script.
+- **NEVER search for, read, or run helper scripts** (dispatch-skill.ps1, init-feature-folder.sh, smoke-codex-compat.ps1, etc.). Legacy scripts exist in `~/.agents/shared/scripts/` but are DEPRECATED and BROKEN — they require `/bin/bash` which is unavailable in most Windows environments. Their logic is already inlined in SKILL.md files. If you catch yourself about to run a `.sh` or `.ps1` from `shared/scripts/` — STOP. Read the SKILL.md instead — it has the same steps written as inline instructions. Use your built-in tools (mkdir, file-write, file-copy) to create folders and files.
 - When a shim skill (e.g., `decompose-tech-spec`) says "Read and follow {target SKILL.md}" — load that file and execute its instructions step by step. Do NOT improvise a replacement procedure.
 - If a SKILL.md references `$AGENTS_HOME` — resolve it to the actual agents home path and read the file. If a referenced file doesn't exist, tell the user — do NOT invent a workaround.
 - **Integrity check:** before executing any SKILL.md, verify it has no git conflict markers (`<<<<<<<`, `=======`, `>>>>>>>`). If found — do NOT execute, tell user to resolve the conflict first.
@@ -21,6 +21,12 @@ These instructions are written for Codex agents that default to the laziest inte
 - **`npm install` with heavy packages** (e.g., `pdfjs-dist`, `sharp`, `prisma`) WILL exceed default terminal timeouts. Use `timeout_ms: 300000` (5 min) or higher for install commands. If it times out, retry — npm caches partial downloads. Do NOT report "install failed" after a single timeout.
 - **Test runner on Windows:** `npm test -- <pattern>` is unreliable on Windows (memory errors, `cannot execute specified program`). Use `npx vitest run <pattern>` (or `npx jest <pattern>`) directly — this is the canonical form. Same applies to any `npm run` wrapper — prefer `npx <tool>` when passing arguments.
 - **File deletion may be blocked** by execution policies or OS locks (antivirus, open handles). If `rm` or `Remove-Item` fails, do NOT retry in a loop. Log the leftover in decisions.md as technical debt: "Cleanup blocked: {file} — reason: {error}. Manual removal needed." Move on — blocked cleanup is NOT a blocker for the pipeline.
+- **Writing YAML/Markdown via PowerShell is DANGEROUS.** PowerShell double-quoted strings treat backticks as escape characters (`` `n `` = newline, `` `t `` = tab) and corrupt Markdown code blocks and YAML content. Rules:
+  - ALWAYS use single-quoted here-strings (`@'...'@`) for file content, NEVER double-quoted (`@"..."@`).
+  - Better yet: use the agent's built-in file-write tool instead of `Set-Content` / `Out-File`.
+  - If content has colons, special YAML characters, or Markdown backticks — write via tool, not shell.
+  - After writing any YAML file, verify it parses: `python -c "import yaml; yaml.safe_load(open('file.yml'))"` or equivalent.
+- **`rg` regex syntax conflicts with PowerShell.** Curly braces, dollar signs, and backticks in regex patterns will be mangled by PowerShell before reaching `rg`. If `rg` is available but gives parse errors — escape the pattern or use `Select-String` instead. Do NOT debug `rg` regex in PowerShell for more than 1 attempt — switch to fallback immediately.
 
 ## Git: Known Pitfalls
 

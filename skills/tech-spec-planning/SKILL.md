@@ -136,6 +136,8 @@ Launch all as subagents, each writes JSON report to `logs/techspec/{name}-review
 
 Pass to each validator: `work/{feature}/tech-spec.md` + `work/{feature}/user-spec.md`.
 
+**When subagent spawning is unavailable or impractical** (environment limitations, single-agent mode, cost constraints): you MUST still perform validation, but may run it as a self-check. For each of the 5 validators, manually check the corresponding concerns listed above against the tech-spec. Document results in `logs/techspec/self-validation.md` with pass/fail per validator category. Log in decisions.md: "Multi-validator phase run as self-check — reason: {why subagents were not used}." This is acceptable but NOT preferred — subagent validation catches more issues.
+
 ### Process findings
 
 Read all 5 reports. For each finding:
