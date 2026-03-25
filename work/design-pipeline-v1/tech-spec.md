@@ -26,7 +26,7 @@ Additionally: two-layer descriptions (human-readable + technical) across all 4 d
 - **design-system-init SKILL.md** — read designer-experience by category, match style-profile after mood, read taste-profile in update flow, two-layer descriptions
 - **design-generate SKILL.md** — read taste-profile in Phase 0, two-layer descriptions in Phase 4
 - **design-review SKILL.md** — optional two-layer explanation for non-obvious token matches
-- **code-writing SKILL.md** — conditional DS token reading in Phase 1.2
+- **code-writing SKILL.md** — conditional DS token reading in Phase 1, step 2 (Read Project Context)
 - **style-profiles.md** (NEW) — 6+ style profiles with concrete design recipes
 - **designer-experience.md** (NEW) — cross-project experience organized by project category
 
@@ -61,7 +61,7 @@ Session flow:
 2. **Read path — per-project** (design-generate): Phase 0 reads taste-profile.md after tokens.json parsing → passes preferences as context to Phase 2 (layout selection) and Phase 3 (assembly).
 3. **Read path — cross-project** (design-system-init): before interview, reads designer-experience.md section matching project category + matches style-profile by mood → uses both for informed proposals.
 4. **Two-layer descriptions**: all 4 design skills describe proposals in human-readable language first, then technical specifics. Design-review — optional, only for non-obvious matches.
-5. **Code-writing DS integration**: conditional step in Phase 1.2 — if UI files + tokens.json exists → read token CSS variable names, use in styles.
+5. **Code-writing DS integration**: conditional step in Phase 1, step 2 (Read Project Context) — if UI files + tokens.json exists → read token CSS variable names, use in styles.
 
 ### Shared resources
 
@@ -95,7 +95,7 @@ None.
 **Alternatives considered:** Mandatory everywhere — rejected: overhead for design-review. Skip design-review entirely — rejected: non-obvious matches genuinely confuse users.
 
 ### Decision 6: Code-writing integration via conditional step (not subagent)
-**Decision:** Add a conditional paragraph to Phase 1.2 of code-writing SKILL.md.
+**Decision:** Add a conditional paragraph to Phase 1, step 2 (Read Project Context) of code-writing SKILL.md.
 **Rationale:** Lightweight: ~500-1000 tokens overhead only when tokens.json exists AND task is UI. Subagent spawn would be disproportionate for "read token names → use var()".
 **Alternatives considered:** Subagent — rejected: too heavy for simple token lookup. Post-write design-review only — rejected: reactive, not proactive.
 
@@ -187,7 +187,7 @@ Agent-driven verification via grep/read checks on modified SKILL.md files and cr
 4. style-profiles.md has 6+ profiles with concrete techniques
 5. designer-experience.md has 4 category sections with correct subsections
 6. two-layer instruction present in all 4 design skills
-7. code-writing conditional DS step present in Phase 1.2
+7. code-writing conditional DS step present in Phase 1, step 2 (Read Project Context)
 8. all reference links in SKILL.md files resolve to existing files
 9. no regression: existing phases, checkpoints, references preserved
 
@@ -247,7 +247,7 @@ bash (grep, test -e, diff), read tool.
 - **Description:** Create `shared/design-references/style-profiles.md` with 6+ style profiles (luxury, brutalist, editorial, minimal, playful, corporate). Each profile contains concrete design techniques. Needed as reference for design-system-init style matching.
 - **Skill:** skill-master
 - **Reviewers:** skill-checker
-- **Verify-smoke:** `grep -c "^## " shared/design-references/style-profiles.md` → 6+; `grep -l "style-profiles" shared/design-references/style-profiles.md` → file exists
+- **Verify-smoke:** `grep -c "^## " shared/design-references/style-profiles.md` → 6+
 - **Files to modify:** (new) `shared/design-references/style-profiles.md`
 - **Files to read:** `shared/design-references/color-psychology.md`, `shared/design-references/color-principles.md` (format reference)
 
@@ -259,33 +259,7 @@ bash (grep, test -e, diff), read tool.
 - **Files to modify:** (new) `shared/design-references/designer-experience.md`
 - **Files to read:** `shared/design-references/color-psychology.md` (format reference)
 
-#### Task 3: Update design-retrospective SKILL.md
-- **Description:** Add new Phase 4.5 (taste-profile writing + experience writing to designer-experience.md), two-layer description instruction in Phase 3, taste-profile section in Phase 5 next-session prompt template, and Self-Verification items. This is the primary "write path" — the most critical modification.
-- **Skill:** skill-master
-- **Reviewers:** skill-checker
-- **Verify-smoke:** `grep "taste-profile" skills/design-retrospective/SKILL.md` → found; `grep "designer-experience" skills/design-retrospective/SKILL.md` → found; `grep "Phase 4.5\|Phase 5" skills/design-retrospective/SKILL.md` → both found
-- **Files to modify:** `skills/design-retrospective/SKILL.md`
-- **Files to read:** `skills/design-retrospective/SKILL.md`, `shared/design-references/designer-experience.md` (from Task 2)
-
-### Wave 2 (зависит от Wave 1)
-
-#### Task 4: Update design-system-init SKILL.md
-- **Description:** Add experience reading (designer-experience.md by category) before interview, style-profile matching after mood determination, taste-profile reading in update flow, two-layer description instructions, and Final Check items. Depends on Tasks 1-2 for reference files to link to.
-- **Skill:** skill-master
-- **Reviewers:** skill-checker
-- **Verify-smoke:** `grep "designer-experience" skills/design-system-init/SKILL.md` → found; `grep "style-profiles" skills/design-system-init/SKILL.md` → found; `grep "taste-profile" skills/design-system-init/SKILL.md` → found
-- **Files to modify:** `skills/design-system-init/SKILL.md`
-- **Files to read:** `skills/design-system-init/SKILL.md`, `shared/design-references/style-profiles.md`, `shared/design-references/designer-experience.md`
-
-#### Task 5: Update design-generate SKILL.md
-- **Description:** Add taste-profile reading step in Phase 0 (after tokens.json parsing), two-layer description instruction in Phase 4, and Final Check items. Depends on Task 3 establishing the taste-profile format.
-- **Skill:** skill-master
-- **Reviewers:** skill-checker
-- **Verify-smoke:** `grep "taste-profile" skills/design-generate/SKILL.md` → found; `grep -c "Phase 0\|Phase 1\|Phase 2\|Phase 3\|Phase 4\|Phase 5" skills/design-generate/SKILL.md` → 6 (all original phases preserved)
-- **Files to modify:** `skills/design-generate/SKILL.md`
-- **Files to read:** `skills/design-generate/SKILL.md`
-
-#### Task 6: Update design-review SKILL.md
+#### Task 3: Update design-review SKILL.md
 - **Description:** Add optional two-layer explanation instruction for non-obvious token matches in How to Report section. Minimal change — only adds guidance for when the suggested token isn't an exact match.
 - **Skill:** skill-master
 - **Reviewers:** skill-checker
@@ -293,13 +267,39 @@ bash (grep, test -e, diff), read tool.
 - **Files to modify:** `skills/design-review/SKILL.md`
 - **Files to read:** `skills/design-review/SKILL.md`
 
-#### Task 7: Update code-writing SKILL.md
-- **Description:** Add conditional DS token integration step at end of Phase 1.2 (Read Project Context). If UI files + tokens.json exist → read tokens, use CSS variables. Silent skip otherwise. Lightweight proactive integration complementing reactive design-review.
+#### Task 4: Update code-writing SKILL.md
+- **Description:** Add conditional DS token integration step at end of Phase 1, step 2 (Read Project Context). If UI files + tokens.json exist → read tokens, use CSS variables. Silent skip otherwise. Lightweight proactive integration complementing reactive design-review.
 - **Skill:** skill-master
 - **Reviewers:** skill-checker
-- **Verify-smoke:** `grep "tokens.json" skills/code-writing/SKILL.md` → found; `grep "silent\|skip" skills/code-writing/SKILL.md` → found
+- **Verify-smoke:** `grep "tokens.json" skills/code-writing/SKILL.md` → found; `grep -i "silent\|skip" skills/code-writing/SKILL.md` → found
 - **Files to modify:** `skills/code-writing/SKILL.md`
 - **Files to read:** `skills/code-writing/SKILL.md`
+
+### Wave 2 (зависит от Wave 1)
+
+#### Task 5: Update design-retrospective SKILL.md
+- **Description:** Add new Phase 4.5 (taste-profile writing + experience writing to designer-experience.md), two-layer description instruction in Phase 3, taste-profile section in Phase 5 next-session prompt template, and Self-Verification items. This is the primary "write path" — the most critical modification.
+- **Skill:** skill-master
+- **Reviewers:** skill-checker
+- **Verify-smoke:** `grep "taste-profile" skills/design-retrospective/SKILL.md` → found; `grep "designer-experience" skills/design-retrospective/SKILL.md` → found; `grep "Phase 4.5\|Phase 5" skills/design-retrospective/SKILL.md` → both found; `grep -i "corrupted\|повреждён\|recreate\|пересозда" skills/design-retrospective/SKILL.md` → found (edge case handling)
+- **Files to modify:** `skills/design-retrospective/SKILL.md`
+- **Files to read:** `skills/design-retrospective/SKILL.md`, `shared/design-references/designer-experience.md`
+
+#### Task 6: Update design-system-init SKILL.md
+- **Description:** Add experience reading (designer-experience.md by category) before interview, style-profile matching after mood determination, taste-profile reading in update flow, two-layer description instructions, and Final Check items. Depends on Tasks 1-2 for reference files to link to.
+- **Skill:** skill-master
+- **Reviewers:** skill-checker
+- **Verify-smoke:** `grep "designer-experience" skills/design-system-init/SKILL.md` → found; `grep "style-profiles" skills/design-system-init/SKILL.md` → found; `grep "taste-profile" skills/design-system-init/SKILL.md` → found
+- **Files to modify:** `skills/design-system-init/SKILL.md`
+- **Files to read:** `skills/design-system-init/SKILL.md`, `shared/design-references/style-profiles.md`, `shared/design-references/designer-experience.md`
+
+#### Task 7: Update design-generate SKILL.md
+- **Description:** Add taste-profile reading step in Phase 0 (after tokens.json parsing), two-layer description instruction in Phase 4, and Final Check items. Taste-profile format is defined in tech-spec Data Models section.
+- **Skill:** skill-master
+- **Reviewers:** skill-checker
+- **Verify-smoke:** `grep "taste-profile" skills/design-generate/SKILL.md` → found; `grep -c "Phase 0\|Phase 1\|Phase 2\|Phase 3\|Phase 4\|Phase 5" skills/design-generate/SKILL.md` → 6 (all original phases preserved)
+- **Files to modify:** `skills/design-generate/SKILL.md`
+- **Files to read:** `skills/design-generate/SKILL.md`
 
 ### Audit Wave
 
