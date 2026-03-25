@@ -110,7 +110,10 @@ This is a NON-NEGOTIABLE environment constraint. Violating it WILL freeze the ho
 - "I'll spawn 6 and they'll queue" ❌ — there is no queue, it will freeze the machine
 
 1. Select tasks for current wave: `status: planned` and dependencies done.
-2. **File existence check — MANDATORY before starting any worker.** For each selected task, read "Files to modify" and verify target files/directories exist. If files are listed as "modify" but don't exist yet (e.g., tech-spec assumed a prior wave would create them), the worker MUST **create** them from scratch — do NOT fail or ask the user. Log in decisions.md: "Created {path} from scratch — tech-spec listed as modify but file didn't exist." This is normal when waves have cross-dependencies.
+2. **File existence AND path naming check — MANDATORY before starting any worker.** For each selected task:
+   - Verify target files/directories from "Files to modify" exist. If listed as "modify" but missing — worker MUST **create** them from scratch. Log in decisions.md: "Created {path} from scratch — tech-spec listed as modify but file didn't exist."
+   - **Check path naming matches reality.** Tech-specs often use camelCase (`storageMigrations/`) while actual code uses kebab-case (`storage-migrations/`). Compare EVERY path in the task against the real filesystem. If naming diverges — use the REAL path, log deviation in decisions.md: "Path deviation: spec says {spec-path}, actual is {real-path}. Using actual."
+   - Do NOT create a new file at the spec path if a file with the same purpose exists at a different-cased path — that creates duplicates.
 3. Set each selected task to `in_progress`.
 4. For each task, run worker flow (respect parallel agent limit — batch if needed):
    - Spawn worker (`agent_type: worker`, model from `tier_high`).

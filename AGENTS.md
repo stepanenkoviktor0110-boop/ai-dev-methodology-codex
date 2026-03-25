@@ -20,7 +20,7 @@ These instructions are written for Codex agents that default to the laziest inte
   - **To update the framework in a project:** `cd ~/.agents && git pull origin master`. That's it. Do NOT cherry-pick, merge, or copy commits between repos. They have completely different git histories.
   - **Framework commit hashes (from ~/.agents/) do NOT exist in the project repo.** If user says "apply commit ea353f5" and it's a framework commit — run `cd ~/.agents && git pull origin master`, NOT `git cherry-pick` in the project.
   - **How to tell which repo a commit belongs to:** run `cd ~/.agents && git log --oneline | grep {hash}`. If found — it's a framework commit. If not found — check the project repo.
-- **Integrity check:** before executing any SKILL.md, verify it has no git conflict markers (`<<<<<<<`, `=======`, `>>>>>>>`). If found — do NOT execute, tell user to resolve the conflict first.
+- **Integrity check — applies to ALL .md files, not just SKILL.md.** Before reading or executing ANY `.md` file (AGENTS.md, task files, tech-spec, user-spec, session-plan), scan for git conflict markers (`<<<<<<<`, `=======`, `>>>>>>>`). If found — do NOT proceed. Tell user: "File {path} has unresolved merge conflicts. Resolve them before continuing." This includes the project's own `AGENTS.md` — if it has conflict markers, the agent's instructions are ambiguous and execution MUST stop.
 
 ## Recovery After Interruption
 
@@ -50,6 +50,7 @@ This rule overrides `max_threads` in config.toml. Even if config says `max_threa
   - If content has colons, special YAML characters, or Markdown backticks — write via tool, not shell.
   - After writing any YAML file, verify it parses: `python -c "import yaml; yaml.safe_load(open('file.yml'))"` or equivalent.
 - **`rg` regex syntax conflicts with PowerShell.** Curly braces, dollar signs, and backticks in regex patterns will be mangled by PowerShell before reaching `rg`. If `rg` is available but gives parse errors — escape the pattern or use `Select-String` instead. Do NOT debug `rg` regex in PowerShell for more than 1 attempt — switch to fallback immediately.
+- **OutOfMemoryException in PowerShell / OOM in test runners.** This environment has limited RAM. If vitest/jest workers OOM — restart with `--maxWorkers=1`. If PowerShell OOMs — break the operation into smaller chunks. Do NOT retry the same command that OOMed without reducing parallelism first.
 
 ## Git: Known Pitfalls
 
@@ -62,6 +63,8 @@ This rule overrides `max_threads` in config.toml. Even if config says `max_threa
   5. If lint-staged STILL fails on files outside your scope — use `--no-verify` ONLY for pure methodology artifacts (no code files). Log this in decisions.md.
 - **Atomic commits are MANDATORY.** Each commit MUST contain only files related to one logical change. Before every `git commit`, run `git diff --cached --name-only` and verify the file list. If unrelated files are staged — unstage them first. A commit that "accidentally" includes extra files corrupts git history and makes rollback impossible.
 - **Verify file state after every write.** After writing or editing any file (especially YAML frontmatter), immediately read it back and confirm the content is correct. PowerShell, encoding issues, and interrupted operations can silently corrupt files. If frontmatter is wrong after write — fix it immediately, do NOT proceed with stale state.
+- **`index.lock` — NEVER run git commands in parallel.** All git commands (add, commit, stash, cherry-pick) MUST be sequential. Parallel git operations cause `index.lock` errors and corrupt state. If you get `fatal: Unable to create index.lock` — another git command is still running. Wait for it, do NOT delete the lock file.
+- **`git stash` + `cherry-pick` is fragile.** Stash pop after cherry-pick often causes merge conflicts. Prefer: finish and commit your current work FIRST, then apply the external change. If stash conflict happens — resolve manually, do NOT retry blindly.
 
 ## Communication
 - Общаться с пользователем только по-русски. Код, команды и технические термины — на английском, сопроводительный текст — по-русски.
