@@ -36,7 +36,16 @@ User description → Parse → Select Layout → Assemble Components → HTML + 
 
 2. Parse tokens into CSS custom properties for use in generated pages (following the mapping pattern from [design-tokens.md](../../shared/design-references/design-tokens.md))
 
-**Checkpoint:** tokens.json exists, parses as valid JSON, contains colors/typography/spacing sections.
+3. Проверить наличие `.design-system/taste-profile.md`:
+   - Если файл существует и не пуст — прочитать и извлечь предпочтения:
+     - **Цветовые предпочтения** — температура, насыщенность, конкретные предпочтения
+     - **Типографика** — стиль заголовков, предпочтения по шрифтам
+     - **Стиль и смелость** — уровень (conservative / balanced / bold / experimental)
+     - **Антипаттерны** — что было отклонено пользователем в прошлых сессиях
+   - Если файла нет или он пуст — продолжить без него (первая сессия, профиль ещё не создан)
+   - Передать загруженные предпочтения как контекст в Phase 2 (выбор лейаута) и Phase 3 (сборка)
+
+**Checkpoint:** tokens.json exists, parses as valid JSON, contains colors/typography/spacing sections. Taste-profile прочитан (если существует) или пропущен с graceful degradation.
 
 ## Phase 1: Parse Request
 
@@ -67,7 +76,12 @@ User description → Parse → Select Layout → Assemble Components → HTML + 
    - Apply the CSS technique from [grid-techniques.md](references/grid-techniques.md) for the chosen pattern
    - Advanced layouts are appropriate when the user asks for visual impact, editorial feel, or premium aesthetics
 
-4. Present the chosen layout to the user:
+4. Если taste-profile загружен — учитывать стиль и уровень смелости при выборе лейаута:
+   - conservative/balanced → предпочитать basic layouts
+   - bold/experimental → рассматривать advanced layouts (Broken Grid, Diagonal, Bento)
+   - Антипаттерны из taste-profile → исключить лейауты, которые пользователь отклонял ранее
+
+5. Present the chosen layout to the user:
    - "For your login page, I'll use Split Screen layout — brand visual on the left half, form on the right."
    - If the user disagrees → select a different pattern
 
@@ -81,6 +95,10 @@ User description → Parse → Select Layout → Assemble Components → HTML + 
 2. Place components into layout regions following patterns from [component-patterns.md](references/component-patterns.md) (BEM naming, variant system, slot pattern)
 3. Inject design tokens as CSS custom properties in `:root`
 4. Add content — real if provided, realistic placeholders otherwise (per generation-guide.md placeholder rules: diverse names, meaningful text, colored rectangles for images, realistic numbers)
+5. Если taste-profile загружен — применить предпочтения при сборке:
+   - Цветовые предпочтения → корректировать выбор цветовых токенов (тёплые/холодные, насыщенность)
+   - Типографика → учитывать предпочтения по стилю заголовков (serif/sans-serif)
+   - Антипаттерны → избегать паттернов, которые пользователь отклонял ранее
 
 ### 3.2 Generate HTML
 
@@ -114,7 +132,13 @@ User description → Parse → Select Layout → Assemble Components → HTML + 
 2. Suggest opening the HTML file in a browser: "Open `.design-system/pages/{name}.html` in your browser to see the interactive preview."
 3. Ask: "Send a screenshot if you'd like adjustments, or describe what to change."
 
-### 4.2 Iterate on feedback
+### 4.2 Two-layer description
+
+После генерации страницы создать двухуровневое описание и сохранить в `.design-system/pages/{name}.description.md`:
+- **Layer 1 (краткое):** тип страницы и выбранный лейаут — одно предложение. Пример: "Landing page на Split Screen лейауте с hero-секцией слева и формой справа."
+- **Layer 2 (детальное):** компоненты, использованные цветовые токены, типографика, отступы, адаптивность — техническая спецификация для будущих итераций.
+
+### 4.3 Iterate on feedback
 
 When the user provides feedback (screenshot or text):
 - "Bigger" / "smaller" → adjust spacing and font sizes
@@ -125,7 +149,7 @@ When the user provides feedback (screenshot or text):
 
 Regenerate both HTML and SVG after each iteration.
 
-### 4.3 Handle context exhaustion
+### 4.4 Handle context exhaustion
 
 If the conversation context is running low and further iterations are needed:
 1. Save the current state of all generated files
@@ -204,3 +228,5 @@ Before finishing, verify:
 - [ ] User has been shown where to find the files
 - [ ] Before/after collage saved to `.design-system/collages/` (if user confirmed final variant)
 - [ ] Intermediate artifacts (SVGs, draft HTMLs) cleaned up — only final HTML + collage remain
+- [ ] Taste-profile прочитан (если `.design-system/taste-profile.md` существует) и предпочтения применены в Phase 2 и Phase 3
+- [ ] Two-layer description сгенерировано и сохранено в `.design-system/pages/{name}.description.md`
