@@ -87,7 +87,7 @@ size: M
 ## Критерии приёмки
 
 - [ ] design-retrospective создаёт/обновляет `.design-system/taste-profile.md` с секциями: цветовые предпочтения, типографика, стиль, уровень смелости (conservative/balanced/bold/experimental), антипаттерны
-- [ ] design-generate читает taste-profile перед генерацией (Phase 0) и учитывает предпочтения при выборе лейаута и стиля
+- [ ] design-generate SKILL.md Phase 0 содержит шаг: читать `.design-system/taste-profile.md` (if exists), передать предпочтения как контекст в Phase 2 (layout selection) и Phase 3 (assembly)
 - [ ] design-system-init читает taste-profile при повторной инициализации (update) и предлагает значения на основе накопленных предпочтений
 - [ ] Создан `shared/design-references/designer-experience.md` с категориями проектов (landing, webapp, admin, portfolio) и структурой секций (предпочтения, что работало, антипаттерны)
 - [ ] design-system-init читает секцию по категории проекта при интервью и использует опыт для предложений
@@ -101,7 +101,7 @@ size: M
 - [ ] При повреждённом taste-profile.md → design-retrospective пересоздаёт файл с предупреждением пользователю
 - [ ] При отсутствии или невалидном designer-experience.md → design-system-init работает без опыта, не падает
 - [ ] designer-experience.md: запись append-only (добавление в конец секции категории), не перезапись всего файла — безопасно для последовательных проектов
-- [ ] Нет регрессии в существующих скиллах: MVP-функциональность работает как прежде
+- [ ] Нет регрессии: все существующие фазы, чекпоинты и reference-ссылки в 4 дизайн-скиллах сохранены; новые шаги добавлены, а не заменяют старые
 
 ## Ограничения
 
