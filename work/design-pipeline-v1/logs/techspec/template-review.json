@@ -1,0 +1,31 @@
+{
+  "validator": "tech-spec-validator",
+  "status": "fail",
+  "findings": [
+    {
+      "severity": "error",
+      "section": "Implementation Tasks / Wave 1",
+      "description": "Wave dependency conflict: Task 3 (Update design-retrospective SKILL.md) lists `shared/design-references/designer-experience.md` in 'Files to read' with note '(from Task 2)', but Task 2 (Create designer-experience.md) is in the same Wave 1. Parallel execution means designer-experience.md may not exist when Task 3 starts.",
+      "recommendation": "Move Task 3 to Wave 2, or remove designer-experience.md from Task 3's 'Files to read' if it only needs to reference the format described in the tech-spec (Data Models section) rather than the actual file."
+    },
+    {
+      "severity": "warning",
+      "section": "Standards Compliance",
+      "description": "Project Knowledge files (architecture.md, patterns.md) not found at `.claude/skills/project-knowledge/references/`. Cannot verify file path conventions or naming patterns compliance.",
+      "recommendation": "If project has architecture/patterns documentation, add it to Project Knowledge. Otherwise, no action needed — this is informational."
+    },
+    {
+      "severity": "warning",
+      "section": "Implementation Tasks / Audit Wave",
+      "description": "Audit tasks (Tasks 8-10) lack 'Files to modify' and 'Files to read' fields. While audit tasks have a lighter structure, specifying 'Files to read' helps auditors scope their review.",
+      "recommendation": "Add 'Files to read' to each audit task listing all files created/modified in this feature: `shared/design-references/style-profiles.md`, `shared/design-references/designer-experience.md`, `skills/design-retrospective/SKILL.md`, `skills/design-system-init/SKILL.md`, `skills/design-generate/SKILL.md`, `skills/design-review/SKILL.md`, `skills/code-writing/SKILL.md`."
+    },
+    {
+      "severity": "warning",
+      "section": "Implementation Tasks / Final Wave",
+      "description": "Task 11 (Pre-deploy QA) lacks 'Files to modify' and 'Files to read' fields. QA task should reference all files to verify.",
+      "recommendation": "Add 'Files to read' listing all feature files for verification scope."
+    }
+  ],
+  "summary": "One critical wave dependency conflict: Task 3 depends on Task 2's output but both are in Wave 1. Three minor warnings about missing 'Files to read' in audit/QA tasks and absent Project Knowledge files. All other checks pass: frontmatter valid, all required sections present with content, skills and reviewers match catalog, no time estimates, no AC/TDD anchors in tasks, task descriptions are appropriately brief, decisions are in Decisions section, risks are specific with mitigations, no wave file conflicts, task count (11) under limit."
+}

@@ -70,13 +70,13 @@ estimated_loc: 20
 ### Smoke
 
 - `grep "taste-profile" skills/design-generate/SKILL.md` → found
-- `grep -c "Phase 0\|Phase 1\|Phase 2\|Phase 3\|Phase 4\|Phase 5" skills/design-generate/SKILL.md` → 6 (all original phases preserved)
+- `grep -c "^## Phase" skills/design-generate/SKILL.md` → 6 (all original phase headers preserved)
 
 ## Details
 
 **Files:** `skills/design-generate/SKILL.md` — добавить taste-profile reading, two-layer description, Final Check items
 **Files to read:** `skills/design-generate/SKILL.md` — текущее содержимое для понимания структуры
-**Dependencies:** task-1 (taste-profile формат), task-2 (базовая структура)
+**Dependencies:** wave 2 per tech-spec (taste-profile format is in tech-spec Data Models, no direct file dependency on tasks 1-2)
 **Edge cases:**
 - taste-profile.md не существует → graceful degradation, продолжить без него
 - taste-profile.md существует но пустой → обработать как отсутствующий

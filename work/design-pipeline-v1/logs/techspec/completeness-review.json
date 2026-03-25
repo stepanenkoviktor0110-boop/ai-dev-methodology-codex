@@ -1,0 +1,34 @@
+{
+  "validator": "completeness",
+  "status": "pass",
+  "sources": {
+    "user_spec": true,
+    "tech_spec": true,
+    "tasks": true
+  },
+  "requirements_total": 16,
+  "requirements_covered": 16,
+  "requirements_partial": 0,
+  "requirements_missing": 0,
+  "findings": [
+    {
+      "type": "underengineering",
+      "severity": "minor",
+      "source": "tech-spec",
+      "requirement": "N/A — shared reference files",
+      "detail": "Architecture section lists style-profiles.md and designer-experience.md as shared files read by multiple skills (design-system-init reads both; design-retrospective writes to designer-experience.md). The Shared Resources subsection is explicitly set to 'None'. While concurrent write conflicts are unlikely in a markdown-only, single-writer scenario, the write path ownership (design-retrospective owns both writes) is not documented in Shared Resources — making the data flow contract implicit rather than explicit. Future maintainers may not realize design-retrospective is the sole writer.",
+      "user_spec_ref": "Сценарий Б (кросс-проектный опыт), Ограничения: append-only",
+      "tech_spec_ref": "Architecture > Shared resources: None; Task 3 (design-retrospective); Task 4 (design-system-init)"
+    },
+    {
+      "type": "underengineering",
+      "severity": "minor",
+      "source": "tech-spec",
+      "requirement": "US-13: При повреждённом taste-profile.md → design-retrospective пересоздаёт файл с предупреждением",
+      "detail": "Task 3 Verify-smoke checks for presence of 'taste-profile' and 'designer-experience' keywords and Phase headers, but does not include a grep check for the corrupted-file recovery branch (e.g., grep for 'warning' or 'recreate' or 'повреждён'). The Acceptance Criteria in tech-spec does list this edge case, but no task-level smoke test validates it. Minor risk: the edge case handler could be accidentally omitted during implementation and the smoke test would not catch it.",
+      "user_spec_ref": "Критерии приёмки: При повреждённом taste-profile.md → design-retrospective пересоздаёт файл с предупреждением пользователю",
+      "tech_spec_ref": "Task 3 Verify-smoke; Acceptance Criteria item 6"
+    }
+  ],
+  "summary": "16/16 requirements covered. 0 gaps, 0 partial, 0 scope creep. 2 minor findings: (1) Shared Resources section omits write-path ownership documentation for the two shared reference files — implicit contract, not a bug; (2) Task 3 smoke test does not verify the corrupted taste-profile recovery branch, creating a blind spot in per-task verification. Both findings are minor and do not block implementation. Status: pass."
+}

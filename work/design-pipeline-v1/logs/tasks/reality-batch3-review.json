@@ -1,0 +1,67 @@
+{
+  "batch": 3,
+  "iteration": 1,
+  "validator": "reality-checker",
+  "tasks_reviewed": [7, 8, 9],
+  "status": "issues_found",
+  "findings": [
+    {
+      "task": 7,
+      "severity": "warning",
+      "section": "Details / depends_on",
+      "issue": "Task-7 declares depends_on: [1, 2], but neither style-profiles.md (task-1) nor designer-experience.md (task-2) are used by design-generate SKILL.md modification. Task-7 only reads .design-system/taste-profile.md, which is a runtime project file (not a shared reference). The dependency reason given in Details ('task-1: taste-profile формат') is incorrect — taste-profile format is defined in tech-spec Data Models, not in style-profiles.md.",
+      "fix": "Change depends_on to [] and move task-7 to Wave 1. Taste-profile format comes from tech-spec, so no build-time dependency on tasks 1 or 2 is needed."
+    },
+    {
+      "task": 7,
+      "severity": "error",
+      "section": "Verification Steps / Smoke",
+      "issue": "Smoke test `grep -c \"Phase 0|Phase 1|Phase 2|Phase 3|Phase 4|Phase 5\" skills/design-generate/SKILL.md → 6` will break after task-7 is implemented. The 'What to do' step 1 instructs adding text 'Передать предпочтения как контекст в Phase 2 и Phase 3' inside Phase 0 body. This adds inline mentions of 'Phase 2' and 'Phase 3', making grep count 8 instead of 6. The smoke test would produce a false failure on a correctly-implemented task.",
+      "fix": "Change the smoke test to grep only for markdown headers: `grep -c \"^## Phase\" skills/design-generate/SKILL.md → 6`. This counts only phase-level headers and is immune to inline body mentions."
+    },
+    {
+      "task": 8,
+      "severity": "warning",
+      "section": "Details / Output path",
+      "issue": "Output path `logs/working/task-8/code-review-report.json` is relative with no explicit base anchor. The feature directory is work/design-pipeline-v1/, but the task does not state the base. An agent running from repo root would need to infer the full path as work/design-pipeline-v1/logs/working/task-8/code-review-report.json.",
+      "fix": "Make the output path explicit: `work/design-pipeline-v1/logs/working/task-8/code-review-report.json`. Same fix applies to task-9 output path."
+    },
+    {
+      "task": 9,
+      "severity": "warning",
+      "section": "Details / Output path",
+      "issue": "Same ambiguous relative path issue as task-8: `logs/working/task-9/security-audit-report.json` has no explicit feature base path anchor.",
+      "fix": "Make the path explicit: `work/design-pipeline-v1/logs/working/task-9/security-audit-report.json`."
+    },
+    {
+      "task": 9,
+      "severity": "warning",
+      "section": "Context Files / relative paths",
+      "issue": "Context Files in task-9 use `../../../skills/...` from tasks/ directory (work/design-pipeline-v1/tasks/). This resolves to ai-dev-repo/skills/... which is correct. However style-profiles.md and designer-experience.md are listed as context with path `../../../shared/design-references/...` but these files do not exist yet at validation time — they are created by tasks 1 and 2. The depends_on: [1,2,...,7] correctly covers this, but the Context Files section lists them without a 'will be created by task-1/2' note, which may confuse the executor.",
+      "fix": "Add a note in Context Files for style-profiles.md and designer-experience.md: '(created by task-1)' and '(created by task-2)' respectively."
+    }
+  ],
+  "stats": {
+    "tasks_checked": 3,
+    "claims_verified": 31,
+    "issues_found": 5
+  },
+  "verified_ok": [
+    "task-7: skills/design-generate/SKILL.md exists at C:/tmp/ai-dev-repo/skills/design-generate/SKILL.md (206 lines — matches tech-spec estimate)",
+    "task-7: Phase 0 step 2 'Parse tokens into CSS custom properties' exists at line 37 — insertion point is valid",
+    "task-7: All 6 phases (Phase 0 – Phase 5) exist as headers in SKILL.md",
+    "task-7: taste-profile is not yet present in SKILL.md — task is not redundant",
+    "task-7: Context Files paths resolve correctly: ../decisions.md, ../user-spec.md, ../../skills/design-generate/SKILL.md",
+    "task-7: Graceful degradation (no taste-profile → continue) and empty-file edge case are explicitly handled",
+    "task-7: Two-layer description not yet in Phase 4 — task addition is valid",
+    "task-8: All 5 SKILL.md files to read exist: design-retrospective, design-system-init, design-generate, design-review, code-writing",
+    "task-8: skills/code-reviewing/SKILL.md exists (both in repo and at ~/.claude/skills/)",
+    "task-8: depends_on: [1,2,3,4,5,6,7] correctly covers all wave-1 and wave-2 tasks",
+    "task-9: skills/security-auditor/SKILL.md exists in repo",
+    "task-9: Path traversal scope is correctly defined — ../../../ chains stay within repo root",
+    "task-9: Edge case note about template placeholders (not vulnerabilities) is appropriate",
+    "task-9: depends_on: [1,2,3,4,5,6,7] correctly covers all prerequisites",
+    "shared/design-references/design-tokens.md exists — referenced from design-generate SKILL.md",
+    "work/design-pipeline-v1/decisions.md exists — referenced in post-completion steps"
+  ]
+}

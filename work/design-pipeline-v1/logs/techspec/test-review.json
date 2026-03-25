@@ -1,0 +1,26 @@
+{
+  "validator": "test-reviewer",
+  "status": "pass",
+  "findings": [
+    {
+      "severity": "warning",
+      "description": "Edge case verification not covered in scenario testing or verify-smoke: corrupted taste-profile recovery, missing designer-experience.md graceful handling, conflicting preferences latest-wins behavior, invalid tokens.json silent skip. These are explicit acceptance criteria (user-spec lines 101-103, 84-85) but no verify-smoke command or scenario test checks them. The Agent Verification Plan step 3 (content completeness via grep) only checks keyword presence, not edge case handling instructions.",
+      "recommendation": "Add verification scenarios or verify-smoke checks that grep for specific edge case handling instructions. For example: `grep -i 'поврежд\\|corrupted\\|recreate' skills/design-retrospective/SKILL.md` for corrupted taste-profile handling; `grep -i 'silent.*skip\\|невалидн' skills/code-writing/SKILL.md` for invalid tokens.json. Alternatively, add these as explicit items in the Agent Verification Plan with concrete grep commands."
+    },
+    {
+      "severity": "warning",
+      "description": "Per-task verify-smoke does not check regression (existing phases/checkpoints preserved) for Tasks 3, 4, 6, 7. Only Task 5 verifies phase count preservation. Tech-spec acceptance criteria explicitly require 'no existing phases, checkpoints, or reference links removed from any SKILL.md'. Regression detection is deferred entirely to post-implementation QA (Task 11), meaning issues could be caught late.",
+      "recommendation": "Add phase/checkpoint count verification to verify-smoke for Tasks 3, 4, 6, 7. For example, Task 3 (design-retrospective): `grep -c 'Phase\\|Checkpoint' skills/design-retrospective/SKILL.md` with expected minimum count based on current file. This catches regressions at task level rather than waiting for final QA."
+    },
+    {
+      "severity": "warning",
+      "description": "Task 4 verify-smoke checks for 'taste-profile' keyword in design-system-init SKILL.md but does not verify it appears specifically in the update flow context. Acceptance criterion (user-spec line 91) requires taste-profile reading specifically during update/re-initialization, not just anywhere in the file.",
+      "recommendation": "Strengthen verify-smoke to check context: `grep -A2 'update\\|повторн' skills/design-system-init/SKILL.md | grep 'taste-profile'` to verify taste-profile is mentioned in the update flow section specifically."
+    },
+    {
+      "severity": "warning",
+      "description": "Agent Verification Plan step 1 (reference resolution) describes the approach ('extract all [text](path) links, verify via bash test -e') but provides no concrete command or script. This makes the verification step ambiguous for the executing agent -- it must construct the extraction logic on its own.",
+      "recommendation": "Provide a concrete verification command in the Agent Verification Plan, e.g.: `grep -oP '\\]\\(([^)]+)\\)' skills/*/SKILL.md | while read link; do path=$(echo $link | grep -oP '\\((.+)\\)' | tr -d '()'); test -e \"$path\" || echo \"BROKEN: $link\"; done`. Or specify that Task 8/10/11 should construct and run this check."
+    }
+  ]
+}

@@ -1,0 +1,71 @@
+{
+  "batch": 4,
+  "iteration": 1,
+  "validator": "reality-checker",
+  "tasks_reviewed": [10, 11],
+  "status": "approved",
+  "findings": [
+    {
+      "task": 10,
+      "severity": "warning",
+      "section": "What to do",
+      "issue": "Step 1 references task files as 'tasks/1.md через tasks/7.md', but actual file naming convention is 'task-1.md' through 'task-7.md'. The Context Files section lists them correctly, but the prose description uses wrong names.",
+      "fix": "Change 'tasks/1.md через tasks/7.md' to 'tasks/task-1.md через tasks/task-7.md' in step 1 description. Low impact — executor will likely follow Context Files section."
+    },
+    {
+      "task": 10,
+      "severity": "warning",
+      "section": "Details / Output",
+      "issue": "Output directory 'logs/working/task-10/' does not exist. The task writes its report there but the directory has not been pre-created.",
+      "fix": "Executor must create the directory before writing the report: 'mkdir -p logs/working/task-10/'. Consider adding this as an explicit step or note in the task."
+    },
+    {
+      "task": 11,
+      "severity": "error",
+      "section": "Acceptance Criteria",
+      "issue": "Task states 'Все acceptance criteria из user-spec (15 пунктов)' but user-spec.md actually contains 16 acceptance criteria checkboxes in the 'Критерии приёмки' section (lines 89-104). The count is off by one.",
+      "fix": "Change '15 пунктов' to '16 пунктов' in the Acceptance Criteria section of task-11.md."
+    },
+    {
+      "task": 11,
+      "severity": "warning",
+      "section": "Details / Output",
+      "issue": "Output directory 'logs/working/task-11/' does not exist. The task writes its qa-report.json there but the directory has not been pre-created.",
+      "fix": "Executor must create the directory before writing: 'mkdir -p logs/working/task-11/'. Consider noting this explicitly in the task."
+    },
+    {
+      "task": 11,
+      "severity": "warning",
+      "section": "What to do / Step 5",
+      "issue": "Step 5 instructs to 'diff каждого SKILL.md против git HEAD' for phase preservation, but this only works if the skills were committed before this feature branch. If tasks 3-7 were already applied and committed, git HEAD diff will show additions — which is expected. However, if the executor runs this before tasks 3-7 are merged/committed, the diff may be empty or misleading. The approach is ambiguous about which git state to compare against.",
+      "fix": "Clarify the diff baseline: 'diff against the commit before this feature branch (use git log to find the base commit)' or 'compare phase header count before and after changes'. Alternatively, the grep-based approach (counting Phase headers) is more reliable than git diff for this purpose."
+    }
+  ],
+  "stats": {
+    "tasks_checked": 2,
+    "claims_verified": 31,
+    "issues_found": 5,
+    "critical_issues": 0,
+    "errors": 1,
+    "warnings": 4
+  },
+  "verified_ok": [
+    "Task 10: all 7 context file paths exist (task-1.md through task-7.md, tech-spec.md, user-spec.md, decisions.md)",
+    "Task 10: skill test-master SKILL.md exists at ~/.claude/skills/test-master/SKILL.md",
+    "Task 10: depends_on [1,2,3,4,5,6,7] correctly captures all wave 1-2 tasks",
+    "Task 10: wave 3 assignment is correct (Audit Wave)",
+    "Task 11: skill pre-deploy-qa SKILL.md exists at ~/.claude/skills/pre-deploy-qa/SKILL.md",
+    "Task 11: tech-spec Acceptance Criteria count is 9 — matches task claim",
+    "Task 11: all 5 referenced SKILL.md files exist (design-retrospective, design-system-init, design-generate, design-review, code-writing)",
+    "Task 11: shared/design-references/style-profiles.md and designer-experience.md are correctly absent (created by tasks 1-2)",
+    "Task 11: design-generate references files exist (component-patterns.md, grid-techniques.md, generation-guide.md)",
+    "Task 11: smoke command for design-generate phases returns 6 on current codebase — matches expected threshold",
+    "Task 11: depends_on [8,9,10] correctly captures all audit tasks",
+    "Task 11: wave 4 assignment is correct (Final Wave)",
+    "Task 11: git repo exists at C:/tmp/ai-dev-repo — git diff approach in step 5 is feasible",
+    "Task 11: implementation hints paths are relative to C:/tmp/ai-dev-repo/ — consistent with repo root",
+    "Task 11: tech-spec Testing Strategy and Agent Verification Plan sections exist and match QA scope",
+    "Task 10: no files_to_modify — audit-only task, correct",
+    "Task 11: no files_to_modify — QA-only task, correct"
+  ]
+}

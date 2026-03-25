@@ -33,7 +33,7 @@ estimated_loc: 0                   # оценка строк кода для ses
    - Task 4: `grep "tokens.json" skills/code-writing/SKILL.md`; `grep -i "silent\|skip" skills/code-writing/SKILL.md`
    - Task 5: `grep "taste-profile" skills/design-retrospective/SKILL.md`; `grep "designer-experience" skills/design-retrospective/SKILL.md`; `grep "Phase 4.5\|Phase 5" skills/design-retrospective/SKILL.md`; `grep -i "corrupted\|повреждён\|recreate\|пересозда" skills/design-retrospective/SKILL.md`
    - Task 6: `grep "designer-experience" skills/design-system-init/SKILL.md`; `grep "style-profiles" skills/design-system-init/SKILL.md`; `grep "taste-profile" skills/design-system-init/SKILL.md`
-   - Task 7: `grep "taste-profile" skills/design-generate/SKILL.md`; `grep -c "Phase 0\|Phase 1\|Phase 2\|Phase 3\|Phase 4\|Phase 5" skills/design-generate/SKILL.md` → 6
+   - Task 7: `grep "taste-profile" skills/design-generate/SKILL.md`; `grep -c "^## Phase" skills/design-generate/SKILL.md` → 6
 4. **Reference resolution** — для каждого модифицированного SKILL.md извлечь все `[text](path)` ссылки, проверить `bash test -e` что целевые файлы существуют
 5. **Phase/checkpoint preservation** — diff каждого SKILL.md против git HEAD, убедиться что существующие фазы и чекпоинты не удалены
 6. **Content completeness** — grep каждого SKILL.md на ожидаемые ключевые слова (taste-profile, designer-experience, style-profiles, two-layer, tokens.json)
@@ -46,7 +46,7 @@ estimated_loc: 0                   # оценка строк кода для ses
 
 ## Acceptance Criteria
 
-- [ ] Все acceptance criteria из user-spec (15 пунктов) проверены и отмечены pass/fail
+- [ ] Все acceptance criteria из user-spec (16 пунктов) проверены и отмечены pass/fail
 - [ ] Все acceptance criteria из tech-spec (9 пунктов) проверены и отмечены pass/fail
 - [ ] Все Verify-smoke проверки из задач 1-7 выполнены и прошли
 - [ ] Все reference-ссылки во всех модифицированных SKILL.md резолвятся в существующие файлы

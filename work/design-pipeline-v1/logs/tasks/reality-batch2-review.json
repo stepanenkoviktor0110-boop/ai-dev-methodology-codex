@@ -1,0 +1,79 @@
+{
+  "batch": 2,
+  "iteration": 1,
+  "validator": "reality-checker",
+  "tasks_reviewed": [4, 5, 6],
+  "status": "approved",
+  "findings": [
+    {
+      "task": 4,
+      "severity": "warning",
+      "section": "Implementation hints",
+      "issue": "Hint says 'paragraph is added after **No project patterns?**' — this bold-paragraph ends with a link to references/universal-patterns.md. The link target (skills/code-writing/references/universal-patterns.md) was not verified to exist. If the file is missing the existing reference in SKILL.md is already broken, but the task does not create it and does not check its existence.",
+      "fix": "Verify skills/code-writing/references/universal-patterns.md exists before implementation. If missing, note it as pre-existing issue. No change needed to task-4 itself."
+    },
+    {
+      "task": 5,
+      "severity": "warning",
+      "section": "What to do / step 1",
+      "issue": "Step 1 instructs the agent to read shared/design-references/designer-experience.md (format reference). This file is created by Task 2. Task 5 correctly declares depends_on: [1, 2], so the file will exist. However, the task does not specify a fallback if the agent executes step 1 before Task 2 completes (e.g., out-of-wave execution). The Verification Steps do not include a check that the file was actually read.",
+      "fix": "Low risk given correct wave assignment. Optionally add a note: 'If designer-experience.md is absent — use structure from tech-spec Data Models section instead.'"
+    },
+    {
+      "task": 5,
+      "severity": "warning",
+      "section": "Acceptance Criteria / Verification Steps",
+      "issue": "Smoke checks verify presence of keywords (taste-profile, designer-experience, Phase 4.5, Phase 5) but do not verify that Phase 5 header was preserved and not renumbered. The hint explicitly says 'Phase 5 stays Phase 5 (does not become Phase 6)', but there is no grep check for the absence of a 'Phase 6' header which would indicate accidental renaming.",
+      "fix": "Add smoke check: grep -c 'Phase 6' skills/design-retrospective/SKILL.md → 0 (should return no results, confirming no renumbering occurred)."
+    },
+    {
+      "task": 6,
+      "severity": "warning",
+      "section": "What to do / step 3",
+      "issue": "Task instructs adding a taste-profile reading step in 'Phase 0 — update branch'. In the real design-system-init SKILL.md, Phase 0 update branch is a single-line instruction: 'If update — load existing tokens.json and use as defaults in interview'. There is no explicit step structure there (no numbered sub-steps), which means the agent must decide how to insert an additional instruction into a compact single-line branch. The task does not acknowledge this layout challenge or provide a concrete formatting hint.",
+      "fix": "Add an implementation hint specifying how to expand the single-line update branch into a two-step instruction block: first load tokens.json, then check and read taste-profile.md."
+    },
+    {
+      "task": 6,
+      "severity": "warning",
+      "section": "Acceptance Criteria",
+      "issue": "AC states: 'Агент читает только соответствующую секцию style-profiles.md, а не весь файл (Decision 4)'. The Verification Steps do not include a check for this constraint — there is no grep or read check that confirms the instruction in the modified SKILL.md explicitly says 'read only matching section'. A reviewer could miss this.",
+      "fix": "Add smoke check: grep -i 'only\\|только.*секци\\|matching section' skills/design-system-init/SKILL.md → found, confirming that partial-read instruction is present."
+    }
+  ],
+  "stats": {
+    "tasks_checked": 3,
+    "claims_verified": 28,
+    "issues_found": 5
+  },
+  "verified_claims": [
+    "skills/code-writing/SKILL.md exists (141 lines — matches tech-spec estimate of 141)",
+    "skills/design-retrospective/SKILL.md exists (168 lines — matches tech-spec estimate of 167)",
+    "skills/design-system-init/SKILL.md exists (172 lines — matches tech-spec estimate of 171)",
+    "Phase 1 step 2 'Read Project Context' exists in code-writing SKILL.md",
+    "'No project patterns?' bold paragraph exists at line 34 of code-writing SKILL.md",
+    "Step 3 'Analyze & Review Approach' exists at line 36 — insertion point for task-4 is valid",
+    "Phase 3 'Write Lessons' exists in design-retrospective SKILL.md",
+    "Phase 4 'Promote Principles' exists in design-retrospective SKILL.md",
+    "Phase 5 'Generate Next-Session Prompt' exists in design-retrospective SKILL.md — no Phase 4.5 yet",
+    "Self-Verification section exists in design-retrospective SKILL.md",
+    "Phase 0 update branch exists in design-system-init SKILL.md",
+    "Phase 2.1 'Project Context and Mood' exists in design-system-init SKILL.md",
+    "Final Check section exists in design-system-init SKILL.md",
+    "shared/design-references/ directory exists",
+    "shared/design-references/color-psychology.md exists",
+    "shared/design-references/color-principles.md exists",
+    "shared/design-references/design-tokens.md exists",
+    "shared/design-references/style-profiles.md does NOT exist yet — task-6 correctly marks it as dependency from Task 1",
+    "shared/design-references/designer-experience.md does NOT exist yet — tasks 5 and 6 correctly declare depends_on: [1, 2]",
+    "task-4 depends_on: [] wave 1 — correct, no dependencies",
+    "task-5 depends_on: [1, 2] wave 2 — correct for files created by tasks 1 and 2",
+    "task-6 depends_on: [1, 2] wave 2 — correct for files created by tasks 1 and 2",
+    "Relative path ../../shared/design-references/ is correct from skills/design-system-init/ depth",
+    "font-pairing.md referenced in design-system-init exists at skills/design-system-init/references/font-pairing.md",
+    "No hardcoded secrets in any task implementation hints",
+    "No SQL or path traversal risks — markdown-only feature",
+    "No hallucinated APIs — all referenced phases and sections exist in actual SKILL.md files",
+    "Smoke checks in all 3 tasks are executable grep commands against real file paths"
+  ]
+}

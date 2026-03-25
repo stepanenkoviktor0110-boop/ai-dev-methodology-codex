@@ -46,7 +46,7 @@ estimated_loc: 80                  # оценка строк кода для ses
 - [user-spec.md](../user-spec.md)
 - [tech-spec.md](../tech-spec.md)
 - [decisions.md](../decisions.md)
-- [color-psychology.md](C:/tmp/ai-dev-repo/shared/design-references/color-psychology.md) — пример существующего файла в shared/design-references/
+- [color-psychology.md](../../../shared/design-references/color-psychology.md) — пример существующего файла в shared/design-references/
 
 ## Verification Steps
 

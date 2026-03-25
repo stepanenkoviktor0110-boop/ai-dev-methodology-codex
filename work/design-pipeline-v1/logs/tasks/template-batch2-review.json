@@ -1,0 +1,145 @@
+{
+  "batch": 2,
+  "iteration": 1,
+  "validator": "task-validator",
+  "tasks_reviewed": [6, 7, 8, 9, 10, 11],
+  "status": "issues_found",
+  "findings": [
+    {
+      "task": 6,
+      "severity": "error",
+      "section": "Context Files",
+      "issue": "Missing mandatory project context files: project.md and architecture.md. Task-creator rules require these always.",
+      "fix": "Add links to project.md and architecture.md from PK discovery (e.g., ~/.claude/skills/project-knowledge/references/project.md and architecture.md)"
+    },
+    {
+      "task": 6,
+      "severity": "error",
+      "section": "Reviewers",
+      "issue": "Template placeholder {round} not replaced in reviewer log path: `logs/working/task-6/skill-checker-{round}.json`",
+      "fix": "Replace {round} with literal placeholder format or use a specific round number, e.g., `logs/working/task-6/skill-checker-1.json`. The template expects the literal text `{round}` only as a pattern, but this is ambiguous — confirm correct format per project conventions."
+    },
+    {
+      "task": 6,
+      "severity": "warning",
+      "section": "Required Skills",
+      "issue": "skill-master is listed without a link to SKILL.md. Other tasks (8, 10, 11) provide full path links.",
+      "fix": "Add path link: `/skill:skill-master` — [skills/skill-master/SKILL.md](~/.claude/skills/skill-master/SKILL.md)"
+    },
+    {
+      "task": 7,
+      "severity": "error",
+      "section": "Context Files",
+      "issue": "Missing mandatory project context files: project.md and architecture.md. Also missing decisions.md which is required per template.",
+      "fix": "Add: [decisions.md](../decisions.md), [project.md]({PK path}/project.md), [architecture.md]({PK path}/architecture.md)"
+    },
+    {
+      "task": 7,
+      "severity": "error",
+      "section": "Reviewers",
+      "issue": "Template placeholder {round} not replaced in reviewer log path: `logs/working/task-7/skill-checker-{round}.json`",
+      "fix": "Same as task 6 — align with project reviewer log path convention"
+    },
+    {
+      "task": 7,
+      "severity": "warning",
+      "section": "Required Skills",
+      "issue": "skill-master listed without link to SKILL.md path.",
+      "fix": "Add path: `/skill:skill-master` — [skills/skill-master/SKILL.md](~/.claude/skills/skill-master/SKILL.md)"
+    },
+    {
+      "task": 7,
+      "severity": "warning",
+      "section": "Frontmatter / depends_on",
+      "issue": "depends_on: [1, 2] but tech-spec Task 7 description mentions 'Taste-profile format is defined in tech-spec Data Models section' — no dependency on Task 5 (design-retrospective, which defines the write path for taste-profile). Task 7 reads taste-profile created by design-retrospective; if Task 5 is not complete, the format reference may be incomplete.",
+      "fix": "Consider adding Task 5 to depends_on if Task 7 needs the taste-profile format established in Task 5. If Task 7 only reads format from tech-spec Data Models (not from Task 5 output), current depends_on is acceptable — document the rationale."
+    },
+    {
+      "task": 8,
+      "severity": "error",
+      "section": "Context Files",
+      "issue": "Missing mandatory project context files: project.md and architecture.md. Also missing decisions.md.",
+      "fix": "Add: [decisions.md](../decisions.md), [project.md]({PK path}/project.md), [architecture.md]({PK path}/architecture.md)"
+    },
+    {
+      "task": 8,
+      "severity": "warning",
+      "section": "Verification Steps",
+      "issue": "Verification Steps section contains only 'Automated' subsection with text 'Нет автоматических тестов — задача аудиторская.' No Smoke or User subsections. Section is technically present but nearly empty.",
+      "fix": "For an audit task this is acceptable. However, add a brief note in Verification Steps about the expected deliverable (audit report path) to make the section meaningful. Or add a smoke check: verify that the output file was created — e.g., `test -f logs/working/task-8/code-review-report.json`."
+    },
+    {
+      "task": 9,
+      "severity": "error",
+      "section": "Context Files",
+      "issue": "Missing mandatory project context files: project.md and architecture.md.",
+      "fix": "Add links to project.md and architecture.md from PK discovery."
+    },
+    {
+      "task": 9,
+      "severity": "warning",
+      "section": "Required Skills",
+      "issue": "security-auditor skill listed without a link to SKILL.md path.",
+      "fix": "Add path: `/skill:security-auditor` — [skills/security-auditor/SKILL.md](~/.claude/skills/security-auditor/SKILL.md)"
+    },
+    {
+      "task": 10,
+      "severity": "error",
+      "section": "Context Files",
+      "issue": "Missing mandatory project context files: project.md and architecture.md.",
+      "fix": "Add links to project.md and architecture.md from PK discovery."
+    },
+    {
+      "task": 10,
+      "severity": "warning",
+      "section": "Verification Steps",
+      "issue": "Verification Steps section exists but contains only an HTML comment with no actual content. For an audit task, the deliverable (report path) should be mentioned as a verification step.",
+      "fix": "Add at minimum: `test -f logs/working/task-10/test-audit-report.json` → file exists, or describe the expected deliverable explicitly."
+    },
+    {
+      "task": 10,
+      "severity": "warning",
+      "section": "Details",
+      "issue": "Details section is missing the **Edge cases** and **Implementation hints** subsections required by template. Only Files, Output, Dependencies, and Scope are present.",
+      "fix": "Add **Edge cases** (e.g., task file missing — skip or report as gap) and **Implementation hints** (e.g., how to extract AC from task files efficiently)."
+    },
+    {
+      "task": 11,
+      "severity": "error",
+      "section": "Context Files",
+      "issue": "Missing mandatory project context files: project.md and architecture.md.",
+      "fix": "Add links to project.md and architecture.md from PK discovery."
+    },
+    {
+      "task": 11,
+      "severity": "warning",
+      "section": "Verification Steps",
+      "issue": "Smoke subsection contains 'QA задача является самостоятельной верификацией. Все проверки описаны в секции What to do.' — this is a description, not executable smoke checks. Per template, smoke steps should be concrete commands.",
+      "fix": "Either move the actual smoke commands from 'What to do' step 3 into the Verification Steps > Smoke subsection, or add a representative subset. Example: `grep -c '^## ' shared/design-references/style-profiles.md` and similar commands already listed in step 3."
+    },
+    {
+      "task": 11,
+      "severity": "warning",
+      "section": "AC carry-forward",
+      "issue": "tech-spec AC item: 'taste-profile template in design-retrospective includes all required sections: color preferences, typography, style+boldness, anti-patterns, change history' — not explicitly listed in Task 11 AC checklist. The checklist has 10 items but this specific structural check is absent.",
+      "fix": "Add AC item: '- [ ] taste-profile template in design-retrospective contains all required sections: color preferences, typography, style+boldness, anti-patterns, change history'"
+    }
+  ],
+  "stats": {
+    "tasks_checked": 6,
+    "issues_found": 17,
+    "critical_count": 5,
+    "major_count": 0,
+    "minor_count": 0,
+    "error_count": 5,
+    "warning_count": 12
+  },
+  "summary": {
+    "critical_pattern": "All 6 tasks are missing mandatory project context files (project.md, architecture.md) in Context Files section. Tasks 6 and 7 also have unreplaced {round} template placeholder in Reviewers section.",
+    "non_code_tasks_ok": "TDD Anchor correctly absent from all 6 tasks (all are skill-master / audit / QA tasks, not code tasks).",
+    "ac_carry_forward": "Acceptance criteria from tech-spec are largely carried forward into individual tasks. One gap in Task 11 (taste-profile template structure check).",
+    "smoke_carry_forward": "Verify-smoke commands from tech-spec are correctly placed in Verification Steps > Smoke for tasks 6 and 7. Audit tasks (8-10) have no smoke checks per spec. Task 11 has smoke commands in What to do instead of Verification Steps.",
+    "dependency_graph": "No cycles detected. Wave order respected: tasks 6-7 in wave 2, tasks 8-10 in wave 3, task 11 in wave 4.",
+    "skill_reviewer_mapping": "skill-master → skill-checker (tasks 6-7): correct. Audit tasks (8-10) and QA (11) with empty reviewers: correct for self-verifying tasks."
+  }
+}
