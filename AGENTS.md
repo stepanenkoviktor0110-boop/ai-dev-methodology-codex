@@ -13,12 +13,13 @@ These instructions are written for Codex agents that default to the laziest inte
 - **NEVER search for, read, or run helper scripts** (dispatch-skill.ps1, init-feature-folder.sh, smoke-codex-compat.ps1, etc.). Legacy scripts exist in `~/.agents/shared/scripts/` but are DEPRECATED and BROKEN — they require `/bin/bash` which is unavailable in most Windows environments. Their logic is already inlined in SKILL.md files. If you catch yourself about to run a `.sh` or `.ps1` from `shared/scripts/` — STOP. Read the SKILL.md instead — it has the same steps written as inline instructions. Use your built-in tools (mkdir, file-write, file-copy) to create folders and files.
 - **Shim (proxy) skills** redirect to another skill. This is normal, not an error. When a shim skill (e.g., `decompose-tech-spec` → `task-decomposition`) says "Read and follow {target SKILL.md}" — load that file and execute its instructions step by step. Do NOT improvise a replacement procedure. Do NOT complain about the redirect — just follow it.
 - If a SKILL.md references `$AGENTS_HOME` — resolve it to the actual agents home path (`~/.agents/`) and read the file.
-- **TWO SEPARATE REPOS — do NOT confuse them:**
-  - `~/.agents/` — the **global methodology framework** (its own git repo, remote: ai-dev-methodology-codex). Skills, agents, templates live here. Framework updates (`git pull`) happen here.
-  - `{project}/.agents/` — **project-local knowledge** (part of the project's git repo). Project docs, patterns, architecture live here.
-  - Committing methodology changes? → `cd ~/.agents && git add && git commit && git push`
-  - Committing project work? → `cd {project} && git add work/... && git commit`
-  - A framework commit hash (e.g., `92d725c`) will NOT be found in the project repo. That is expected — it lives in `~/.agents/`.
+- **⛔ TWO SEPARATE GIT REPOS — NEVER mix them up. NEVER cherry-pick between them.**
+  - `~/.agents/` — the **global methodology framework**. Its own git repo with its own remote (ai-dev-methodology-codex). Skills, agents, templates live here.
+  - `{project}/` — the **project repo**. Has its own git history, its own remote.
+  - `{project}/.agents/` — project-local knowledge. Part of the PROJECT repo, NOT the framework.
+  - **To update the framework in a project:** `cd ~/.agents && git pull origin master`. That's it. Do NOT cherry-pick, merge, or copy commits between repos. They have completely different git histories.
+  - **Framework commit hashes (from ~/.agents/) do NOT exist in the project repo.** If user says "apply commit ea353f5" and it's a framework commit — run `cd ~/.agents && git pull origin master`, NOT `git cherry-pick` in the project.
+  - **How to tell which repo a commit belongs to:** run `cd ~/.agents && git log --oneline | grep {hash}`. If found — it's a framework commit. If not found — check the project repo.
 - **Integrity check:** before executing any SKILL.md, verify it has no git conflict markers (`<<<<<<<`, `=======`, `>>>>>>>`). If found — do NOT execute, tell user to resolve the conflict first.
 
 ## Recovery After Interruption
