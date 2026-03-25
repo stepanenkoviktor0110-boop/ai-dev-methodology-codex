@@ -3,7 +3,7 @@ skill: feature-execution
 feature: design-pipeline-v1
 feature_dir: work/design-pipeline-v1
 execution_plan: work/design-pipeline-v1/logs/execution-plan.md
-last_completed_wave: 2
+last_completed_wave: 3
 total_waves: 4
 
 tasks:
@@ -14,12 +14,12 @@ tasks:
   5: done
   6: done
   7: done
-  8: planned
-  9: planned
-  10: planned
+  8: done
+  9: done
+  10: done
   11: planned
 
-next_wave: 3
+next_wave: 4
 
 current_session: 2
 total_sessions: 2

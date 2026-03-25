@@ -1,0 +1,93 @@
+{
+  "task": 10,
+  "type": "test-audit",
+  "status": "pass",
+  "summary": "All 9 tech-spec scenario criteria and all 15 user-spec acceptance criteria are covered by Verify-smoke commands and scenario checks across tasks 1-7. No critical gaps found; three medium-severity improvements identified around verify depth and edge-case explicitness.",
+  "coverage": {
+    "tech_spec_criteria_total": 9,
+    "tech_spec_criteria_covered": 9,
+    "user_spec_criteria_total": 15,
+    "user_spec_criteria_covered": 15
+  },
+  "findings": [
+    {
+      "severity": "medium",
+      "description": "Task 3 Verify-smoke (design-review) uses only `grep -i 'non-obvious|неочевидн'` — a single keyword match. It does not verify that the instruction is marked as optional, nor that the existing 3-recommendation cap is preserved. The AC requires both, but only keyword presence is checked.",
+      "suggestion": "Add smoke check: `grep -i 'optional\\|опционально\\|только при' skills/design-review/SKILL.md` to confirm optional labeling. Add line-count regression check to confirm file did not shrink significantly."
+    },
+    {
+      "severity": "medium",
+      "description": "Task 7 Verify-smoke checks only `grep 'taste-profile'` (found) and phase count (6). It does not verify that Phase 0 specifically contains the taste-profile step, that graceful degradation is described, or that Phase 4 contains two-layer description — all required by the task AC.",
+      "suggestion": "Add targeted checks: `grep -A3 'Phase 0' skills/design-generate/SKILL.md | grep 'taste-profile'` and `grep -i 'two-layer\\|layer 1\\|layer 2' skills/design-generate/SKILL.md`."
+    },
+    {
+      "severity": "medium",
+      "description": "No Verify-smoke command across any task checks reference link resolution (that ../../shared/design-references/ paths actually point to existing files). The tech-spec Agent Verification Plan lists this as item 1 ('Reference resolution via bash test -e') but it appears only in QA (Task 11), not in per-task smoke checks.",
+      "suggestion": "Add to Tasks 5, 6 smoke: `test -f shared/design-references/designer-experience.md && echo OK` and `test -f shared/design-references/style-profiles.md && echo OK`. Task 4 could add `test -f .design-system/tokens.json` is not applicable (conditional), but path format verification is meaningful."
+    },
+    {
+      "severity": "low",
+      "description": "Task 6 Verify-smoke checks only keyword presence (`grep 'designer-experience' skills/design-system-init/SKILL.md`) but does not verify that the step reads only the matching category section (Decision 4 requirement). A full-file read instead of section read would pass the smoke check.",
+      "suggestion": "Add smoke: `grep -i 'секцию\\|section\\|только соответствующ' skills/design-system-init/SKILL.md` to confirm selective section reading instruction is present."
+    },
+    {
+      "severity": "low",
+      "description": "Task 2 Verify-smoke checks `grep -c '^## '` (4+) and `grep 'Антипаттерны'` but does not verify that the file contains append-only format description — required by AC item 5. The format description exists in the created file, but is not smoke-verified.",
+      "suggestion": "Add: `grep -i 'append-only\\|append only' shared/design-references/designer-experience.md` to the smoke checks."
+    },
+    {
+      "severity": "info",
+      "description": "style-profiles.md has 8 sections (^## count = 8), not 7 as stated in decisions.md. The extra section is likely a Quick Lookup table header or intro section, not an 8th style profile. This is not a test gap but an inconsistency between decisions.md (claims 7 profiles) and the grep-based smoke check. Smoke only counts all ## headers.",
+      "suggestion": "Clarify smoke command: `grep -c '^## ' shared/design-references/style-profiles.md` counts ALL H2 headers including non-profile sections. A more precise check would be `grep -c '^## [A-Z]' shared/design-references/style-profiles.md` to count only capitalized profile names."
+    },
+    {
+      "severity": "info",
+      "description": "Scenario 9 from tech-spec ('no regression: existing phases, checkpoints, references preserved') has no dedicated Verify-smoke in any individual task. Task 5 decisions.md entry reports '5 original phases + checkpoints preserved' but this is self-reported by the implementing agent, not independently verified via a smoke command.",
+      "suggestion": "Add regression smoke to tasks 3-7: count existing phase headers before and after with `grep -c '^## Phase'` and assert count >= original. Task 5 should verify 5 original phases preserved (Phase 4.5 is new, total should be 6 post-modification)."
+    }
+  ],
+  "verify_smoke_summary": [
+    {
+      "task": 1,
+      "commands": 1,
+      "status": "adequate",
+      "notes": "Counts ^## headers in style-profiles.md. Verified result: 8 (>=6 threshold met, 7 style profiles + likely intro/lookup section). Sufficient for basic structural check."
+    },
+    {
+      "task": 2,
+      "commands": 2,
+      "status": "adequate",
+      "notes": "Counts category sections (4) and verifies Антипаттерны subsections exist. Missing: append-only format description verification."
+    },
+    {
+      "task": 3,
+      "commands": 1,
+      "status": "weak",
+      "notes": "Single keyword grep for 'non-obvious'. Does not verify optional labeling, 3-cap preservation, or that existing format was not modified."
+    },
+    {
+      "task": 4,
+      "commands": 2,
+      "status": "adequate",
+      "notes": "Checks tokens.json keyword and silent/skip keywords. Both confirmed present. UI extensions (.tsx, .vue, .html, .css, .scss) are listed in the actual file."
+    },
+    {
+      "task": 5,
+      "commands": 4,
+      "status": "adequate",
+      "notes": "Best coverage among all tasks: taste-profile, designer-experience, Phase 4.5/5, edge case handling. Confirmed all 4 checks pass per decisions.md."
+    },
+    {
+      "task": 6,
+      "commands": 3,
+      "status": "adequate",
+      "notes": "Checks all three reference integrations. Missing: verification that section-only read (not full file) is instructed."
+    },
+    {
+      "task": 7,
+      "commands": 2,
+      "status": "weak",
+      "notes": "Only checks taste-profile keyword presence and phase count. Does not verify Phase 0 placement, graceful degradation, or Phase 4 two-layer description."
+    }
+  ]
+}

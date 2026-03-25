@@ -116,3 +116,33 @@ Review details — in JSON files via links. QA report — in logs/working/.
 **Verification:**
 - `grep "taste-profile" skills/design-generate/SKILL.md` → found (5 matches)
 - `grep -c "^## Phase" skills/design-generate/SKILL.md` → 6 (all phases preserved)
+
+## Task 10: Test Audit
+
+**Status:** Done
+**Agent:** test-auditor
+**Summary:** Все 9 сценарных критериев tech-spec и все 15 критериев приёмки user-spec покрыты Verify-smoke командами и сценарными проверками задач 1-7. Критических пробелов не обнаружено; выявлены 3 medium-находки: weak smoke в задачах 3 и 7 (недостаточно глубокая проверка), отсутствие per-task проверки резолюции reference-ссылок (откладывается до QA в задаче 11).
+**Deviations:** None
+
+**Verification:**
+- Audit report → [logs/working/task-10/test-audit-report.json]
+
+## Task 8: Code Audit
+
+**Status:** Done
+**Agent:** code-auditor
+**Summary:** Проведён полный code-аудит 7 файлов фичи (5 SKILL.md и 2 reference-файла). Критических и высокоприоритетных проблем не выявлено. Цепочка пайплайна design-retrospective → design-system-init → design-generate → design-review функционирует корректно, все пути к файлам валидны, терминология в целом согласована. Найдены: 1 medium-находка (неясный механизм активации design-review в пайплайне — нет явного вызывающего скилла), 3 low-находки (minor inconsistencies в именовании и неполный fallback при определении категории проекта), 1 info-наблюдение (термин "двухслойное описание" имеет четыре вариации написания across skills).
+**Deviations:** None
+
+**Verification:**
+- Audit report → [logs/working/task-8/code-review-report.json]
+
+## Task 9: Security Audit
+
+**Status:** Done
+**Agent:** security-auditor
+**Summary:** Проведён полный security-аудит 9 файлов фичи (5 SKILL.md, 2 reference-файла, decisions.md, preview-template.html). Критических и высокоприоритетных уязвимостей не обнаружено. Выявлены: 1 medium-находка (prompt injection через append-only designer-experience.md при чтении агентом как контекст) и 3 info-наблюдения (реализованная защита от path traversal, корректная обработка деструктивных операций, потенциальный агрегат вкусовых предпочтений). Все риски носят теоретический характер для markdown-only фичи.
+**Deviations:** None
+
+**Verification:**
+- Audit report → [logs/working/task-9/security-audit-report.json]

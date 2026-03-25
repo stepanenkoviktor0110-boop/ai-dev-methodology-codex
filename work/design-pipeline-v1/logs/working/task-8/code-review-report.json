@@ -1,0 +1,47 @@
+{
+  "task": 8,
+  "type": "code-audit",
+  "status": "pass",
+  "summary": "All 7 files reviewed. Pipeline chain integrity confirmed (design-retrospective → design-system-init → design-generate → design-review). 4 findings identified: 2 low-severity terminology inconsistencies, 1 medium-severity unclear integration trigger, and 1 low-severity missing clarification. No critical or high-severity issues found.",
+  "findings": [
+    {
+      "severity": "medium",
+      "file": "skills/design-review/SKILL.md",
+      "description": "The 'When to Activate' section describes design-review as self-activating based on conditions (tokens.json exists + UI files changed), but neither code-writing/SKILL.md nor design-generate/SKILL.md explicitly invoke or reference design-review. It is unclear whether design-review is auto-triggered by the runtime environment, must be invoked by the user, or is expected to be called by another skill. This integration gap could lead to the review step being silently skipped.",
+      "suggestion": "Either add a step in code-writing Phase 3 'Run Reviews' to include design-review when UI files are changed (alongside code-reviewer, security-auditor), OR add a note to design-review's 'When to Activate' section clarifying it is self-invoked by the agent runtime when conditions are met. The current wording implies self-activation but no mechanism enforces it."
+    },
+    {
+      "severity": "low",
+      "file": "skills/design-system-init/SKILL.md",
+      "description": "Terminology inconsistency in Final Check item: line 185 says '- [ ] style-profile использован' (singular, no hyphen suffix for 'profiles'), while the actual file is named 'style-profiles.md' (plural) and is referenced correctly in line 62 as '[style-profiles.md](../../shared/design-references/style-profiles.md)'. Minor inconsistency that could cause confusion during self-verification.",
+      "suggestion": "Update Final Check item to: '- [ ] style-profiles.md использован: предложения по палитре и типографике учитывают рецепты из соответствующего профиля'"
+    },
+    {
+      "severity": "low",
+      "file": "skills/design-generate/SKILL.md",
+      "description": "Phase 4.2 introduces the 'Two-layer description' concept and saves it to '.design-system/pages/{name}.description.md', but this output artifact is not mentioned in the Phase 0 Checkpoint or in Phase 3's 'Save files' section. The file name validation rule (only lowercase letters, digits, hyphens) defined in Phase 3.4 for HTML/SVG files implicitly applies to description.md files too, but this is not stated explicitly.",
+      "suggestion": "Add '.design-system/pages/{name}.description.md' to the list of outputs in Phase 3.4 'Save files' section (step 2-3), with the same file name validation rule. This makes the full output set explicit and consistent."
+    },
+    {
+      "severity": "low",
+      "file": "skills/design-retrospective/SKILL.md",
+      "description": "Phase 4.5 'Experience запись' instructs the agent to 'определить категорию текущего проекта: landing, webapp, admin, portfolio' but provides no fallback if the category cannot be determined from session context. The instruction says 'Определять по типу проекта из контекста сессии' but does not specify what to do if the session context is ambiguous (e.g., a microsite that could be landing or portfolio).",
+      "suggestion": "Add a fallback: if category cannot be determined with confidence, ask the user to confirm: 'К какой категории относится этот проект: landing, webapp, admin, или portfolio?' This prevents incorrect categorization of cross-project experience entries."
+    },
+    {
+      "severity": "info",
+      "file": "skills/design-generate/SKILL.md + skills/design-retrospective/SKILL.md",
+      "description": "Terminology for two-layer descriptions is slightly inconsistent across files: design-retrospective uses 'двухслойно' (line 73), design-system-init uses 'двухслойные' (Final Check line 187), design-generate uses 'Two-layer description' in English as section heading (Phase 4.2 title) and 'двухуровневое описание' in the body text (line 137), while design-review uses 'two-layer explanation' in English (line 85). The concept is the same across all files but the naming is not unified.",
+      "suggestion": "Adopt a single term throughout: recommend 'Two-layer description / двухслойное описание' as the canonical form. Update design-generate's body text at line 137 from 'двухуровневое описание' to 'двухслойное описание' to match the other skills. English/Russian alternation is acceptable in section headings."
+    }
+  ],
+  "files_reviewed": [
+    "skills/design-retrospective/SKILL.md",
+    "skills/design-system-init/SKILL.md",
+    "skills/design-generate/SKILL.md",
+    "skills/design-review/SKILL.md",
+    "skills/code-writing/SKILL.md",
+    "shared/design-references/style-profiles.md",
+    "shared/design-references/designer-experience.md"
+  ]
+}
