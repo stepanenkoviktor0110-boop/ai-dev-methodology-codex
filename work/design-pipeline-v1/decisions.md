@@ -146,3 +146,13 @@ Review details — in JSON files via links. QA report — in logs/working/.
 
 **Verification:**
 - Audit report → [logs/working/task-9/security-audit-report.json]
+
+## Task 11: Pre-deploy QA
+
+**Status:** Done
+**Agent:** qa-lead
+**Summary:** Полное приёмочное тестирование фичи design-pipeline-v1. Все 17 smoke-проверок пройдены (tasks 1-7). Все 9 tech-spec и 15 user-spec критериев приёмки выполнены. 19/19 reference-ссылок в SKILL.md резолвятся. Три аудиторских отчёта (tasks 8-10) не содержат critical/high находок. Общий статус: PASS.
+**Deviations:** None
+
+**Verification:**
+- QA report → [logs/working/task-11/qa-report.json]
