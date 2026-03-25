@@ -33,6 +33,11 @@ description: |
 
    **No project patterns?** Apply baseline from [universal-patterns.md](references/universal-patterns.md) — naming, error handling, structure.
 
+   **UI task with Design System?** If task touches UI files (.tsx, .vue, .html, .css, .scss) AND `tokens.json` exists in the project root or design-system directory:
+   - Read `tokens.json` — extract color, spacing, typography tokens
+   - Use CSS variables defined there (e.g., `var(--color-primary)`, `var(--spacing-md)`) instead of hardcoded values
+   - If `tokens.json` is missing or fails to parse → silent skip, proceed without tokens. Do not block coding.
+
 3. **Analyze & Review Approach**
 
    Before coding, output your findings:
