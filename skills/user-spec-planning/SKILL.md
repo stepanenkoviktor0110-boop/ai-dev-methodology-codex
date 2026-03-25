@@ -12,6 +12,8 @@ description: |
 
 # User Spec Planning
 
+Before starting, check [lessons-learned.md](references/lessons-learned.md) for known pitfalls from past user-spec-planning work (if file exists).
+
 Thorough adaptive interview → codebase scan → user-spec.md → dual validation → user approval.
 Output: `work/{feature}/user-spec.md` with status `approved`.
 
