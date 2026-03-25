@@ -1,0 +1,59 @@
+{
+  "batch": "cross",
+  "iteration": 1,
+  "validator": "reality-checker",
+  "tasks_reviewed": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11],
+  "status": "approved",
+  "findings": [
+    {
+      "severity": "major",
+      "category": "cross-task-integration",
+      "task": 7,
+      "issue": "Task 7 declares depends_on: [1, 2] but does not use style-profiles.md (created by Task 1) or designer-experience.md (created by Task 2) anywhere in its description, steps, or context files. The Details section explicitly states 'no direct file dependency on tasks 1-2'. Task 7 only depends on the taste-profile format defined in tech-spec Data Models, which is a documentation reference, not a file artifact.",
+      "fix": "Remove Task 1 and Task 2 from depends_on in Task 7. The correct declaration is depends_on: [] (no dependency needed, format is in tech-spec). Alternatively, if the wave-2 grouping is intentional for scheduling, document the rationale explicitly."
+    },
+    {
+      "severity": "major",
+      "category": "cross-task-integration",
+      "task": 5,
+      "issue": "Task 5 declares depends_on: [1, 2] but only uses designer-experience.md (created by Task 2) as an actual dependency — it reads the file format in step 1 and links to it in Context Files. Task 1 (style-profiles.md) is never referenced in Task 5 description, steps, acceptance criteria, or context files. design-retrospective writes to designer-experience.md but does not read or reference style-profiles.md.",
+      "fix": "Remove Task 1 from depends_on in Task 5. The correct declaration is depends_on: [2]."
+    },
+    {
+      "severity": "major",
+      "category": "feasibility",
+      "task": 7,
+      "issue": "Task 7 Context Files contains incorrect relative path: [SKILL.md](../../skills/design-generate/SKILL.md). The task file is located at work/design-pipeline-v1/tasks/task-7.md. Going up two levels from that path yields work/, not the repo root. The correct path (matching all other tasks) is ../../../skills/design-generate/SKILL.md (three levels up). Tasks 3, 4, 5, 6, 8, 9 all correctly use ../../../skills/.",
+      "fix": "Replace [SKILL.md](../../skills/design-generate/SKILL.md) with [SKILL.md](../../../skills/design-generate/SKILL.md) in the Context Files section of task-7.md."
+    },
+    {
+      "severity": "minor",
+      "category": "cross-task-integration",
+      "task": 5,
+      "issue": "Task 5 AC item checks path correctness: '- [ ] Ссылка на designer-experience.md использует корректный относительный путь (../../shared/design-references/designer-experience.md)'. This relative path is relative to the skills/design-retrospective/ directory, not to the task file itself. The path is correct for the SKILL.md being modified, but the phrasing could be confused with the task file's own paths. All other tasks that declare similar AC items use the same convention, so this is consistent but worth noting.",
+      "fix": "No action required — path is correct for SKILL.md context. Optional: add clarification comment '(relative to skills/design-retrospective/)' for unambiguous reading."
+    },
+    {
+      "severity": "minor",
+      "category": "cross-task-integration",
+      "task": 6,
+      "issue": "Task 6 step 3 instructs: 'In Phase 0 — in the update branch, add a step: read .design-system/taste-profile.md'. The current design-system-init SKILL.md Phase 0 update branch only loads tokens.json. Task 6 adds taste-profile reading here. However, tech-spec Architecture section states 'design-system-init reads taste-profile in update flow' which aligns. No conflict with other tasks. But task-5 (design-retrospective) creates taste-profile in Phase 4.5 and does NOT declare design-system-init as a downstream — this is by design since taste-profile is project-local. The dependency direction is correct.",
+      "fix": "No action required — the design is correct. Flagged as minor for awareness."
+    }
+  ],
+  "stats": {
+    "tasks_checked": 11,
+    "cross_task_claims_verified": 28,
+    "issues_found": 5,
+    "critical": 0,
+    "major": 3,
+    "minor": 2
+  },
+  "cross_task_summary": {
+    "duplicate_file_creation": "None found. style-profiles.md created only by Task 1, designer-experience.md created only by Task 2. No overlap.",
+    "path_consistency": "All tasks use shared/design-references/ for global files and .design-system/ for per-project files. Consistent throughout. Exception: task-7 Context Files has a broken relative path (2 levels instead of 3).",
+    "terminology_consistency": "taste-profile, designer-experience, style-profiles terms are used consistently across all tasks. Two-layer / двухслойное описание concept is consistently named. Append-only rule consistently applied to designer-experience.md.",
+    "wave_structure": "Wave 1 (tasks 1-4) are independent — correct. Wave 2 (tasks 5-7) depend on Wave 1 outputs — mostly correct, but task-7 and task-5 have spurious dependencies on task-1 as noted above. Wave 3 (tasks 8-10) audit tasks depend on all of 1-7 — correct. Wave 4 (task-11) depends on 8-10 — correct.",
+    "shared_resources_coverage": "Tech-spec declares 'Shared resources: None' which is consistent — style-profiles.md and designer-experience.md are reference files written/read directly, not shared runtime resources requiring lifecycle management."
+  }
+}

@@ -1,6 +1,6 @@
 ---
 status: planned
-depends_on: [1, 2]
+depends_on: [2]
 wave: 2
 skills: [skill-master]
 verify: [smoke]

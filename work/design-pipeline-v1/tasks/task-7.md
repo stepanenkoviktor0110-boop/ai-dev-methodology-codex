@@ -1,6 +1,6 @@
 ---
 status: planned
-depends_on: [1, 2]
+depends_on: []
 wave: 2
 skills: [skill-master]
 verify: [smoke]
@@ -63,7 +63,7 @@ estimated_loc: 20
 - [user-spec.md](../user-spec.md)
 - [tech-spec.md](../tech-spec.md)
 - [decisions.md](../decisions.md)
-- [SKILL.md](../../skills/design-generate/SKILL.md)
+- [SKILL.md](../../../skills/design-generate/SKILL.md)
 
 ## Verification Steps
 

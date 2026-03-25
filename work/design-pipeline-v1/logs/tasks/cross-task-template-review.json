@@ -1,0 +1,62 @@
+{
+  "batch": "cross",
+  "iteration": 1,
+  "validator": "task-validator",
+  "tasks_reviewed": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11],
+  "status": "approved",
+  "findings": [
+    {
+      "severity": "minor",
+      "category": "resource-sharing",
+      "task": 5,
+      "section": "frontmatter / Details",
+      "issue": "Task 5 declares depends_on: [1, 2], but style-profiles.md (task 1) is not referenced or used anywhere in task 5's instructions, Context Files, or What to do. Only designer-experience.md (task 2) is actually consumed. The Details section justifies both dependencies by saying 'нужен формат designer-experience.md', but that applies only to task 2. Superfluous dependency on task 1 inflates the dependency chain unnecessarily.",
+      "fix": "Remove task 1 from task 5's depends_on. Change to depends_on: [2]. Task 5 only reads designer-experience.md format, which is owned by task 2."
+    },
+    {
+      "severity": "minor",
+      "category": "resource-sharing",
+      "task": 7,
+      "section": "frontmatter / Details",
+      "issue": "Task 7 declares depends_on: [1, 2], but neither style-profiles.md (task 1) nor designer-experience.md (task 2) is referenced in task 7's instructions, Context Files, or Verification Steps. The Details section itself explicitly states: 'no direct file dependency on tasks 1-2'. Both declared dependencies are spurious. Task 7 only adds taste-profile reading, which is a project-local file with format defined in tech-spec Data Models.",
+      "fix": "Remove tasks 1 and 2 from task 7's depends_on. Change to depends_on: []. Task 7 is effectively a Wave 1 task that was placed in Wave 2 without a real dependency. Alternatively, if keeping in Wave 2 for sequencing reasons, document the rationale explicitly."
+    },
+    {
+      "severity": "major",
+      "category": "resource-sharing",
+      "task": null,
+      "section": "tech-spec / Shared resources",
+      "issue": "Tech-spec Shared Resources section states 'None', but style-profiles.md and designer-experience.md are actual shared resources: task 1 creates style-profiles.md and tasks 6 (and implicitly 8, 9, 11) consume it; task 2 creates designer-experience.md and tasks 5, 6 (and 8, 9, 11) consume it. The ownership and consumer dependency structure is correctly reflected in task frontmatter (tasks 5 and 6 both have depends_on: [1, 2]), but the tech-spec Shared Resources section is incomplete — it should document these files as shared resources with their owner tasks.",
+      "fix": "Update tech-spec Shared Resources section to document: style-profiles.md (owner: task 1, consumers: task 6) and designer-experience.md (owner: task 2, consumers: tasks 5, 6). This does not require task changes since the depends_on declarations are already correct for the real consumers."
+    }
+  ],
+  "wave_map": {
+    "wave_1": [1, 2, 3, 4],
+    "wave_2": [5, 6, 7],
+    "wave_3": [8, 9, 10],
+    "wave_4": [11]
+  },
+  "dependency_cycles": "none",
+  "competing_instances_same_wave": "none — each task in each wave modifies a distinct file",
+  "ownership_map": {
+    "shared/design-references/style-profiles.md": {"owner": 1, "consumers": [6, 8, 9, 11], "dependency_declared": [6]},
+    "shared/design-references/designer-experience.md": {"owner": 2, "consumers": [5, 6, 8, 9, 11], "dependency_declared": [5, 6]},
+    "skills/design-review/SKILL.md": {"owner": 3, "consumers": [8, 9, 11], "dependency_declared": [8, 9, 11]},
+    "skills/code-writing/SKILL.md": {"owner": 4, "consumers": [8, 9, 11], "dependency_declared": [8, 9, 11]},
+    "skills/design-retrospective/SKILL.md": {"owner": 5, "consumers": [8, 9, 11], "dependency_declared": [8, 9, 11]},
+    "skills/design-system-init/SKILL.md": {"owner": 6, "consumers": [8, 9, 11], "dependency_declared": [8, 9, 11]},
+    "skills/design-generate/SKILL.md": {"owner": 7, "consumers": [8, 9, 11], "dependency_declared": [8, 9, 11]}
+  },
+  "notes": [
+    "Audit tasks (8, 9, 10) and QA task (11) correctly depend on all producing tasks. Their consumer relationships to shared files are read-only audit activities, not structural dependencies requiring depends_on beyond the producing tasks — which are already covered.",
+    "Dependency wave ordering is consistent throughout: all Wave N tasks have depends_on pointing exclusively to tasks in waves < N. No violations.",
+    "No two tasks in the same wave modify the same file."
+  ],
+  "stats": {
+    "tasks_checked": 11,
+    "issues_found": 3,
+    "critical": 0,
+    "major": 1,
+    "minor": 2
+  }
+}
