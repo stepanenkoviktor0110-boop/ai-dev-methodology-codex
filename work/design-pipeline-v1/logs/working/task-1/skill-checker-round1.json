@@ -1,0 +1,21 @@
+{
+  "task": 1,
+  "reviewer": "skill-checker",
+  "round": 1,
+  "status": "fail",
+  "findings": [
+    {
+      "severity": "major",
+      "location": "C:/tmp/ai-dev-repo/shared/design-references/style-profiles.md",
+      "message": "Отсутствует quick-lookup таблица. Tech-spec acceptance criteria явно требует: 'style-profiles.md follows existing reference file format: Russian language, structured sections, concrete values, quick-lookup table'. Таблица быстрого поиска нужна для того, чтобы агент мог быстро сопоставить настроение/категорию проекта с профилем без чтения всего файла.",
+      "fix": "Добавить таблицу в конец файла (перед итоговым примечанием) в формате: | Стиль | Настроение | Категория проекта | Ключевые слова |. Строки для всех 7 профилей. Пример: | Luxury | тишина, премиум, статус | landing, portfolio | serif, пустота, золото, приглушённые цвета |"
+    },
+    {
+      "severity": "minor",
+      "location": "C:/tmp/ai-dev-repo/shared/design-references/style-profiles.md — профиль Neo-Retro",
+      "message": "Профиль Neo-Retro не входит в список обязательных из user-spec и task-1 (luxury, brutalist, editorial, minimal, playful, corporate). Это не нарушение — task допускает 6+ профилей, дополнительные приветствуются — но следует убедиться что профиль не перекрывает существующие. Neo-Retro пересекается с Brutalist по эстетике 'сырости' и с Editorial по структурности. Риск: агент может выбрать Neo-Retro вместо более конкретного профиля.",
+      "fix": "Добавить в quick-lookup таблицу чёткие критерии выбора Neo-Retro vs Brutalist vs Editorial. Либо добавить в профиль секцию 'Отличие от похожих стилей' с одной строкой."
+    }
+  ],
+  "summary": "Файл в целом качественный: 7 профилей (6 обязательных + Neo-Retro), каждый содержит конкретные техники с реальными значениями (hex, px, font-names), написан на русском, структура согласована с существующими reference-файлами, терминология соответствует color-psychology.md и color-principles.md (grège, световая тонировка, асимметрия насыщенности). Smoke-тест проходит. Критическое нарушение одно: отсутствует quick-lookup таблица, явно указанная в acceptance criteria tech-spec. Без неё агент при матчинге профиля вынужден читать все 7 профилей вместо быстрого поиска по таблице — нарушает принцип токен-бюджета (~1000-1500 токенов overhead)."
+}

@@ -1,0 +1,50 @@
+{
+  "task": 4,
+  "reviewer": "skill-checker",
+  "round": 1,
+  "status": "pass",
+  "findings": [
+    {
+      "severity": "minor",
+      "location": "body",
+      "check": "silent_skip_non_ui",
+      "message": "Silent skip when conditions not met (non-UI files) is only implicitly covered by the conditional paragraph structure. There is no explicit 'Otherwise → skip' line for the case where files are not UI — only the missing/invalid tokens.json case has an explicit skip statement.",
+      "fix": "Acceptable as-is: the paragraph is fully conditional ('If task touches UI files ... AND tokens.json exists'), so non-UI tasks never enter the block. The implicit skip is sufficient. No change required, but adding '**Not a UI task or no tokens.json?** Skip this step — zero overhead.' after the closing bullet would make intent explicit."
+    }
+  ],
+  "checks": {
+    "conditional_step_location": {
+      "status": "pass",
+      "detail": "Paragraph added at lines 36-39 in Phase 1, step 2 (Read Project Context), after 'No project patterns?' line (34) and before step 3 'Analyze & Review Approach' (line 41). Position matches task-4 spec exactly."
+    },
+    "dual_condition": {
+      "status": "pass",
+      "detail": "Line 36: 'If task touches UI files (.tsx, .vue, .html, .css, .scss) AND tokens.json exists in the project root or design-system directory'. Both conditions present. All 5 required extensions listed."
+    },
+    "silent_skip_conditions_not_met": {
+      "status": "pass_with_note",
+      "detail": "Non-UI files: implicitly skipped because the entire paragraph is conditional. No overhead introduced. tokens.json missing: line 39 explicitly states 'silent skip, proceed without tokens. Do not block coding.' The implicit handling for non-UI is functionally correct."
+    },
+    "silent_skip_invalid_missing_tokens": {
+      "status": "pass",
+      "detail": "Line 39: 'If tokens.json is missing or fails to parse → silent skip, proceed without tokens. Do not block coding.' Covers both missing and invalid (parse failure) cases explicitly."
+    },
+    "no_regression": {
+      "status": "pass",
+      "detail": "All 3 phases preserved with original content. Phase 1 checkpoint at line 52, Phase 2 checkpoint at line 76, Phase 3 checkpoint at line 134, Self-Verification at lines 136-146. New paragraph inserted within step 2 without removing or replacing any existing content. Total file: 146 lines (was ~141, +5 lines as expected per tech-spec)."
+    },
+    "overhead_minimal": {
+      "status": "pass",
+      "detail": "The conditional block itself is 4 lines (~60-80 tokens). Overhead incurred only when both conditions are true, at which point tokens.json is read (~500-1000 tokens). Matches Decision 6 from tech-spec. Zero overhead for non-UI tasks or projects without tokens.json."
+    },
+    "formatting_consistency": {
+      "status": "pass",
+      "detail": "Uses bold-header pattern ('**UI task with Design System?**') consistent with adjacent paragraphs ('**Working on a task?**', '**Standalone..?**', '**No project patterns?**'). Bullet list format matches surrounding content."
+    },
+    "skill_file_size": {
+      "status": "pass",
+      "detail": "146 lines total, well under 500-line limit."
+    }
+  },
+  "summary": "Task 4 implementation passes all checks. The conditional DS token integration step is correctly placed at the end of Phase 1 step 2, uses the required dual condition (UI file extensions AND tokens.json existence), handles missing/invalid tokens.json with explicit silent skip, and introduces zero overhead for non-UI tasks. All existing phases, checkpoints, and self-verification section are fully preserved. One minor note: the silent skip for non-UI files is implicit rather than explicit, which is functionally correct but could be made more readable with an optional 'Otherwise skip' line."
+}

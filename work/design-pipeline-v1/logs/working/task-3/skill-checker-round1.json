@@ -1,0 +1,8 @@
+{
+  "task": 3,
+  "reviewer": "skill-checker",
+  "round": 1,
+  "status": "pass",
+  "findings": [],
+  "summary": "All acceptance criteria satisfied. Two-layer explanation added at lines 85-91 in How to Report section. Format is correct: human-readable 'why:' precedes technical 'detail:'. Instruction is explicitly optional ('Skip the explanation when the match is exact.'). No regression: all five sections preserved (When to Activate, What to Read, What to Check, How to Report, Scope Guard), cap-3 constraint intact, base format 'found ... -> use ...' unchanged. File is 120 lines, well under 500-line limit."
+}
