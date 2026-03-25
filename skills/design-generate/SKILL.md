@@ -4,6 +4,7 @@ description: |
   Generates HTML/CSS pages and static SVG mockups from text descriptions using
   a project's design system. Selects from 15 layout patterns (5 basic + 10 advanced
   grids), assembles components, applies tokens, supports iteration via screenshots.
+  After approval, generates diagonal before/after collage.
 
   Use when: "сделай макет", "generate design", "сгенерируй страницу", "create mockup",
   "макет страницы", "generate a page", "собери страницу", "покажи страницу",
@@ -20,6 +21,10 @@ User description → Parse → Select Layout → Assemble Components → HTML + 
                                                               User feedback (screenshot)
                                                                       ↓
                                                                   Iterate
+                                                                      ↓
+                                                              User approves final
+                                                                      ↓
+                                                          Before/After Collage
 ```
 
 ## Phase 0: Readiness Check
@@ -138,6 +143,43 @@ Open the HTML file, apply the feedback, regenerate HTML+SVG.
 
 **Checkpoint:** result presented, user feedback addressed (or continuation prompt generated).
 
+## Phase 5: Before/After Collage
+
+Triggers when the user confirms the final variant ("да", "этот", "утверждаю", "go", "approved").
+
+### 5.1 Capture "Before"
+
+- If replacing an existing page → take a screenshot of the current version (or ask user to paste one)
+- If designing from scratch → use a solid `var(--color-neutral-200)` rectangle with centered text "No previous design"
+
+### 5.2 Build collage
+
+Generate a single HTML file with diagonal split overlay:
+
+```html
+<div class="collage" style="position:relative; width:100%; max-width:1440px; aspect-ratio:16/9; overflow:hidden">
+  <!-- Bottom layer: After -->
+  <img src="{after-screenshot}" style="width:100%; height:100%; object-fit:cover">
+  <!-- Top layer: Before, clipped diagonally -->
+  <img src="{before-screenshot}" style="position:absolute; inset:0; width:100%; height:100%; object-fit:cover; clip-path:polygon(0 0,100% 0,0 100%)">
+  <!-- Diagonal line -->
+  <div style="position:absolute; inset:0; background:linear-gradient(to bottom right,transparent calc(50% - 1px),white calc(50% - 1px),white calc(50% + 1px),transparent calc(50% + 1px)); pointer-events:none"></div>
+  <!-- Labels -->
+  <span style="position:absolute; top:12%; left:8%; background:rgba(0,0,0,.6); color:#fff; padding:6px 18px; border-radius:4px; font:600 14px/1 system-ui">До</span>
+  <span style="position:absolute; bottom:12%; right:8%; background:rgba(0,0,0,.6); color:#fff; padding:6px 18px; border-radius:4px; font:600 14px/1 system-ui">После</span>
+</div>
+```
+
+Images: embed as base64 data URIs (self-contained file, no external dependencies).
+
+### 5.3 Save
+
+1. Validate name: `/^[a-z0-9-]+$/`
+2. Save to `.design-system/collages/{page-name}-collage.html`
+3. Tell the user: "Collage saved to `.design-system/collages/{page-name}-collage.html` — open in browser to see the diagonal before/after comparison."
+
+**Checkpoint:** collage generated with diagonal clip-path, both images embedded, labels overlaid, file saved.
+
 ## Final Check
 
 Before finishing, verify:
@@ -147,3 +189,4 @@ Before finishing, verify:
 - [ ] File names match `/^[a-z0-9-]+$/` pattern
 - [ ] `.design-system/pages/` directory contains the generated files
 - [ ] User has been shown where to find the files
+- [ ] Before/after collage saved to `.design-system/collages/` (if user confirmed final variant)
