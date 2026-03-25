@@ -15,6 +15,8 @@ Decompose tech-spec Implementation Tasks into individual task files with paralle
 **Output:** `work/{feature}/tasks/*.md` (validated)
 **Language:** Task files in English, communication in Russian
 
+Before starting, check [lessons-learned.md](references/lessons-learned.md) for known pitfalls from past task-decomposition work (if file exists).
+
 ## Phase 0: Scope Estimation
 
 Before creating tasks, present the user a structural plan:

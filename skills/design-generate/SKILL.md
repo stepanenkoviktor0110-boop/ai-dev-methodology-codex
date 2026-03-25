@@ -180,6 +180,19 @@ Images: embed as base64 data URIs (self-contained file, no external dependencies
 
 **Checkpoint:** collage generated with diagonal clip-path, both images embedded, labels overlaid, file saved.
 
+### 5.4 Cleanup
+
+After the collage is saved, delete intermediate artifacts that were used only for demonstration and iteration:
+
+1. Remove all iteration SVGs: `.design-system/pages/{name}.svg`, `{name}-mobile.svg`, etc.
+2. Remove intermediate HTML previews if the final version has been applied to the actual codebase
+3. Keep only:
+   - `.design-system/collages/{page-name}-collage.html` (before/after comparison)
+   - `.design-system/pages/{name}.html` (final approved version — as reference)
+4. Ask the user: "Промежуточные файлы (SVG, черновики) удалены. Оставлен финальный HTML и коллаж до/после. Ок?"
+
+**Checkpoint:** intermediate artifacts removed, only final HTML + collage remain.
+
 ## Final Check
 
 Before finishing, verify:
@@ -190,3 +203,4 @@ Before finishing, verify:
 - [ ] `.design-system/pages/` directory contains the generated files
 - [ ] User has been shown where to find the files
 - [ ] Before/after collage saved to `.design-system/collages/` (if user confirmed final variant)
+- [ ] Intermediate artifacts (SVGs, draft HTMLs) cleaned up — only final HTML + collage remain
