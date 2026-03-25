@@ -1,6 +1,6 @@
 ---
 created: 2026-03-25
-status: draft
+status: approved
 type: feature
 size: M
 ---
