@@ -1,5 +1,21 @@
 # Global Preferences
 
+## ⛔ RULE #1: Framework Updates — ONLY `git pull`, NEVER cherry-pick
+
+**This rule has been violated 3 times. Read it carefully.**
+
+When user says "apply framework commit {hash}" or "update framework":
+1. `cd ~/.agents && git pull origin master` — this is the ONLY correct command.
+2. Done. Return to project work.
+
+**What is FORBIDDEN — do NOT do ANY of these:**
+- `git cherry-pick {hash}` in the project repo ❌
+- `git fetch methodology && git cherry-pick` ❌
+- Copying files from `~/.agents/` to `{project}/.agents/` ❌
+- Any attempt to merge framework history into project history ❌
+
+**Why:** `~/.agents/` and `{project}/` are SEPARATE git repos with DIFFERENT histories. Cherry-pick WILL cause merge conflicts in files that don't belong to the project (like `skills/feature-execution/SKILL.md`). The project reads skills from `~/.agents/` at runtime — pulling there is enough.
+
 ## Instruction Tone: Strict by Default
 
 These instructions are written for Codex agents that default to the laziest interpretation of any rule. Therefore:
@@ -13,13 +29,7 @@ These instructions are written for Codex agents that default to the laziest inte
 - **NEVER search for, read, or run helper scripts** (dispatch-skill.ps1, init-feature-folder.sh, smoke-codex-compat.ps1, etc.). Legacy scripts exist in `~/.agents/shared/scripts/` but are DEPRECATED and BROKEN — they require `/bin/bash` which is unavailable in most Windows environments. Their logic is already inlined in SKILL.md files. If you catch yourself about to run a `.sh` or `.ps1` from `shared/scripts/` — STOP. Read the SKILL.md instead — it has the same steps written as inline instructions. Use your built-in tools (mkdir, file-write, file-copy) to create folders and files.
 - **Shim (proxy) skills** redirect to another skill. This is normal, not an error. When a shim skill (e.g., `decompose-tech-spec` → `task-decomposition`) says "Read and follow {target SKILL.md}" — load that file and execute its instructions step by step. Do NOT improvise a replacement procedure. Do NOT complain about the redirect — just follow it.
 - If a SKILL.md references `$AGENTS_HOME` — resolve it to the actual agents home path (`~/.agents/`) and read the file.
-- **⛔ TWO SEPARATE GIT REPOS — NEVER mix them up. NEVER cherry-pick between them.**
-  - `~/.agents/` — the **global methodology framework**. Its own git repo with its own remote (ai-dev-methodology-codex). Skills, agents, templates live here.
-  - `{project}/` — the **project repo**. Has its own git history, its own remote.
-  - `{project}/.agents/` — project-local knowledge. Part of the PROJECT repo, NOT the framework.
-  - **To update the framework in a project:** `cd ~/.agents && git pull origin master`. That's it. Do NOT cherry-pick, merge, or copy commits between repos. They have completely different git histories.
-  - **Framework commit hashes (from ~/.agents/) do NOT exist in the project repo.** If user says "apply commit ea353f5" and it's a framework commit — run `cd ~/.agents && git pull origin master`, NOT `git cherry-pick` in the project.
-  - **How to tell which repo a commit belongs to:** run `cd ~/.agents && git log --oneline | grep {hash}`. If found — it's a framework commit. If not found — check the project repo.
+- **Two repos** — see RULE #1 at the top. `~/.agents/` = framework (update via `git pull`). `{project}/` = project. `{project}/.agents/` = project-local knowledge (part of project repo, NOT framework).
 - **Integrity check — applies to ALL .md files, not just SKILL.md.** Before reading or executing ANY `.md` file (AGENTS.md, task files, tech-spec, user-spec, session-plan), scan for git conflict markers (`<<<<<<<`, `=======`, `>>>>>>>`). If found — do NOT proceed. Tell user: "File {path} has unresolved merge conflicts. Resolve them before continuing." This includes the project's own `AGENTS.md` — if it has conflict markers, the agent's instructions are ambiguous and execution MUST stop.
 
 ## Recovery After Interruption
