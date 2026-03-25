@@ -19,7 +19,7 @@ Create a design system for a web project through scanning existing styles and st
 1. Verify the project is web-based — look for HTML, CSS, SCSS, JS, TS, JSX, TSX, Vue, or Svelte files. If none found — stop and explain: "This skill works with web projects only (HTML/CSS/JS/TS/React/Vue/Svelte). Your project does not appear to be a web project."
 2. Check if `.design-system/` directory already exists:
    - If yes — ask user: **(a)** update existing tokens, **(b)** recreate from scratch, **(c)** cancel
-   - If "update" — load existing `tokens.json` and use as defaults in interview
+   - If "update" — load existing `tokens.json` and use as defaults in interview. Also read `.design-system/taste-profile.md` (if exists) — use saved preferences (liked/disliked decisions, style tendencies) as context for proposing updates. If file is missing — continue without it.
    - If "recreate" — proceed as if no DS exists
    - If "cancel" — stop
 
@@ -53,9 +53,13 @@ Propose-first approach: suggest concrete values based on scan results, user conf
 
 ### 2.1 Project Context and Mood
 
-Ask: "Who is this project for? What feeling should it evoke?" Offer examples: professional, playful, calm, bold, luxurious, minimal.
+1. Определить категорию проекта (landing / webapp / admin / portfolio) и прочитать соответствующую секцию `## {Category}` из [designer-experience.md](../../shared/design-references/designer-experience.md) — учесть накопленные предпочтения, удачные решения и антипаттерны при формулировке предложений. Если секция пуста или файл отсутствует — продолжить без неё.
 
-Based on user's answer, propose a color mood using the emotional color map from [color-psychology.md](../../shared/design-references/color-psychology.md) — match the described emotion to a color combination from the summary table (e.g., "calm spa" → dusty rose + warm beige + terracotta; "fintech" → dark navy + warm white + copper).
+2. Ask: "Who is this project for? What feeling should it evoke?" Offer examples: professional, playful, calm, bold, luxurious, minimal.
+
+3. Based on user's answer, propose a color mood using the emotional color map from [color-psychology.md](../../shared/design-references/color-psychology.md) — match the described emotion to a color combination from the summary table (e.g., "calm spa" → dusty rose + warm beige + terracotta; "fintech" → dark navy + warm white + copper).
+
+4. После определения настроения — прочитать только соответствующую секцию из [style-profiles.md](../../shared/design-references/style-profiles.md): найти профиль по совпадению mood + category (использовать Quick Lookup таблицу для матчинга), загрузить только эту секцию. Использовать рецепты профиля (типографика, палитра, spacing, характерные приёмы) при формировании предложений в следующих шагах интервью. Если точного совпадения нет — выбрать ближайший подходящий профиль.
 
 ### 2.2 Color Palette
 
@@ -105,6 +109,14 @@ User confirms or adjusts.
 Based on scan results and project type, propose a component list. Common set: button, card, input, badge, alert, navbar. User selects which to include in v1.
 
 After every 2-3 topics — briefly summarize decisions so far.
+
+### Двухслойные описания
+
+При предложении любых решений во время интервью — описывать двумя слоями:
+1. **Человеко-понятный** — образное описание на языке ощущений («тёплая уютная палитра с акцентом на натуральные тона», «чистая геометричная типографика с ощущением лёгкости»).
+2. **Технический** — конкретные значения (hex-коды, font-family, font-weight, px/rem).
+
+Сначала всегда человеко-понятное описание, затем техническое. Это помогает пользователю сначала оценить общее ощущение, а потом проверить детали.
 
 **Checkpoint:** All topics covered: mood, palette, typography, spacing, radii/shadows/breakpoints, components. User confirmed choices. Proceed to Phase 3.
 
@@ -169,3 +181,7 @@ Before finishing, verify:
 - [ ] All file names in `.design-system/` match `/^[a-z0-9-]+$/` (excluding extensions)
 - [ ] `.design-system/README.md` reflects actual contents
 - [ ] User confirmed palette, typography, spacing choices during interview
+- [ ] designer-experience.md был прочитан по категории проекта (или отмечено как пустой/отсутствующий)
+- [ ] style-profile использован: предложения по палитре и типографике учитывают рецепты из соответствующего профиля
+- [ ] taste-profile.md прочитан при update-сценарии (или отмечен как отсутствующий)
+- [ ] Все описания решений двухслойные: сначала образное, затем техническое

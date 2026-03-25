@@ -78,3 +78,27 @@ Review details — in JSON files via links. QA report — in logs/working/.
 - `grep "tokens.json" skills/code-writing/SKILL.md` → found (3 matches)
 - `grep -i "silent\|skip" skills/code-writing/SKILL.md` → found
 - All phases and checkpoints intact (3 phases, 3 checkpoints)
+
+## Task 6: Update design-system-init SKILL.md
+
+**Status:** Done
+**Agent:** init-updater
+**Summary:** Расширен `skills/design-system-init/SKILL.md` тремя новыми шагами: чтение designer-experience.md по категории проекта перед интервью (Phase 2.1, шаг 1), матчинг style-profile по mood+category после определения настроения (Phase 2.1, шаг 4), чтение taste-profile.md при update-сценарии (Phase 0). Добавлены инструкции двухслойных описаний (образное + техническое) и 4 пункта Final Check. Все существующие фазы и чекпоинты сохранены.
+**Deviations:** None
+
+**Verification:**
+- `grep "designer-experience"` → found
+- `grep "style-profiles"` → found
+- `grep "taste-profile"` → found
+- All 5 phases and 5 checkpoints intact, file at 187 lines (under 500 limit)
+
+## Task 7: Update design-generate SKILL.md
+
+**Status:** Done
+**Agent:** generate-updater
+**Summary:** Добавлено чтение taste-profile в Phase 0 (после парсинга tokens.json, с graceful degradation при отсутствии файла), учёт предпочтений в Phase 2 (выбор лейаута по уровню смелости) и Phase 3 (применение цветовых/типографических предпочтений при сборке), инструкция two-layer description в Phase 4, и два пункта проверки в Final Check.
+**Deviations:** None
+
+**Verification:**
+- `grep "taste-profile" skills/design-generate/SKILL.md` → found (5 matches)
+- `grep -c "^## Phase" skills/design-generate/SKILL.md` → 6 (all phases preserved)
