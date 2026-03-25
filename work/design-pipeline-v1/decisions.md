@@ -32,3 +32,39 @@ Review details — in JSON files via links. QA report — in logs/working/.
 - Manual check → OK
 
 -->
+
+## Task 2: Create designer-experience.md
+
+**Status:** Done
+**Agent:** experience-builder
+**Summary:** Создан scaffold-файл `shared/design-references/designer-experience.md` — кросс-проектная база дизайнерского опыта с 4 категориями (Landing, Webapp, Admin, Portfolio). Каждая категория содержит 3 подсекции: Предпочтения, Что работало, Антипаттерны. Файл работает в режиме append-only и совместим с парсингом по `## Category`.
+**Deviations:** None
+
+**Verification:**
+- `grep -c "^## "` → 4 (4 категории)
+- `grep "Антипаттерны"` → found (4 подсекции)
+
+## Task 3: Update design-review SKILL.md
+
+**Status:** Done
+**Agent:** main agent
+**Summary:** Added optional two-layer explanation (why + detail) to design-review's "How to Report" section for non-obvious token matches. The explanation is skipped for exact matches, keeping the skill lightweight. Existing `found X -> use Y` format and 3-recommendation cap preserved.
+**Deviations:** None
+
+**Reviews:** Pending skill-checker review.
+
+**Verification:**
+- `grep -i "non-obvious" skills/design-review/SKILL.md` → found
+- All existing sections intact, file at 120 lines (under 500 limit)
+
+## Task 4: Update code-writing SKILL.md
+
+**Status:** Done
+**Agent:** main agent
+**Summary:** Added conditional DS token integration step at end of Phase 1, step 2 (Read Project Context). When a task touches UI files (.tsx, .vue, .html, .css, .scss) and tokens.json exists — the skill reads tokens and uses CSS variables. Silent skip if tokens.json is missing or invalid, zero overhead for non-UI tasks.
+**Deviations:** None
+
+**Verification:**
+- `grep "tokens.json" skills/code-writing/SKILL.md` → found (3 matches)
+- `grep -i "silent\|skip" skills/code-writing/SKILL.md` → found
+- All phases and checkpoints intact (3 phases, 3 checkpoints)
