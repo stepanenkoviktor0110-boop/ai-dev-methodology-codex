@@ -79,6 +79,20 @@ Review details — in JSON files via links. QA report — in logs/working/.
 - `grep -i "silent\|skip" skills/code-writing/SKILL.md` → found
 - All phases and checkpoints intact (3 phases, 3 checkpoints)
 
+## Task 5: Update design-retrospective SKILL.md
+
+**Status:** Done
+**Agent:** retro-updater
+**Summary:** Добавлена Phase 4.5 (Write Taste Profile & Experience) с полным write path: запись вкусовых предпочтений в `.design-system/taste-profile.md` (latest-wins при конфликтах) и append-only запись обобщённого опыта в `designer-experience.md` по категориям проектов. Phase 3 дополнена двухслойным описанием уроков (human-readable + technical), Phase 5 — секцией вкусового профиля в шаблоне промпта, Self-Verification — 6 новыми пунктами проверки.
+**Deviations:** None
+
+**Verification:**
+- `grep "taste-profile"` → found (12 matches)
+- `grep "designer-experience"` → found (5 matches)
+- `grep "Phase 4.5\|Phase 5"` → both found
+- `grep -i "corrupted\|повреждён"` → found
+- All 5 original phases + checkpoints preserved, file at 241 lines
+
 ## Task 6: Update design-system-init SKILL.md
 
 **Status:** Done
