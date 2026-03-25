@@ -33,6 +33,16 @@ Review details — in JSON files via links. QA report — in logs/working/.
 
 -->
 
+## Task 1: Create style-profiles.md
+
+**Status:** Done
+**Agent:** style-profiler
+**Summary:** Создан справочный файл `shared/design-references/style-profiles.md` с 7 стилевыми профилями (Luxury, Brutalist, Editorial, Minimal, Playful, Corporate, Neo-Retro). Каждый профиль содержит конкретные дизайн-рецепты: типографика с указанием шрифтов и размеров, цветовая палитра с hex-кодами, spacing/layout-параметры и характерные CSS-приёмы. Добавлен седьмой профиль Neo-Retro сверх минимальных 6, т.к. он органично ссылается на принципы из color-principles.md (grège, исторический колорит, инверсия доминанты).
+**Deviations:** Добавлен 7-й профиль Neo-Retro сверх минимальных 6 — расширяет покрытие стилей без избыточности.
+
+**Verification:**
+- `grep -c "^## " shared/design-references/style-profiles.md` → 7
+
 ## Task 2: Create designer-experience.md
 
 **Status:** Done

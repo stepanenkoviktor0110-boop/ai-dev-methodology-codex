@@ -82,6 +82,14 @@ Examples:
 - `found gap: 8px in Card.vue:32 -> use --space-2 (8px) or consider --space-4 (16px) for component spacing`
 - `found font-family: Arial in Header.css:5 -> use --font-heading (Inter, system-ui, sans-serif)`
 
+**Non-obvious matches** (token is not an exact value match): add a brief two-layer explanation after the `->` line — first why the token fits (human-readable), then the technical detail. Example:
+```
+found color #3a82f5 in Card.tsx:9 -> use --color-primary-500
+  why: closest brand primary color (off by 1 in R channel)
+  detail: token value #3b82f6, deltaE < 1
+```
+Skip the explanation when the match is exact.
+
 Prioritization when more than 3 findings:
 1. Colors — highest visual impact
 2. Typography — brand consistency
