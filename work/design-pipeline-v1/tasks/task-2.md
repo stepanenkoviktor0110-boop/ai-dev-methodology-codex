@@ -1,5 +1,5 @@
 ---
-status: planned                    # planned -> in_progress -> done
+status: done                    # planned -> in_progress -> done
 depends_on: []                     # номера задач-зависимостей
 wave: 1                            # волна параллельного выполнения
 skills: [skill-master]             # МАССИВ скиллов для загрузки
