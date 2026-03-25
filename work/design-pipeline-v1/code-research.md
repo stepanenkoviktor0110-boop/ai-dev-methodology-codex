@@ -298,3 +298,262 @@ Else: skip silently (no error, no message).
 Key: calls ONLY design-review, not the full design pipeline.
 
 Pattern for write-code integration: same dual-condition check (tokens.json exists + UI files involved), same silent skip, same minimal overhead.
+
+## 10. Detailed SKILL.md Analysis
+
+## Updated: 2026-03-26
+
+### 10.1 New File Existence Check
+
+None of the three new files exist yet anywhere in the repository:
+- `.design-system/taste-profile.md` — not found (created per-project at runtime)
+- `shared/design-references/designer-experience.md` — not found
+- `shared/design-references/style-profiles.md` — not found
+
+Existing `shared/design-references/` contains only: `color-psychology.md`, `color-principles.md`, `design-tokens.md`, `library-catalog.md`.
+
+No existing SKILL.md references `taste-profile`, `designer-experience`, or `style-profiles` except one incidental mention: `design-retrospective/SKILL.md` line 107 uses the phrase "taste profile" (lowercase, in prose) inside the `design-principles.md` template header — not as a file reference.
+
+### 10.2 design-system-init/SKILL.md (171 lines)
+
+**Phase structure:**
+| Phase | Lines | Header |
+|-------|-------|--------|
+| Frontmatter | 1-11 | `---` YAML block |
+| Title + description | 13-15 | `# Design System Init` |
+| Phase 0: Project Readiness | 17-26 | `## Phase 0: Project Readiness` |
+| Phase 1: Project Scan | 28-48 | `## Phase 1: Project Scan` |
+| Phase 2: Interview | 50-109 | `## Phase 2: Interview` |
+| - 2.1 Project Context and Mood | 54-58 | `### 2.1 Project Context and Mood` |
+| - 2.2 Color Palette | 60-73 | `### 2.2 Color Palette` |
+| - 2.3 Typography | 75-84 | `### 2.3 Typography` |
+| - 2.4 Spacing | 86-93 | `### 2.4 Spacing` |
+| - 2.5 Radii, Shadows, Breakpoints | 94-101 | `### 2.5 Radii, Shadows, Breakpoints` |
+| - 2.6 Components | 103-109 | `### 2.6 Components` |
+| Phase 3: Build | 111-145 | `## Phase 3: Build` |
+| Phase 4: Verify | 147-160 | `## Phase 4: Verify` |
+| Final Check | 162-172 | `## Final Check` |
+
+**Insertion point A — experience + style-profiles reading (before interview):**
+Insert between line 52 and line 54. Current text at boundary:
+
+```
+Line 52: Propose-first approach: suggest concrete values based on scan results, user confirms or adjusts. One topic at a time.
+Line 53: (empty)
+Line 54: ### 2.1 Project Context and Mood
+```
+
+New content goes after line 52 (after "Propose-first approach" sentence, before `### 2.1`). This is where to add steps for reading `designer-experience.md` (by project category) and `style-profiles.md` (for profile matching after mood is determined).
+
+**Insertion point B — style-profile matching (after mood, before palette):**
+Alternative: insert between 2.1 (mood determined) and 2.2 (palette). After line 58, before line 60. Once mood + category are known, match to a style-profile and use its recipes for proposing palette/typography/spacing.
+
+**Insertion point C — taste-profile reading for update flow:**
+Line 22: `- If "update" — load existing tokens.json and use as defaults in interview`. Add: also read `.design-system/taste-profile.md` (if exists) and use accumulated preferences as additional defaults.
+
+**Insertion point D — two-layer description instruction:**
+Add as a general instruction near the top of Phase 2 (after line 52) or as a standalone paragraph before `### 2.1`. Instructs the agent to describe all design proposals in two layers: human-readable first, then technical details.
+
+**Final Check additions (line 162-172):**
+Add checklist items for: style-profile was offered if applicable, experience was consulted if available, two-layer descriptions used.
+
+**Existing references in this file (4):**
+- `../../shared/design-references/color-psychology.md` (line 58)
+- `../../shared/design-references/color-principles.md` (line 70)
+- `references/font-pairing.md` (line 76)
+- `../../shared/design-references/design-tokens.md` (line 115)
+
+### 10.3 design-generate/SKILL.md (206 lines)
+
+**Phase structure:**
+| Phase | Lines | Header |
+|-------|-------|--------|
+| Frontmatter | 1-12 | `---` YAML block |
+| Title + description + flow diagram | 14-28 | `# Design Generate` |
+| Phase 0: Readiness Check | 30-39 | `## Phase 0: Readiness Check` |
+| Phase 1: Parse Request | 41-57 | `## Phase 1: Parse Request` |
+| Phase 2: Select Layout | 59-74 | `## Phase 2: Select Layout` |
+| Phase 3: Assemble & Generate | 76-107 | `## Phase 3: Assemble & Generate` |
+| - 3.1 Assemble page | 78-84 | `### 3.1 Assemble page` |
+| - 3.2 Generate HTML | 86-92 | `### 3.2 Generate HTML` |
+| - 3.3 Generate SVG | 94-99 | `### 3.3 Generate SVG` |
+| - 3.4 Save files | 101-107 | `### 3.4 Save files` |
+| Phase 4: Present & Iterate | 109-144 | `## Phase 4: Present & Iterate` |
+| Phase 5: Before/After Collage | 146-194 | `## Phase 5: Before/After Collage` |
+| Final Check | 196-206 | `## Final Check` |
+
+**Insertion point A — taste-profile reading (Phase 0):**
+Insert between line 37 and line 39. Current text at boundary:
+
+```
+Line 37: 2. Parse tokens into CSS custom properties for use in generated pages (following the mapping pattern from [design-tokens.md](../../shared/design-references/design-tokens.md))
+Line 38: (empty)
+Line 39: **Checkpoint:** tokens.json exists, parses as valid JSON, contains colors/typography/spacing sections.
+```
+
+Add step 3: "Read `.design-system/taste-profile.md` (if exists). Extract aesthetic preferences (color temperature, spacing density, boldness level, anti-patterns). Pass to Phase 2 and Phase 3 as context. If file missing or malformed — proceed without preferences."
+
+The checkpoint on line 39 should be updated to optionally mention taste-profile.
+
+**Insertion point B — two-layer description instruction:**
+Add to Phase 4 (Present & Iterate), around line 111-115. When presenting results and explaining layout/style choices, use two-layer descriptions.
+
+**Final Check additions (line 196-206):**
+Add checklist item: taste-profile was consulted if available.
+
+**Existing references in this file (4):**
+- `../../shared/design-references/design-tokens.md` (line 37)
+- `references/generation-guide.md` (line 61)
+- `references/component-patterns.md` (lines 54, 81)
+- `references/grid-techniques.md` (line 67)
+
+### 10.4 design-review/SKILL.md (111 lines)
+
+**Section structure (no numbered phases):**
+| Section | Lines | Header |
+|---------|-------|--------|
+| Frontmatter | 1-10 | `---` YAML block |
+| Title + description | 12-14 | `# Design Review` |
+| When to Activate | 16-32 | `## When to Activate` |
+| What to Read | 34-43 | `## What to Read` |
+| What to Check | 45-68 | `## What to Check` |
+| - Colors | 49-57 | `### Colors` |
+| - Spacing | 58-61 | `### Spacing` |
+| - Typography | 63-66 | `### Typography` |
+| - Non-DS Custom Properties | 67-68 | `### Non-DS Custom Properties` |
+| How to Report | 70-94 | `## How to Report` |
+| Scope Guard | 96-111 | `## Scope Guard` |
+
+**Insertion point — two-layer description (optional):**
+In "How to Report" section, after line 80 (the `found X in Y -> use Z` format examples). Add optional instruction: for non-obvious replacements (e.g., approximate color match, spacing that is close but not exact), add a brief human-readable explanation of why the suggested token is the right match. This is optional per user-spec: "design-review — опционально, только при неочевидных заменах".
+
+Current text at boundary:
+```
+Line 80: Examples:
+Line 81: - `found color #3B82F6 in Button.tsx:14 -> use --color-primary-500`
+Line 82: - `found gap: 8px in Card.vue:32 -> use --space-2 (8px) or consider --space-4 (16px) for component spacing`
+Line 83: - `found font-family: Arial in Header.css:5 -> use --font-heading (Inter, system-ui, sans-serif)`
+```
+
+Insert after line 83: instruction for optional explanation on non-obvious matches.
+
+**No taste-profile or experience integration needed** — this skill is read-only, lightweight, and explicitly scope-guarded. No changes except the optional two-layer addition.
+
+**Existing references in this file (2):**
+- `../../shared/design-references/design-tokens.md` (line 43)
+- `../../shared/design-references/color-principles.md` (line 56)
+
+### 10.5 design-retrospective/SKILL.md (167 lines)
+
+**Phase structure:**
+| Phase | Lines | Header |
+|-------|-------|--------|
+| Frontmatter | 1-10 | `---` YAML block |
+| Title + description | 12-19 | `# Design Retrospective` |
+| Phase 1: Collect Evidence | 21-36 | `## Phase 1: Collect Evidence` |
+| Phase 2: Identify Patterns | 38-54 | `## Phase 2: Identify Patterns` |
+| Phase 3: Write Lessons | 56-93 | `## Phase 3: Write Lessons` |
+| Phase 4: Promote Principles | 95-124 | `## Phase 4: Promote Principles` |
+| Phase 5: Generate Next-Session Prompt | 126-154 | `## Phase 5: Generate Next-Session Prompt` |
+| Self-Verification | 156-167 | `## Self-Verification` |
+
+**Insertion point A — taste-profile + experience writing (new Phase 4.5):**
+Insert between line 124 and line 126. Current text at boundary:
+
+```
+Line 122: 6. If no rules qualify for promotion — report: "Нет правил для промоушена (ни одно не появилось 3+ раз)."
+Line 123: (empty)
+Line 124: **Checkpoint:** qualifying rules promoted to `design-principles.md`, or reported that none qualify.
+Line 125: (empty)
+Line 126: ## Phase 5: Generate Next-Session Prompt
+```
+
+New Phase 4.5 goes after line 124 (after Phase 4 checkpoint), before line 126 (Phase 5). This phase:
+1. Reads existing `.design-system/taste-profile.md` (if exists)
+2. Extracts aesthetic preferences from session corrections (color temperature, spacing density, boldness, anti-patterns)
+3. Merges with existing preferences (latest wins for conflicts, marks overridden preferences as "пересмотрено")
+4. Writes updated `taste-profile.md`
+5. Determines project category (landing/webapp/admin/portfolio)
+6. Reads relevant section from `shared/design-references/designer-experience.md`
+7. Appends generalizable session learnings to that section (append-only)
+8. If file/section missing — creates it
+
+**Insertion point B — two-layer description instruction:**
+Add to Phase 3 (Write Lessons), after line 80 (the lesson format template). When writing Problem/Cause/Solution text, use human-readable language first, then technical specifics.
+
+**Insertion point C — taste-profile in next-session prompt:**
+Phase 5 prompt structure (lines 130-150): add a section for accumulated preferences from taste-profile.md in the prompt template, between "Накопленные принципы" and "Что было сделано в последней сессии".
+
+**Self-Verification additions (line 156-167):**
+Add checklist items: taste-profile.md created/updated, designer-experience.md updated (if applicable), two-layer descriptions used in lessons.
+
+**Existing references in this file (0):**
+No external reference links. The skill reads only `.design-system/` runtime artifacts.
+
+### 10.6 code-writing/SKILL.md (141 lines)
+
+**Phase structure:**
+| Phase | Lines | Header |
+|-------|-------|--------|
+| Frontmatter | 1-10 | `---` YAML block |
+| Title | 12 | `# Code Writing` |
+| Phase 1: Preparation | 14-47 | `## Phase 1: Preparation` |
+| - 1.1 Parse Requirements | 16-19 | `1. **Parse Requirements**` |
+| - 1.2 Read Project Context | 21-34 | `2. **Read Project Context (Graceful)**` |
+| - 1.3 Analyze & Review Approach | 36-47 | `3. **Analyze & Review Approach**` |
+| Phase 2: Implementation (TDD) | 49-71 | `## Phase 2: Implementation (TDD)` |
+| Phase 3: Post-work | 73-129 | `## Phase 3: Post-work` |
+| Self-Verification | 131-141 | `## Self-Verification` |
+
+**Insertion point — DS token integration (Phase 1.2):**
+Insert after line 34, before line 36. Current text at boundary:
+
+```
+Line 34:    **No project patterns?** Apply baseline from [universal-patterns.md](references/universal-patterns.md) — naming, error handling, structure.
+Line 35: (empty)
+Line 36: 3. **Analyze & Review Approach**
+```
+
+New conditional step goes after line 34 (end of "Read Project Context" section). Add:
+
+```
+   **UI task with design system?** If the task involves UI files (.tsx, .vue, .html, .css, .scss)
+   AND `.design-system/tokens.json` exists in the project root:
+   - Read `tokens.json` — extract CSS custom property names (~500-1000 tokens overhead)
+   - When writing styles, use `var(--token-name)` instead of hardcoded color/spacing/typography values
+   - If `tokens.json` is missing or malformed → skip silently, do not block coding
+```
+
+**Self-Verification additions (line 131-141):**
+Add checklist item: if UI task with DS, tokens were applied (no hardcoded values matching token equivalents).
+
+### 10.7 Shared Design References Format Analysis
+
+All four existing files follow a consistent format that new files (`designer-experience.md`, `style-profiles.md`) must match:
+
+| File | Lines | Language | Structure |
+|------|-------|----------|-----------|
+| color-psychology.md | 324 | Russian | Title + subtitle -> Part I (color profiles by color, each: nature/what it conveys/nuance/contexts) -> Part II (10 combinations, each: feeling/reading/contexts/danger) -> Summary table |
+| color-principles.md | 187 | Russian | Title + subtitle -> 10 numbered principles, each: essence/how it works/nuance/effect, some with CSS code blocks. Star ratings for difficulty. |
+| design-tokens.md | 114 | English | Title -> JSON schema code block -> Naming conventions -> CSS generation code block -> Extraction guide -> Dark mode section |
+| library-catalog.md | 104 | Russian | Title + description -> Sections by type (icons, UI elements, illustrations) -> entries: name, URL, License, Style, Use-cases |
+
+**Pattern for new files:**
+- `designer-experience.md` — Russian, structured by project category. Each category section: preferences, what worked, anti-patterns. Append-only design with dated entries.
+- `style-profiles.md` — Russian, structured by style name. Each profile: core philosophy (1 sentence), specific techniques (concrete values: fonts, spacing ratios, color approaches), contexts where applicable, danger/pitfalls. Quick-lookup table at end mapping mood -> profile.
+
+### 10.8 generation-guide.md Format (first 50 lines)
+
+Located at `skills/design-generate/references/generation-guide.md`. Starts with a table of contents linking to sections: Page Assembly Process, Layout Selection Guide, Basic Layout Patterns, Advanced Grid Patterns, Responsive Behavior, Placeholder Content, HTML Generation, SVG Generation, Device Frames, Iterating on Designs. Contains a selection table mapping request types to layout patterns with basic/advanced categorization.
+
+### 10.9 Summary of All Changes Required
+
+| File | Type | Changes |
+|------|------|---------|
+| `skills/design-system-init/SKILL.md` | MODIFY | +experience reading (Phase 2 top), +style-profile matching (after 2.1), +taste-profile in update flow (Phase 0), +two-layer descriptions, +Final Check items |
+| `skills/design-generate/SKILL.md` | MODIFY | +taste-profile reading (Phase 0), +two-layer descriptions (Phase 4), +Final Check items |
+| `skills/design-review/SKILL.md` | MODIFY | +optional two-layer for non-obvious matches (How to Report section) |
+| `skills/design-retrospective/SKILL.md` | MODIFY | +new Phase 4.5 (taste-profile + experience writing), +two-layer in lessons, +taste-profile in next-session prompt, +Self-Verification items |
+| `skills/code-writing/SKILL.md` | MODIFY | +conditional DS token step (Phase 1.2), +Self-Verification item |
+| `shared/design-references/designer-experience.md` | CREATE | Cross-project experience by category (landing, webapp, admin, portfolio). Russian. Append-only sections. |
+| `shared/design-references/style-profiles.md` | CREATE | 6+ style profiles (luxury, brutalist, editorial, minimal, playful, corporate). Russian. Quick-lookup table. |
