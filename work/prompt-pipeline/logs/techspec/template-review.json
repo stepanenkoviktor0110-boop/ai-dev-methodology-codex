@@ -1,0 +1,72 @@
+{
+  "status": "changes_required",
+  "findings": [
+    {
+      "severity": "minor",
+      "category": "standards",
+      "issue": "Project Knowledge files (architecture.md, patterns.md) not found. Cannot verify file paths and naming patterns against project conventions.",
+      "fix": "Create .claude/skills/project-knowledge/references/architecture.md and patterns.md, or accept that standards compliance check is skipped for this feature."
+    },
+    {
+      "severity": "critical",
+      "category": "tasks",
+      "issue": "Task 8 (Code Audit) has no 'Files to modify' and no 'Files to read' fields. Audit tasks need 'Files to read' to know what to audit.",
+      "fix": "Add 'Files to read' listing all source files created in the feature: src/parser.js, src/state.js, src/writer.js, src/logger.js, workflow/prompt-pipeline.json."
+    },
+    {
+      "severity": "critical",
+      "category": "tasks",
+      "issue": "Task 9 (Security Audit) has no 'Files to modify' and no 'Files to read' fields. Security audit needs explicit file scope.",
+      "fix": "Add 'Files to read' listing all source files: src/parser.js, src/state.js, src/writer.js, src/logger.js, workflow/prompt-pipeline.json."
+    },
+    {
+      "severity": "critical",
+      "category": "tasks",
+      "issue": "Task 10 (Test Audit) has no 'Files to modify' and no 'Files to read' fields. Test audit needs to know which test files to review.",
+      "fix": "Add 'Files to read' listing all test files: src/parser.test.js, src/state.test.js, src/writer.test.js."
+    },
+    {
+      "severity": "critical",
+      "category": "tasks",
+      "issue": "Task 11 (Pre-deploy QA) has no 'Files to modify' and no 'Files to read' fields.",
+      "fix": "Add 'Files to read' with all source and test files, plus user-spec.md and tech-spec.md for acceptance criteria verification."
+    },
+    {
+      "severity": "critical",
+      "category": "tasks",
+      "issue": "Task 12 (Deploy) has no 'Files to modify' and no 'Files to read' fields.",
+      "fix": "Add 'Files to read' listing deployment artifacts: workflow/prompt-pipeline.json, prompts/*.md, templates/*.json. Add 'Files to modify' if deploy scripts are needed."
+    },
+    {
+      "severity": "major",
+      "category": "task_quality",
+      "issue": "Task 12 (Deploy) uses skill 'deploy-pipeline' but has 'Reviewers: none'. Per skills-and-reviewers.md, deploy-pipeline defaults to: code-reviewer, security-auditor, deploy-reviewer.",
+      "fix": "Set reviewers to 'code-reviewer, security-auditor, deploy-reviewer' or explicitly justify why reviewers are skipped."
+    },
+    {
+      "severity": "major",
+      "category": "task_quality",
+      "issue": "Task 2 (Template Configs) creates 12 JSON config files but has no Verify-smoke field. Template configs define project structure and are consumed by prompts and workflow — validation is important.",
+      "fix": "Add Verify-smoke, e.g.: node -e \"const c = require('./templates/landing-page.json'); console.log(c.id, c.stack, c.maxFiles)\" to verify config loads correctly."
+    },
+    {
+      "severity": "major",
+      "category": "verification",
+      "issue": "Task 4 (State Manager) has no Verify-smoke or Verify-user field. State manager handles file I/O and session persistence — this qualifies as external integration.",
+      "fix": "Add Verify-smoke, e.g.: node -e \"const s = require('./src/state'); s.save('/tmp/test-state.json', {id:'test'}); console.log(JSON.stringify(s.load('/tmp/test-state.json')))\""
+    },
+    {
+      "severity": "major",
+      "category": "tasks",
+      "issue": "Task 5 (n8n Workflow — Core Flow) description is 4 sentences but covers a very broad scope: Form Triggers, Code nodes, parser integration, state manager integration, prompt template substitution, AND file generation loop. This is a large task that may benefit from splitting.",
+      "fix": "Consider splitting Task 5 into two tasks: (1) core workflow structure with Form Triggers and step chain, (2) prompt template substitution and file generation loop. Or accept as-is if the workflow JSON is a single artifact."
+    },
+    {
+      "severity": "minor",
+      "category": "structure",
+      "issue": "Dependencies subsection is titled '### Using existing (from project)' instead of the expected '### Using existing'.",
+      "fix": "Rename to '### Using existing' to match template exactly, or keep as-is if the meaning is clear."
+    }
+  ],
+  "summary": "5 critical findings: Tasks 8-12 (Audit Wave, Final Wave) lack required 'Files to read' / 'Files to modify' fields. 4 major findings: Task 12 missing reviewers for deploy-pipeline skill, Tasks 2 and 4 missing Verify-smoke for components with I/O, Task 5 broad scope. Tech-spec structure is solid overall — Decisions, Risks, Architecture, Data Models are well-documented. Fix critical findings (add file fields to audit/QA/deploy tasks) to get approved."
+}

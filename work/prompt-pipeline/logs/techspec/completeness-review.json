@@ -1,0 +1,71 @@
+{
+  "status": "fail",
+  "sources": {
+    "user_spec": true,
+    "tech_spec": true,
+    "tasks": true
+  },
+  "requirements_total": 25,
+  "requirements_covered": 19,
+  "requirements_partial": 4,
+  "requirements_missing": 2,
+  "findings": [
+    {
+      "type": "gap",
+      "source": "user-spec",
+      "requirement": "US-19: Пустая вставка — показывает предупреждение, не переходит к следующему шагу",
+      "detail": "Ни в одном из Implementation Tasks, ни в Architecture нет явного описания обработки пустого ввода в форме. Task 7 упоминает 'кнопку Повторить шаг', но это другой сценарий. Acceptance criteria user-spec прямо требует этого поведения.",
+      "severity": "critical"
+    },
+    {
+      "type": "gap",
+      "source": "user-spec",
+      "requirement": "US-18: При ошибке записи (нет прав, диск полон) — показывает ошибку с путём, уже записанные файлы не удаляются",
+      "detail": "Task 6 описывает запись файлов и создание архива, но не содержит явной стратегии обработки ошибок ввода-вывода. Требование из user-spec (показать ошибку с путём + не удалять уже записанные) нигде в tech-spec не зафиксировано. Feature size M — отсутствие error handling для файловых операций критично.",
+      "severity": "critical"
+    },
+    {
+      "type": "partial",
+      "source": "user-spec",
+      "requirement": "US-22: При выборе 'Начать новый' — предыдущий прогресс удаляется (файлы проекта на диске остаются)",
+      "detail": "Task 7 описывает восстановление сессии в целом, но явно не описывает сценарий удаления state-файла при выборе 'Начать новый'. Особо важное условие — файлы проекта на диске при этом остаются — нигде не зафиксировано. При наивной реализации агент может удалить и state и файлы.",
+      "severity": "major"
+    },
+    {
+      "type": "partial",
+      "source": "tech-spec",
+      "requirement": "US-24: JSON-лог сессии как отдельный артефакт",
+      "detail": "В Data Models лог встроен в session state JSON (поле 'log' внутри того же файла). Однако Task 7 вводит отдельный модуль 'src/logger.js', не описанный в Architecture и не имеющий Data Model. Неясно: лог хранится внутри session state (как в Data Models) или в отдельном файле через logger.js? Это расхождение между Data Models и Implementation Tasks создаёт риск неконсистентной реализации.",
+      "severity": "major"
+    },
+    {
+      "type": "partial",
+      "source": "user-spec",
+      "requirement": "US-24: Лог содержит — итоговую структуру файлов и заглушки (какие были, какие доработаны)",
+      "detail": "Session State Data Model содержит поля 'stubs' и 'backlog', но поле 'completedAt' или отметка о завершении итоговой структуры отсутствует. Также нет поля для отслеживания 'какие заглушки доработаны' — в модели есть только список заглушек, но не их статус (доработана/нет).",
+      "severity": "minor"
+    },
+    {
+      "type": "partial",
+      "source": "user-spec",
+      "requirement": "US-12: 12 шаблонов доступны с названием, описанием и примером, сгруппированы в форме по категориям",
+      "detail": "Template Config JSON содержит поля name, category, description, example — структура корректна. Однако нигде в tech-spec не описано как категории отображаются в форме n8n (группировка). n8n Form Trigger имеет ограниченные возможности группировки опций — этот технический аспект требует уточнения, но не критичен.",
+      "severity": "minor"
+    },
+    {
+      "type": "underengineering",
+      "source": "tech-spec",
+      "requirement": "US-18, US-19: Error handling strategy",
+      "detail": "Feature size M с файловыми операциями, парсингом пользовательского ввода и disk I/O — отсутствие явной стратегии обработки ошибок в Architecture является недостатком. Covered частично только для парсера (Testing Strategy покрывает edge cases) и path traversal. Для file writer и пустого ввода — нет.",
+      "severity": "major"
+    },
+    {
+      "type": "structural_gap",
+      "source": "tech-spec",
+      "requirement": "src/logger.js",
+      "detail": "Task 7 вводит новый модуль 'src/logger.js' который не описан в Architecture (раздел 'What we're building/modifying' перечисляет Parser, State Manager, Archive Generator, но не Logger). Если logger — самостоятельный компонент, он должен быть в Architecture. Если это часть State Manager — нужно убрать отдельный файл из Task 7. Решение отсутствует в секции Decisions.",
+      "severity": "major"
+    }
+  ],
+  "summary": "19/25 требований покрыты полностью, 4 частично, 2 не покрыты (US-18, US-19). Найдено 2 критических gap: отсутствует обработка пустого ввода и стратегия обработки ошибок записи файлов — оба явно упомянуты в acceptance criteria user-spec. Структурная проблема: модуль logger.js введён в Task 7 без отражения в Architecture. Расхождение в Data Models: лог встроен в session state, но задача создаёт отдельный logger модуль."
+}

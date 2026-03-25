@@ -1,0 +1,62 @@
+{
+  "status": "changes_required",
+  "summary": "Checked 14 claims, found 5 mirages (2 critical, 2 major, 1 minor)",
+  "findings": [
+    {
+      "severity": "critical",
+      "type": "missing_pattern",
+      "claim": "tech-spec Decision 1 says: 'n8n does not support dynamic multi-step forms in one trigger' and 'each step = separate Form Trigger with unique webhook URL'",
+      "reality": "n8n has a dedicated Form node (n8n-nodes-base.form) specifically designed for multi-step forms within a single workflow. The correct architecture is: ONE Form Trigger node starts the workflow, then multiple Form nodes create additional form pages. Custom logic nodes can be placed between Form nodes. This is the native n8n way to implement multi-step flows — not multiple Form Triggers.",
+      "source": "tech-spec.md, section Decisions, Decision 1",
+      "fix": "Rewrite the architecture to use 1 Form Trigger + N Form nodes instead of N Form Triggers. Each step is a Form node (not Form Trigger). This changes the fundamental workflow structure: instead of separate webhook URLs per step, there is one entry point and the user progresses through pages sequentially within a single workflow execution."
+    },
+    {
+      "severity": "critical",
+      "type": "missing_pattern",
+      "claim": "tech-spec says zlib (Node.js built-in) can be used as fallback for creating .zip archives: 'встроенный zlib + tar' in Risks table, and '(или встроенный zlib модуля Node.js)' in Dependencies",
+      "reality": "Node.js zlib module only supports gzip/deflate/brotli compression of individual streams. It cannot create .zip archives (ZIP format). zlib creates .gz files, not .zip files. There is no built-in Node.js module for creating ZIP archives. The 'zlib + tar' fallback would produce .tar.gz, not .zip.",
+      "source": "tech-spec.md, section Dependencies and section Risks",
+      "fix": "Remove zlib as a ZIP fallback. Either: (1) commit to archiver as the only solution and document the n8n configuration requirements, or (2) use a shell command 'zip' as the fallback (as also mentioned in Risks), or (3) use .tar.gz format instead of .zip if zlib fallback is needed. Clarify in the spec which format is actually required."
+    },
+    {
+      "severity": "major",
+      "type": "missing_pattern",
+      "claim": "tech-spec Decision 2 says about n8n Static Data: 'ограничен по объёму и привязан к execution' (limited in volume and tied to execution)",
+      "reality": "n8n Static Data (getWorkflowStaticData) persists across production workflow executions — it is NOT tied to a single execution. It is workflow-scoped (global or per-node). The limitation is that it only works in production mode (not during manual test runs) and storing large amounts of data in it is discouraged but not technically limited by a hard cap.",
+      "source": "tech-spec.md, section Decisions, Decision 2",
+      "fix": "Correct the rationale for Decision 2. The valid reasons to prefer JSON file over Static Data are: (1) Static Data does not persist during manual/test executions, making debugging harder; (2) Static Data is harder to inspect/edit manually; (3) storing large text (full spec, generated files) in Static Data is not recommended practice. Remove the incorrect claim about being 'tied to execution'."
+    },
+    {
+      "severity": "major",
+      "type": "missing_dependency",
+      "claim": "tech-spec says Code nodes will use fs.readFileSync to read prompt files and archiver to create ZIP archives, listing fs, path as 'Using existing' and archiver as 'New packages'",
+      "reality": "n8n Code nodes run in a sandbox that blocks require() by default. Using built-in modules (fs, path) requires setting NODE_FUNCTION_ALLOW_BUILTIN=fs,path environment variable on the n8n instance. Using external packages (archiver) requires: (1) setting NODE_FUNCTION_ALLOW_EXTERNAL=archiver, (2) installing the package in n8n's node_modules directory. Neither of these configuration requirements is mentioned in the tech-spec.",
+      "source": "tech-spec.md, section Dependencies and section Decisions (Decision 3)",
+      "fix": "Add a section documenting required n8n configuration: NODE_FUNCTION_ALLOW_BUILTIN=fs,path and NODE_FUNCTION_ALLOW_EXTERNAL=archiver environment variables. Include this in the deploy task (Task 12) as a prerequisite. Also note that this only works on self-hosted n8n, not n8n Cloud."
+    },
+    {
+      "severity": "minor",
+      "type": "missing_pattern",
+      "claim": "tech-spec Architecture diagram shows multiple Form Trigger nodes in the flow: '[Form: New/Resume]', '[Form: paste LLM response]', '[Form: paste validation]', etc., each as separate webhook endpoints",
+      "reality": "With the correct n8n architecture (1 Form Trigger + N Form nodes), these would be Form nodes, not Form Triggers. Each Form node is a page in the multi-step form, not a separate webhook. The flow diagram notation is misleading even if it was intended as shorthand.",
+      "source": "tech-spec.md, section Architecture, 'How it works' diagram",
+      "fix": "Update the flow diagram to distinguish between the initial Form Trigger and subsequent Form nodes. E.g.: '[FormTrigger: New/Resume] -> [Code: load template] -> [Form: paste LLM response] -> [Code: parse spec] -> [Form: paste validation] -> ...'"
+    }
+  ],
+  "stats": {
+    "total_claims_checked": 14,
+    "confirmed": 9,
+    "mirages_found": 5,
+    "verified_claims": [
+      "n8n Form Trigger node exists (n8n-nodes-base.formtrigger)",
+      "n8n Code node exists and supports JavaScript",
+      "npm archiver package exists and creates .zip archives",
+      "Node.js fs module exists (built-in)",
+      "Node.js path module exists (built-in)",
+      "Node.js zlib module exists (built-in, but only gzip/deflate)",
+      "n8n Static Data (getWorkflowStaticData) exists",
+      "n8n supports webhook URLs for form triggers",
+      "n8n Read/Write Files from Disk node exists as alternative to fs"
+    ]
+  }
+}

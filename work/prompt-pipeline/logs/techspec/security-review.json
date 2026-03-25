@@ -1,0 +1,111 @@
+{
+  "status": "changes_required",
+  "summary": {
+    "totalFindings": 10,
+    "critical": 3,
+    "major": 4,
+    "minor": 3
+  },
+  "findings": [
+    {
+      "severity": "critical",
+      "category": "A01: Broken Access Control",
+      "title": "n8n Form Trigger webhooks exposed without authentication",
+      "description": "Each pipeline step is a Form Trigger with a unique webhook URL. The tech-spec does not mention any authentication mechanism (API key, session token, basic auth) on these webhooks. Anyone who discovers or guesses a webhook URL can submit arbitrary LLM responses, manipulate session state, trigger file writes, and download generated archives. n8n Form Triggers are publicly accessible by default.",
+      "location": "Section: Architecture — 'Each Form Trigger is a separate webhook URL'",
+      "impact": "Unauthorized users can inject malicious code into generated projects, overwrite files on VPS, exfiltrate session data, or abuse the pipeline for arbitrary file creation on the server.",
+      "recommendation": "Add authentication to all webhook endpoints. Options: (1) n8n basic auth on Form Trigger nodes, (2) a shared secret query parameter validated in a Code node before each step, (3) IP allowlisting at the reverse proxy level. At minimum, generate a per-session token at step 1 and validate it on all subsequent steps.",
+      "cwe": "CWE-306"
+    },
+    {
+      "severity": "critical",
+      "category": "A03: Injection",
+      "title": "Path traversal via LLM-generated file paths — spec mentions protection but implementation details are insufficient",
+      "description": "The parser receives file paths from user-pasted LLM output (e.g. '=== FILE: ../../etc/crontab ==='). The spec mentions 'path normalization and checking it does not escape outputPath' but does not specify the exact algorithm. Common pitfalls: (1) checking before normalization, (2) not handling URL-encoded sequences (%2e%2e), (3) not handling null bytes, (4) not handling Windows-style paths on Linux (..\\..\\), (5) symlink-based traversal where outputPath itself contains symlinks. Both parser.js and writer.js must enforce this independently (defense in depth).",
+      "location": "Section: Risks — 'Path traversal в путях файлов из ответа LLM'; Task 1: Parser; Task 6: Writer",
+      "impact": "Arbitrary file write on VPS. An attacker (or a jailbroken LLM) could overwrite system files, n8n configuration, SSH keys, or plant a web shell.",
+      "recommendation": "Enforce in both parser and writer: (1) path.resolve(outputPath, filePath), (2) verify resolved path startsWith(path.resolve(outputPath)), (3) reject paths containing null bytes, (4) reject absolute paths, (5) reject paths with '..' segments before normalization as an additional check. Example:\n\nfunction safePath(outputPath, filePath) {\n  if (filePath.includes('\\0')) throw new Error('Null byte in path');\n  if (path.isAbsolute(filePath)) throw new Error('Absolute path rejected');\n  const resolved = path.resolve(outputPath, filePath);\n  if (!resolved.startsWith(path.resolve(outputPath) + path.sep)) {\n    throw new Error('Path traversal detected');\n  }\n  return resolved;\n}",
+      "cwe": "CWE-22"
+    },
+    {
+      "severity": "critical",
+      "category": "A03: Injection",
+      "title": "Arbitrary file write via user-controlled outputPath",
+      "description": "The session state contains 'outputPath' (e.g. '/home/user/projects/coffee-site') which determines where files are written on the VPS. The tech-spec does not specify how this path is set or validated. If the user can supply or influence outputPath via a form field, they can write files anywhere on the filesystem the n8n process can access.",
+      "location": "Section: Data Models — 'outputPath: /home/user/projects/coffee-site'; Task 6: Writer",
+      "impact": "Arbitrary file write on the VPS filesystem. Could overwrite n8n config, system files, or deploy malicious content.",
+      "recommendation": "outputPath must be derived server-side from a fixed base directory + session ID, never from user input. Example: outputPath = path.join(BASE_PROJECT_DIR, sessionId). If a user-provided project name is used, sanitize it to alphanumeric + hyphens only and enforce the base directory constraint.",
+      "cwe": "CWE-73"
+    },
+    {
+      "severity": "major",
+      "category": "A04: Insecure Design",
+      "title": "No input size limits on form submissions",
+      "description": "Users paste full LLM responses into Form Trigger text fields. The spec does not define maximum input sizes. A malicious or accidental submission of extremely large text (hundreds of MB) could exhaust disk space (via state file writes) or memory (during parsing), causing denial of service on the VPS.",
+      "location": "Section: Architecture — Form Trigger paste fields; Task 1: Parser; Task 4: State Manager",
+      "impact": "Denial of service: memory exhaustion crashing n8n, or disk exhaustion preventing other services from operating.",
+      "recommendation": "Enforce input size limits: (1) Configure n8n webhook payload size limits, (2) In the parser Code node, check input length before processing (e.g., max 500KB per response), (3) Limit total session state file size, (4) Limit number of files from decomposition (already partially addressed by maxFiles in template config — enforce it in parser).",
+      "cwe": "CWE-770"
+    },
+    {
+      "severity": "major",
+      "category": "A08: Software and Data Integrity",
+      "title": "No integrity validation of user-pasted LLM responses",
+      "description": "The pipeline trusts that user-pasted text is a genuine LLM response. A user (or attacker with webhook access) can paste arbitrary crafted content that the parser will process as valid files. Combined with insufficient path validation, this becomes a file-write primitive. Even with path validation, arbitrary file content is written to disk without any sanitization.",
+      "location": "Section: Architecture — entire paste-and-parse flow",
+      "impact": "Injection of malicious code into generated projects (e.g., web shells disguised as HTML files, scripts with reverse shells). If the generated project is later deployed, this becomes remote code execution.",
+      "recommendation": "This is partially inherent to the design (copy-paste from LLM). Mitigations: (1) restrict file extensions to those defined in template config's typicalFiles patterns, (2) reject unexpected file types (e.g., .sh, .php, .py if template is HTML/CSS/JS), (3) scan generated file content for obvious malicious patterns (eval, exec, shell commands) as a warning, (4) ensure generated files are never executed on the VPS, only served as static downloads.",
+      "cwe": "CWE-502"
+    },
+    {
+      "severity": "major",
+      "category": "A01: Broken Access Control",
+      "title": "Session state file accessible without authorization",
+      "description": "Session state JSON files stored on disk contain full project specs, generated code, and session logs. The spec does not mention file permissions or access controls. Any process on the VPS (or any user with webhook access) can read/modify any session by knowing or guessing the session ID (UUID).",
+      "location": "Section: Data Models — Session State; Task 4: State Manager",
+      "impact": "Information disclosure of project specs and generated code. Session hijacking by modifying state files. If UUIDs are predictable (v1 instead of v4), enumeration attacks become feasible.",
+      "recommendation": "(1) Use crypto.randomUUID() or uuid v4 for session IDs, (2) set restrictive file permissions (0600) on state files, (3) validate session ownership via a session token stored in the state and passed through the form chain, (4) store state files in a dedicated directory with restrictive permissions.",
+      "cwe": "CWE-732"
+    },
+    {
+      "severity": "major",
+      "category": "A05: Security Misconfiguration",
+      "title": "fs.readFileSync for prompt templates without path restriction",
+      "description": "The spec states 'n8n reads prompt templates via fs.readFileSync'. If the template path is constructed using any user-controlled input (e.g., template ID from form selection), this could be exploited for arbitrary file read. The template ID 'landing-page' could be manipulated to '../../../etc/passwd'.",
+      "location": "Section: Decisions — Decision 3: 'n8n читает их через fs.readFileSync'; Task 5: Workflow",
+      "impact": "Arbitrary file read on VPS: configuration files, SSH keys, n8n credentials, environment variables.",
+      "recommendation": "Validate template ID against a whitelist of known template IDs before constructing file paths. Example:\n\nconst VALID_TEMPLATES = ['landing-page', 'telegram-bot', ...];\nif (!VALID_TEMPLATES.includes(templateId)) throw new Error('Invalid template');\nconst configPath = path.join(TEMPLATES_DIR, `${templateId}.json`);",
+      "cwe": "CWE-22"
+    },
+    {
+      "severity": "minor",
+      "category": "A09: Security Logging and Monitoring",
+      "title": "No security event logging",
+      "description": "The session log captures prompts, responses, and timestamps, but the spec does not mention logging security-relevant events: failed path traversal attempts, invalid template IDs, oversized inputs, malformed markers, repeated failed attempts. Without security logging, attacks go undetected.",
+      "location": "Section: Data Models — log field; Task 7: Session Recovery & Logging",
+      "impact": "Inability to detect and respond to attacks or abuse of the pipeline.",
+      "recommendation": "Add security event logging for: (1) rejected paths (traversal attempts), (2) rejected template IDs, (3) input size limit violations, (4) parse failures, (5) unexpected file extensions. Log to a separate security log file with timestamps and source IPs if available from n8n.",
+      "cwe": "CWE-778"
+    },
+    {
+      "severity": "minor",
+      "category": "A05: Security Misconfiguration",
+      "title": "ZIP archive download served without access control",
+      "description": "The final step provides a download link for the generated .zip archive. The spec does not describe how this link is secured. If the download URL is predictable or lacks authentication, anyone can download generated projects.",
+      "location": "Section: Architecture — '[Form: download link + backlog + session log]'; Task 6: Archive & File Writer",
+      "impact": "Information disclosure of generated project source code to unauthorized parties.",
+      "recommendation": "Serve the archive via a time-limited, token-protected URL. Options: (1) include session token as query parameter in download URL, (2) delete archive after first download, (3) set a short TTL (e.g., 1 hour) and auto-delete via cron.",
+      "cwe": "CWE-552"
+    },
+    {
+      "severity": "minor",
+      "category": "best-practice",
+      "title": "No rate limiting on webhook endpoints",
+      "description": "The spec does not mention rate limiting for Form Trigger webhooks. Without rate limiting, an attacker could flood the pipeline with requests, creating thousands of sessions and filling disk space with state files and generated projects.",
+      "location": "Section: Architecture — Form Trigger webhooks",
+      "impact": "Denial of service via resource exhaustion (disk space, memory, CPU).",
+      "recommendation": "Implement rate limiting at the reverse proxy level (nginx/caddy): limit to 10-20 requests per minute per IP. Also implement a maximum number of concurrent sessions and automatic cleanup of old sessions.",
+      "cwe": "CWE-799"
+    }
+  ]
+}
