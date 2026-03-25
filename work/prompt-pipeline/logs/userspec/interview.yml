@@ -1,0 +1,285 @@
+# Interview Plan for Feature Planning
+# Prompt Pipeline — n8n workflow для пошаговой разработки через copy-paste в LLM
+
+interview_metadata:
+  started: "2026-03-25 12:00:00"
+  last_updated: "2026-03-25 12:30:00"
+  status: "in_progress"
+  can_resume: true
+  current_question_num: 8
+  feature_size: "M"
+
+conversation_history:
+  - question_num: 1
+    timestamp: "2026-03-25 12:00:00"
+    topic: "feature_description"
+    agent_question: |
+      Опиши, что хочешь сделать.
+    user_answer: |
+      Хочу создать приложение, которое реализует весь путь работы по методологии,
+      но без CLI агента, а через любую LLM. Веб-интерфейс с цепочкой промтов,
+      которые переносишь в LLM и получаешь код для копирования.
+      Это на случай когда лимиты заканчиваются, а проект делать надо.
+    summary: "Prompt Pipeline — замена CLI-агента через copy-paste в LLM"
+
+  - question_num: 2
+    timestamp: "2026-03-25 12:05:00"
+    topic: "constraints"
+    agent_question: |
+      Стек, стратегия контекста, формат?
+    user_answer: |
+      Ограничить систему маленьким кругом простых форматов с вариациями простых стеков.
+      Не больше 5-8 файлов в результате, если больше — промт предлагает собрать MVP,
+      остальное в бэклог. ~10 шаблонов.
+    summary: "5-8 файлов лимит, ~10 шаблонов стеков, MVP-first подход"
+
+  - question_num: 3
+    timestamp: "2026-03-25 12:10:00"
+    topic: "templates"
+    agent_question: |
+      Какие стеки поддержать?
+    user_answer: |
+      Лендинги, вебапы, боты, набор из 10 вариантов. Обязательно n8n шаблоны 3-5 штук.
+    summary: "~13 шаблонов: лендинги, вебапы, боты, API, CLI, n8n workflows"
+
+  - question_num: 4
+    timestamp: "2026-03-25 12:15:00"
+    topic: "pivot_to_n8n"
+    agent_question: |
+      n8n может быть самой платформой для Prompt Pipeline?
+    user_answer: |
+      Да, на базе n8n можно реализовать такого костыльного CLI бота.
+    summary: "Пивот: сам Prompt Pipeline = n8n workflow"
+
+  - question_num: 5
+    timestamp: "2026-03-25 12:18:00"
+    topic: "llm_providers"
+    agent_question: |
+      Какие LLM доступны?
+    user_answer: |
+      ChatGPT, DeepSeek, Qwen. Только бесплатные решения через сайт, API не вариант.
+    summary: "Copy-paste через chatgpt.com/deepseek/qwen, без API"
+
+  - question_num: 6
+    timestamp: "2026-03-25 12:20:00"
+    topic: "success_criteria"
+    agent_question: |
+      Критерии успеха — от идеи до рабочего лендинга за 40 минут через copy-paste?
+    user_answer: |
+      Да.
+    summary: "Критерий: от идеи до рабочего проекта быстро через copy-paste"
+
+  - question_num: 7
+    timestamp: "2026-03-25 12:22:00"
+    topic: "testing_strategy"
+    agent_question: |
+      Unit-тесты только на парсер ответов LLM, остальное без тестов?
+    user_answer: |
+      Да.
+    summary: "Unit-тесты только на парсер"
+
+  - question_num: 8
+    timestamp: "2026-03-25 12:25:00"
+    topic: "infrastructure"
+    agent_question: |
+      n8n установлен?
+    user_answer: |
+      На VPS лежит всё.
+    summary: "n8n уже на VPS"
+
+phase1_feature_overview:
+  feature_name:
+    score: 95
+    status: "complete"
+    value: "prompt-pipeline"
+    gaps: ""
+    required: true
+
+  feature_description:
+    score: 90
+    status: "complete"
+    value: "n8n workflow для пошаговой разработки проектов через copy-paste в LLM. Генерирует промты по методологии, пользователь копирует в chatgpt/deepseek/qwen, вставляет ответ обратно, n8n парсит и создаёт файлы."
+    gaps: ""
+    required: true
+
+  work_type:
+    score: 95
+    status: "complete"
+    value: "feature"
+    gaps: ""
+    required: true
+
+  user_problem:
+    score: 90
+    status: "complete"
+    value: "Лимиты Claude Code заканчиваются, а проект делать надо. Нужна альтернатива без CLI-агента, работающая через любую бесплатную LLM."
+    gaps: ""
+    required: true
+
+  target_users:
+    score: 90
+    status: "complete"
+    value: "Только автор — личный инструмент"
+    gaps: ""
+    required: false
+
+  success_criteria:
+    score: 85
+    status: "complete"
+    value: "От идеи до рабочего проекта (5-8 файлов) через copy-paste в бесплатную LLM за одну сессию"
+    gaps: ""
+    required: true
+
+  constraints:
+    score: 85
+    status: "complete"
+    value: "Россия (блокировки API). Только бесплатные LLM через сайт, без API. MVP = 5-8 файлов, остальное в бэклог. ~13 шаблонов стеков. Платформа — n8n на VPS."
+    gaps: ""
+    required: true
+
+  testing_strategy:
+    score: 85
+    status: "complete"
+    value: "Unit-тесты только на парсер ответов LLM (критичный компонент). E2E и интеграционные не нужны."
+    gaps: ""
+    required: true
+
+phase2_user_experience:
+  user_stories:
+    score: 50
+    status: "partial"
+    value: "Пользователь выбирает шаблон → описывает проект → получает промты пошагово → копирует в LLM → вставляет ответ → получает файлы"
+    gaps: "Детальный flow, экраны, навигация между шагами"
+    required: true
+
+  acceptance_criteria:
+    score: 30
+    status: "partial"
+    value: ""
+    gaps: "Конкретный чеклист что должно работать"
+    required: true
+
+  edge_cases:
+    score: 10
+    status: "pending"
+    value: ""
+    gaps: "Что если LLM выдала мусор? Что если пользователь вставил неполный ответ?"
+    required: true
+
+  error_scenarios:
+    score: 10
+    status: "pending"
+    value: ""
+    gaps: "Ошибки парсинга, невалидный код, прерывание посередине"
+    required: true
+
+  verification_strategy:
+    score: 20
+    status: "pending"
+    value: ""
+    gaps: "Как проверить что workflow работает"
+    required: true
+
+  ui_ux_requirements:
+    score: 30
+    status: "partial"
+    value: "n8n формы для ввода"
+    gaps: "Конкретные формы, поля"
+    required: false
+
+  risks:
+    score: 20
+    status: "pending"
+    value: ""
+    gaps: "Риски: качество ответов LLM, размер промтов, потеря контекста"
+    required: true
+
+  technical_decisions:
+    score: 60
+    status: "partial"
+    value: "n8n как платформа, copy-paste через веб-сайты LLM, 5-8 файлов лимит"
+    gaps: "Формат промтов, формат парсинга ответов"
+    required: false
+
+  deploy_approach:
+    score: 85
+    status: "complete"
+    value: "n8n уже на VPS, деплой = импорт workflow"
+    gaps: ""
+    required: false
+
+  manual_user_actions:
+    score: 50
+    status: "partial"
+    value: "Импорт workflow в n8n"
+    gaps: "Нужно ли что-то ещё настраивать?"
+    required: false
+
+phase3_integration:
+  integration_points:
+    score: 40
+    status: "partial"
+    value: "n8n на VPS, файловая система для создания проектов"
+    gaps: "Куда создаются файлы? Доступ к файловой системе VPS?"
+    required: true
+
+  dependencies:
+    score: 70
+    status: "partial"
+    value: "n8n"
+    gaps: ""
+    required: false
+
+  technical_constraints:
+    score: 50
+    status: "partial"
+    value: "Размер промта ограничен контекстным окном LLM"
+    gaps: ""
+    required: false
+
+  data_requirements:
+    score: 30
+    status: "pending"
+    value: ""
+    gaps: "Шаблоны хранятся где? В n8n или на диске?"
+    required: false
+
+  migration_needs:
+    score: 95
+    status: "complete"
+    value: "Нет миграции — новый проект"
+    gaps: ""
+    required: false
+
+phase4_completion:
+  userspec_file: "work/prompt-pipeline/user-spec.md"
+  status: "pending"
+
+decision_rules:
+  required_threshold: 85
+  optional_threshold: 50
+  stop_criteria:
+    - "All required items in current cycle scope score >= 85%"
+    - "Structural: every required item has non-empty value, no TBD, gaps empty or conscious limitations"
+  priority_order:
+    - "Required items with score < 85% (lowest score first)"
+    - "Optional items mentioned by user in context"
+  question_strategy:
+    - "3-4 questions per batch about different gaps"
+    - "Propose solutions, challenge weak answers"
+
+progress:
+  current_phase: "phase2_user_experience"
+  questions_asked: 8
+  last_question: "n8n установлен?"
+  total_required_score: 90
+  total_optional_score: 55
+  completion_estimate: "45%"
+  user_detail_level: "brief"
+
+notes: |
+  - Пивот: с Next.js на n8n workflow
+  - Только бесплатные LLM через сайт (chatgpt, deepseek, qwen)
+  - n8n уже на VPS
+  - Нужна адаптация промтов из скиллов под plain-text формат
+  - n8n шаблоны (3-5 штук) входят в список шаблонов проектов
