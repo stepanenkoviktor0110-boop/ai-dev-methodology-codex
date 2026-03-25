@@ -1,0 +1,230 @@
+interview_metadata:
+  started: "2026-03-25 12:00:00"
+  last_updated: "2026-03-25 12:30:00"
+  status: "in_progress"
+  can_resume: true
+  current_question_num: 9
+  feature_size: "M"
+
+conversation_history:
+  - question_num: 1
+    timestamp: "2026-03-25 12:05:00"
+    topic: "feature_description, user_problem, success_criteria"
+    agent_question: |
+      Batch 1: Предложил разбиение на 3 модуля (A: профиль вкуса, B: улучшение ретроспективы, C: интеграция write-code).
+      Спросил про конкретные боли MVP и критерии успеха.
+    user_answer: |
+      1. Согласен с разбиением
+      2. Просто пока не тянет на классного дизайнера, но всё впереди
+      3. Да, критерий "после 3 сессий предлагает из предпочтений" подходит
+    summary: "Разбиение на 3 модуля принято. Боль — недостаточное качество дизайна. Критерий — 3 сессии до обучения."
+
+  - question_num: 2
+    timestamp: "2026-03-25 12:10:00"
+    topic: "feature_description, user_problem, success_criteria"
+    agent_question: |
+      Batch 2: Уточнил формат taste-profile (md vs json), конкретные слабости MVP,
+      кросс-проектность опыта.
+    user_answer: |
+      1. Стилевые профили — только если подходят под формат проекта, не все скопом
+      2. Простые варианты предлагает, нет люкса. Тренды описывает непонятно — приходится уточнять
+      3. Учитывать накопленный опыт важно всегда
+    summary: "Контекстный подбор стилей. Две боли: банальные предложения + непонятные описания. Кросс-проектный опыт обязателен."
+
+  - question_num: 3
+    timestamp: "2026-03-25 12:15:00"
+    topic: "feature_description, constraints, integration_points"
+    agent_question: |
+      Batch 3: Предложил designer-experience.md с категориями проектов, понятность описаний
+      через двухслойное объяснение, спросил про тяжесть обработки.
+    user_answer: |
+      Принято. Но не тяжело ли будет обрабатывать? Может выделять категории проектов
+      и по схожим параметрам определять контекст.
+    summary: "Категоризация по типам проектов принята. Читать только релевантную секцию."
+
+  - question_num: 4
+    timestamp: "2026-03-25 12:20:00"
+    topic: "constraints, testing_strategy, feature_size"
+    agent_question: |
+      Batch 4: Бюджет токенов (~1000-1500 overhead), размер M, scenario testing.
+    user_answer: |
+      Делай всё.
+    summary: "Все constraints и решения подтверждены. Пользователь дал зелёный свет на полный цикл."
+
+phase1_feature_overview:
+  feature_name:
+    score: 95
+    status: "complete"
+    value: "design-pipeline-v1"
+    gaps: ""
+    required: true
+  feature_description:
+    score: 90
+    status: "complete"
+    value: "Углубление обучения design pipeline: taste-profile (накопление предпочтений по проекту), designer-experience (кросс-проектный опыт по категориям), style-profiles (стилевые рецепты по контексту), write-code интеграция (чтение токенов при UI-кодировании), правило понятности описаний (двухслойное объяснение)"
+    gaps: ""
+    required: true
+  work_type:
+    score: 95
+    status: "complete"
+    value: "feature"
+    gaps: ""
+    required: true
+  user_problem:
+    score: 90
+    status: "complete"
+    value: "MVP даёт безопасные/банальные дизайн-предложения без люкса. Описания трендов и стилей непонятны пользователю. Агент не запоминает предпочтения между сессиями. Опыт не переносится между проектами."
+    gaps: ""
+    required: true
+  target_users:
+    score: 85
+    status: "complete"
+    value: "Разработчик без дизайнера, использующий AI-агента для визуальной работы"
+    gaps: ""
+    required: false
+  success_criteria:
+    score: 85
+    status: "complete"
+    value: "После 3 сессий design-generate агент предлагает из предпочтений без напоминания. Описания понятны пользователю без уточнений. Кросс-проектный опыт влияет на init нового проекта."
+    gaps: ""
+    required: true
+  constraints:
+    score: 85
+    status: "complete"
+    value: "Token overhead на задачу ~1000-1500. Лёгкая интеграция write-code ~500-1000 токенов. Категоризация experience по типам проектов — читать только релевантную секцию."
+    gaps: ""
+    required: true
+  testing_strategy:
+    score: 85
+    status: "complete"
+    value: "Scenario testing (как MVP). Без integration/E2E — нечего запускать (markdown-only feature)."
+    gaps: ""
+    required: true
+
+phase2_user_experience:
+  user_stories:
+    score: 85
+    status: "complete"
+    value: "А: design-system-init читает experience → предлагает стиль по категории проекта. Б: design-generate читает taste-profile → применяет предпочтения. В: design-retrospective пишет в taste-profile и experience. Г: write-code читает tokens.json при UI-файлах."
+    gaps: ""
+    required: true
+  acceptance_criteria:
+    score: 85
+    status: "complete"
+    value: "taste-profile.md создаётся при init, обогащается ретроспективой. designer-experience.md категоризирован по типам проектов. style-profiles.md содержит контекстные рецепты. write-code читает токены при UI. Описания двухслойные."
+    gaps: ""
+    required: true
+  edge_cases:
+    score: 85
+    status: "complete"
+    value: "Конфликтующие предпочтения между сессиями — latest wins. Новая категория проекта — начать с чистого листа. taste-profile отсутствует — skip. designer-experience пуст — работать без него."
+    gaps: ""
+    required: true
+  error_scenarios:
+    score: 85
+    status: "complete"
+    value: "taste-profile.md повреждён → пересоздать при следующей ретроспективе. designer-experience.md невалидный → warn, работать без него. tokens.json отсутствует при write-code → silent skip."
+    gaps: ""
+    required: true
+  verification_strategy:
+    score: 85
+    status: "complete"
+    value: "Scenario testing: проверить что taste-profile создаётся/обновляется, experience категоризируется, style-profiles подбираются по контексту, write-code читает токены."
+    gaps: ""
+    required: true
+  ui_ux_requirements:
+    score: 0
+    status: "pending"
+    value: ""
+    gaps: "N/A — markdown skills, no UI"
+    required: false
+  risks:
+    score: 85
+    status: "complete"
+    value: "Один проект контаминирует рекомендации другого — митигация через категоризацию. Style-profiles раздувают контекст — митигация через контекстный подбор. taste-profile конфликтует между сессиями — latest wins."
+    gaps: ""
+    required: true
+  technical_decisions:
+    score: 85
+    status: "complete"
+    value: "taste-profile в .design-system/ проекта (md). designer-experience в shared/design-references/ (md, секции по категориям). style-profiles как reference (md). Двухслойные описания: человеческий язык + техническое обоснование."
+    gaps: ""
+    required: false
+  deploy_approach:
+    score: 80
+    status: "complete"
+    value: "git pull на VPS для обновления скиллов"
+    gaps: ""
+    required: false
+  manual_user_actions:
+    score: 80
+    status: "complete"
+    value: "Нет ручных действий — скиллы подхватываются автоматически"
+    gaps: ""
+    required: false
+
+phase3_integration:
+  integration_points:
+    score: 90
+    status: "complete"
+    value: "design-system-init: читает experience + style-profiles при интервью. design-generate: читает taste-profile перед генерацией. design-retrospective: пишет в taste-profile и experience. code-writing: читает tokens.json при UI-файлах (Phase 1.2). Все 4 дизайн-скилла: двухслойные описания."
+    gaps: ""
+    required: true
+  dependencies:
+    score: 90
+    status: "complete"
+    value: "MVP скиллы: design-system-init, design-generate, design-review, design-retrospective. code-writing SKILL.md. shared/design-references/."
+    gaps: ""
+    required: false
+  technical_constraints:
+    score: 85
+    status: "complete"
+    value: "Token overhead ~1000-1500 на задачу. Читать только релевантную секцию experience. Style-profiles подбирать по контексту, не грузить все."
+    gaps: ""
+    required: false
+  data_requirements:
+    score: 85
+    status: "complete"
+    value: "taste-profile.md: секции цвет/типографика/стиль/антипаттерны + уровень смелости. designer-experience.md: секции по категориям проектов (landing, webapp, admin, portfolio). style-profiles.md: рецепты стилей с приёмами."
+    gaps: ""
+    required: false
+  migration_needs:
+    score: 90
+    status: "complete"
+    value: "Нет миграции. Новые файлы создаются при первом использовании. Существующие .design-system/ проектов не затрагиваются до ретроспективы."
+    gaps: ""
+    required: false
+
+phase4_completion:
+  userspec_file: ""
+  status: "pending"
+
+decision_rules:
+  required_threshold: 85
+  optional_threshold: 50
+  stop_criteria:
+    - "All required items in current cycle scope score >= 85%"
+    - "Structural: every required item has non-empty value, no TBD, gaps empty or conscious limitations"
+  priority_order:
+    - "Required items with score < 85% (lowest score first)"
+    - "Optional items mentioned by user in context"
+  question_strategy:
+    - "3-4 questions per batch about different gaps"
+    - "Propose solutions based on PK, not just ask questions"
+
+progress:
+  current_phase: "phase4_completion"
+  questions_asked: 9
+  last_question: "Batch 4 — constraints, size, testing"
+  total_required_score: 88
+  total_optional_score: 82
+  completion_estimate: "85%"
+  user_detail_level: "moderate"
+
+notes: |
+  Context from completed MVP:
+  - Post-MVP v1 plan defined in user-spec.md lines 196-203
+  - MVP had 4 skills + shared references + do-task hook
+  - Feature size M (modifying existing skills, not new architecture)
+  - Key decisions: taste-profile in .design-system/, experience categorized by project type,
+    style-profiles contextual, two-layer descriptions, latest-wins for conflicts
