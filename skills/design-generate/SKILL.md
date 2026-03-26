@@ -152,8 +152,9 @@ Regenerate both HTML and SVG after each iteration.
 ### 4.4 Handle context exhaustion
 
 If the conversation context is running low and further iterations are needed:
-1. Save the current state of all generated files
-2. Generate a continuation prompt the user can paste into a new session:
+1. **Quick Learning (background).** Spawn a subagent to run [quick-learning](../quick-learning/SKILL.md). Pass it: "design session", iteration count, user corrections summary. Do NOT read quick-learning SKILL.md yourself.
+2. Save the current state of all generated files
+3. Generate a continuation prompt the user can paste into a new session:
 
 ```
 Continue design iteration for `.design-system/pages/{name}.html`.

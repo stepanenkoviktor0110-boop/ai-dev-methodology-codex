@@ -189,6 +189,10 @@ Example entry:
 
 **Checkpoint:** taste-profile.md записан/обновлён (или пропущен если нет данных), experience записи добавлены в designer-experience.md (append-only).
 
+## Phase 4.9: Quick Learning (background)
+
+Before generating the next-session prompt, spawn a subagent to run [quick-learning](../quick-learning/SKILL.md). Pass it: "design retrospective", session corrections summary (from Phase 1-2), lessons extracted count. The subagent runs in the **background** — proceed to Phase 5 immediately. When it finishes, show the user its one-line summary. Do NOT read quick-learning SKILL.md yourself.
+
 ## Phase 5: Generate Next-Session Prompt
 
 Generate a self-contained prompt for continuing design work in a new session. The prompt requires zero prior conversation context to be useful.
