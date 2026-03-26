@@ -23,6 +23,8 @@ job_max_runtime_seconds = 3600      # 1 hour for large waves
 
 Before starting, check [lessons-learned.md](references/lessons-learned.md) for known pitfalls (if file exists).
 
+Also read [quick-ref.md](../quick-learning/references/quick-ref.md) — top reasoning patterns from past sessions (~7 lines, if file exists and non-empty).
+
 ## Model Profiles
 
 Use model tiers from [model-profiles.md](../tech-spec-planning/references/model-profiles.md):
