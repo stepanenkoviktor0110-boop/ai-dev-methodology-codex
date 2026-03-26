@@ -79,7 +79,7 @@ Execute a spec-driven task with validation and status tracking.
 
    > **This is a HARD STOP. Do NOT pick up the next task. Do NOT continue to the next session.**
 
-   **a0. Quick Learning.** Before the session report, run the [quick-learning](../quick-learning/SKILL.md) procedure. This takes under 60 seconds — analyze reasoning patterns from this session and write transferable insights to `$AGENTS_HOME/skills/quick-learning/references/reasoning-patterns.md`. Show the user the one-line summary, then proceed to step (a).
+   **a0. Quick Learning (subagent, background).** Spawn a subagent to run [quick-learning](../quick-learning/SKILL.md). Pass it: feature path, current session number, path to decisions.md. The subagent runs in the **background** while you proceed with step (a). When it finishes, show the user its one-line summary. Do NOT read the quick-learning SKILL.md yourself — the subagent loads it independently in its own context.
 
    a. Present session report:
       ```

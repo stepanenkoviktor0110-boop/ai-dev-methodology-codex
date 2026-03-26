@@ -22,7 +22,7 @@ Fast session analysis — extract reasoning patterns, not specific decisions.
 **Output:** entries in `$AGENTS_HOME/skills/quick-learning/references/reasoning-patterns.md`
 **Language:** Entries in Russian (they serve the user community), communication in Russian.
 
-Before starting, check [reasoning-patterns.md](references/reasoning-patterns.md) for existing patterns (if file exists).
+Before starting, check [reasoning-patterns.md](references/reasoning-patterns.md) for existing patterns (if file exists). **Read only the last 30 lines** — enough to check for duplicates without wasting context on the full history.
 
 ## What This Is NOT
 
