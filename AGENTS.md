@@ -1,5 +1,19 @@
 # Global Preferences
 
+## ⛔ RULE #0: Auto-Update Before Any Pipeline Step
+
+**Before running ANY pipeline command** (`/new-user-spec`, `/new-tech-spec`, `/decompose-tech-spec`, `/do-feature`, `/do-task`, `/retrospective`, `/done`), the agent MUST check for methodology updates:
+
+```bash
+cd ~/.agents && git fetch origin master --quiet && git diff HEAD origin/master --stat
+```
+
+- If diff is non-empty → run `git pull origin master` and report: "Методология обновлена: {N} файлов изменено."
+- If diff is empty → proceed silently.
+- If fetch fails (no internet, auth error) → warn user and proceed with current version.
+
+**This check is MANDATORY and runs ONCE per session** (not before every command — just the first pipeline command). After the first check, skip on subsequent commands within the same session.
+
 ## ⛔ RULE #1: Framework Updates — ONLY `git pull`, NEVER cherry-pick
 
 **This rule has been violated 3 times. Read it carefully.**
