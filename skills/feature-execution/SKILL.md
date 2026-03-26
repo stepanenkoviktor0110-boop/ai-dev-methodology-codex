@@ -21,9 +21,7 @@ max_depth = 2                       # worker (depth 1) can spawn reviewer (depth
 job_max_runtime_seconds = 3600      # 1 hour for large waves
 ```
 
-Before starting, check [lessons-learned.md](references/lessons-learned.md) for known pitfalls (if file exists).
-
-Also read [quick-ref.md](../quick-learning/references/quick-ref.md) — top reasoning patterns from past sessions (~7 lines, if file exists and non-empty).
+Before starting, read [quick-ref.md](../quick-learning/references/quick-ref.md) — top reasoning patterns from past sessions (~7 lines, if file exists and non-empty).
 
 ## Model Profiles
 
@@ -160,7 +158,7 @@ If findings exist, spawn a fixer worker (`tier_high`) and re-run only affected a
 ## Phase 3: Wave Transition
 
 1. Verify decisions entries exist and include verification results.
-2. Update tasks `in_progress` -> `done`.
+2. Update tasks `in_progress` -> `done` (or `done_with_concerns` if worker reported concerns — preserve the `concerns:` field from decisions.md entry into task frontmatter).
 3. Commit status/decision updates:
    - **Stage logs/ artifacts explicitly** (they are gitignored by the global `logs/` rule):
      ```bash

@@ -1,21 +1,24 @@
 ---
 name: quick-learning
 description: |
-  Fast meta-analysis of session reasoning patterns. Runs automatically before
-  every session break. Focuses NOT on specific decisions made, but on the LOGIC
-  of decision-making — what reasoning approaches worked, what didn't, and what
-  patterns can improve future work on similar projects.
+  Owner of the unified methodology knowledge system: format, triad structure,
+  similarity check, 4-tier graduation, promotion, and pruning rules.
 
-  Three-tier knowledge system: transit buffer → skill instructions → quick reference card.
+  Two writers feed this system:
+  - quick-learning (this skill) — reasoning patterns from sessions (HOW decisions were made)
+  - retrospective — operational lessons from features (WHAT went wrong and why)
+
+  Both write to the same buffer (reasoning-patterns.md) using the same triad format.
   Signal-gated: skips clean sessions automatically (zero cost).
 
-  Automatic trigger: called by feature-execution and do-task before SESSION END PROTOCOL.
+  Automatic trigger: called by feature-execution, do-task, design-generate (context exhaustion),
+  and design-retrospective (before next-session prompt).
   Manual trigger: "quick learning", "быстрый анализ", "что улучшить в процессе"
 ---
 
 # Quick Learning
 
-Fast session analysis — extract reasoning patterns, not specific decisions.
+**Format owner** for the unified methodology knowledge system. Defines triad structure, similarity check, promotion pipeline, and pruning rules. Both quick-learning and retrospective follow these rules when writing entries.
 
 **Time budget:** Under 60 seconds. This is NOT a full retrospective.
 **Input:** `work/{feature}/decisions.md` + git log of current session
@@ -24,16 +27,17 @@ Fast session analysis — extract reasoning patterns, not specific decisions.
 
 ## What This Is NOT
 
-- NOT a retrospective (that's `/retrospective` — runs after full feature, maps problems to skills)
+- NOT a retrospective (that's `/retrospective` — runs after full feature, analyzes WHAT went wrong)
 - NOT a code review (that's done per-task by reviewers)
-- NOT about WHAT was decided — it's about HOW decisions were reached
+- quick-learning focuses on HOW decisions were reached; retrospective focuses on WHAT problems occurred
+- Both write to the same buffer using the same format defined here
 
 ## Design: TRIZ-Optimized
 
 Four contradictions resolved via TRIZ principles:
 
 1. **Signal gate** (TRIZ-15: Dynamicity) — don't analyze by schedule, analyze by signal. No signals = skip immediately, zero token cost.
-2. **Write-only subagent** (TRIZ-2: Extraction) — the subagent ONLY writes patterns. It never reads the full buffer. Reads last 30 lines for dedup only. Application of patterns happens through promoted instructions already in skills.
+2. **Write-only subagent** (TRIZ-2: Extraction) — the subagent ONLY writes patterns. It never reads the full buffer. Reads triad-index.md (~30 lines) for dedup only. Application of patterns happens through promoted instructions already in skills.
 3. **Three-tier graduation** (TRIZ-1: Segmentation + TRIZ-10: Prior action) — raw buffer → skill instructions → quick reference card. Each tier is smaller and cheaper to read than the previous.
 4. **Scope segmentation** (TRIZ-1: Segmentation) — universal patterns (always apply) vs situational (context-matched). Different read cost, different application rules.
 
@@ -48,6 +52,14 @@ Check 3 binary signals. If ALL are zero — **skip entirely** with summary "Clea
 | Fix rounds | `git log --oneline -20` — count `fix:` commits | Something went wrong and was corrected |
 | Scope change | `decisions.md` — any deviation, unplanned work, changed approach | Plan didn't survive contact with reality |
 | Recovery event | `git log` — rollbacks, retries, blocked→unblocked | A non-obvious recovery path was found |
+
+**For design sessions** (called from design-generate or design-retrospective), use design-specific signals:
+
+| Signal | How to check | Meaning |
+|--------|-------------|---------|
+| Iteration rounds | Count user feedback cycles in session | Multiple rounds = initial approach missed the mark |
+| Taste correction | User changed color/font/spacing after proposal | Proposal didn't match user's aesthetic sense |
+| Layout rework | User rejected layout and asked for different one | Wrong layout pattern selected for the content |
 
 **If at least 1 signal is present → proceed to Step 2.**
 
@@ -84,6 +96,8 @@ Each pattern is decomposed into a **trigger → action → goal** triad. Two pat
 | **Near** | Same goal, different action (or same action, different goal) | **Merge**: keep the more actionable wording, combine triggers, increment `Seen`. |
 | **Distinct** | Different goal | Add as new entry. |
 
+**Mechanical pre-filter:** if the Goal of a new triad shares 3+ content words (nouns/verbs, ignoring stop-words) with an existing Goal — treat it as a Near match candidate and verify manually. This reduces reliance on subjective judgment.
+
 **Examples of SAME (exact or near):**
 
 ```
@@ -119,7 +133,7 @@ When merging, keep the **most general trigger** and the **most actionable wordin
 **Pattern:** {the transferable reasoning approach — 1-2 sentences, imperative}
 **Scope:** {universal | situational}
 **Situation:** {only for situational — when this applies}
-**Category:** {sequencing | information-gathering | problem-decomposition | scope-management | recovery | communication | tool-selection}
+**Category:** {sequencing | information-gathering | problem-decomposition | scope-management | recovery | communication | tool-selection | design-taste | design-process | design-iteration}
 ```
 
 **Scope rules:**
@@ -129,8 +143,18 @@ When merging, keep the **most general trigger** and the **most actionable wordin
 **Writing rules:**
 - Must be actionable — a concrete instruction, not vague advice.
 - Must be non-obvious — "write tests" is obvious. "Run smoke before spawning reviewers" is not.
-- Max 2 entries per session.
+- Max 2 entries per session (retrospective allows max 3 per feature — larger scope).
 - **Every entry MUST have a Triad field** — this is the key for similarity matching.
+
+### Step 3.5: Pruning Check (5 sec)
+
+After writing, count rows in `triad-index.md`. If more than 25 rows:
+
+1. Remove `Seen: 1` entries with date older than 30 days — from both `triad-index.md` and `reasoning-patterns.md`.
+2. Merge similar entries (same goal, different wording) — combine triggers, keep most actionable wording.
+3. Remove entries contradicted by later experience.
+
+This step is **mandatory** for both quick-learning and retrospective. It is the only mechanism that keeps the buffer bounded.
 
 ### Step 4: Summary (5 sec)
 
@@ -151,9 +175,9 @@ Tier 0: Triad Index                 Tier 1: Transit Buffer         Tier 2: Skill
 triad-index.md                      reasoning-patterns.md          {skill}/SKILL.md               quick-ref.md
 ━━━━━━━━━━━━━━━━━━━━━               ━━━━━━━━━━━━━━━━━━━━━          ━━━━━━━━━━━━━━━━━━━━━          ━━━━━━━━━━━━━━━━━━━━━
 1-line summaries of all triads      Full entries with context       Promoted patterns (Seen ≥ 3)   Top 5-7 one-liners
-~1 line per pattern (max 20)        Seen counter, scope, category   Permanent, loaded by skill     Loaded at session START
+~1 line per pattern (max 30)        Seen counter, scope, category   Permanent, loaded by skill     Loaded at session START
 Read: ALWAYS (for similarity)       Read: only on merge/promote     Read: by skill itself          Read: 7 lines max
-Written: on every add/merge         Written: on new insight         Written: at promotion          Auto-generated
+Writers: quick-learning + retro     Writers: quick-learning + retro Written: at promotion          Auto-generated
 ```
 
 ### Tier 0: Triad Index (the similarity engine)
@@ -174,8 +198,8 @@ Format:
 **Rules:**
 - Updated on every write, merge, or promotion.
 - When a pattern is promoted (Seen ≥ 3) — remove its row from the index.
-- The subagent reads triad-index.md (~20 lines) instead of reasoning-patterns.md (~200+ lines) for similarity matching.
-- After finding a match in the index, the subagent edits the corresponding entry in reasoning-patterns.md by row number.
+- The subagent reads triad-index.md (~30 lines) instead of the full reasoning-patterns.md for similarity matching.
+- After finding a match in the index, the subagent locates the corresponding entry in reasoning-patterns.md by matching its title (`### date feature: title`).
 
 ### Tier 1 → Tier 2: Promotion (when Seen reaches 3)
 
@@ -190,6 +214,9 @@ Format:
 | recovery | feature-execution |
 | communication | feature-execution |
 | tool-selection | code-writing |
+| design-taste | design-system-init |
+| design-process | design-generate |
+| design-iteration | design-retrospective |
 
 2. Add the pattern as a permanent instruction in the target skill's SKILL.md (1-2 lines, imperative).
 3. **Remove the entry from reasoning-patterns.md.**
@@ -214,7 +241,9 @@ This file is loaded by feature-execution at **session start** (Phase 1). Cost: ~
 
 **When to regenerate:** every time a universal pattern is promoted to Tier 2. Read all promoted universal patterns from skill SKILL.md files, pick top 7 by impact, rewrite quick-ref.md.
 
-### Pruning (when buffer exceeds 20 entries)
+### Pruning
+
+Pruning is executed by Step 3.5 (above) after every write. Trigger: triad-index exceeds 25 rows. Rules:
 
 1. Merge similar patterns (same insight, different wording).
 2. Remove `Seen: 1` entries older than 30 days — they didn't recur, noise.

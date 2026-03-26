@@ -35,7 +35,7 @@ Run retrospective skill to extract lessons learned from the feature process:
 
 1. Read and execute `$AGENTS_HOME/skills/retrospective/SKILL.md`
 2. Pass feature path to the skill
-3. Wait for completion — lessons will be written to relevant skills' `references/lessons-learned.md`
+3. Wait for completion — lessons will be written as triad entries to `$AGENTS_HOME/skills/quick-learning/references/reasoning-patterns.md`
 
 ## Step 5: Update Project Knowledge
 
