@@ -239,7 +239,7 @@ max_depth = 2       # worker (depth 1) can spawn reviewer (depth 2)
 | Execution | code-writing, feature-execution, pre-deploy-qa, post-deploy-qa | code-researcher |
 | Quality | code-reviewing, security-auditor, test-master | code-reviewer, security-auditor, test-reviewer, prompt-reviewer |
 | Validation | — | userspec-quality-validator, userspec-adequacy-validator, tech-spec-validator, skeptic, completeness-validator, task-validator, reality-checker |
-| Meta | methodology, retrospective, documentation-writing, skill-master | documentation-reviewer, deploy-reviewer, infrastructure-reviewer, skill-checker |
+| Meta | methodology, retrospective, quick-learning, documentation-writing, skill-master | documentation-reviewer, deploy-reviewer, infrastructure-reviewer, skill-checker |
 
 For full details on any skill, read its `SKILL.md` directly:
 ```

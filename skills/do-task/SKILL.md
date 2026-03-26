@@ -79,6 +79,8 @@ Execute a spec-driven task with validation and status tracking.
 
    > **This is a HARD STOP. Do NOT pick up the next task. Do NOT continue to the next session.**
 
+   **a0. Quick Learning.** Before the session report, run the [quick-learning](../quick-learning/SKILL.md) procedure. This takes under 60 seconds — analyze reasoning patterns from this session and write transferable insights to `$AGENTS_HOME/skills/quick-learning/references/reasoning-patterns.md`. Show the user the one-line summary, then proceed to step (a).
+
    a. Present session report:
       ```
       ## Отчёт по сессии {N} из {total}

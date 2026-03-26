@@ -83,6 +83,10 @@ This rule overrides `max_threads` in config.toml. Even if config says `max_threa
 - Границы сессий определяются автоматически из `session-plan.md` (генерируется при `/decompose-tech-spec`). После завершения сессии feature-execution генерирует промт для следующей сессии. Не запускать следующую сессию автоматически.
 - Сначала искать ответы в документации проекта (project knowledge, backlog, code-research, skills), не спрашивать пользователя то, что можно найти самостоятельно.
 
+## Quick Learning — Before Every Session Break
+
+Before every session end (in `/do-feature` and `/do-task`), the [quick-learning](skills/quick-learning/SKILL.md) procedure runs automatically. It takes under 60 seconds and extracts meta-level reasoning patterns (not specific decisions — those go to retrospective). Insights are written to `$AGENTS_HOME/skills/quick-learning/references/reasoning-patterns.md` so all methodology users benefit. This is already wired into feature-execution and do-task — no manual invocation needed.
+
 ## Session End Protocol — MANDATORY
 
 After completing ANY pipeline step (`/new-user-spec`, `/new-tech-spec`, `/decompose-tech-spec`, `/infrastructure-setup`, `/do-feature` session, `/do-task`, `/retrospective`, `/done`), you MUST end with this exact block:

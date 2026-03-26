@@ -177,6 +177,8 @@ If findings exist, spawn a fixer worker (`tier_high`) and re-run only affected a
 
 > **This is a HARD STOP. Do NOT continue to the next session. Do NOT start the next wave.**
 
+**Step 0: Quick Learning.** Before the session report, run the [quick-learning](../quick-learning/SKILL.md) procedure. This takes under 60 seconds — analyze reasoning patterns from this session and write transferable insights to `$AGENTS_HOME/skills/quick-learning/references/reasoning-patterns.md`. Show the user the one-line summary, then proceed to Step 1.
+
 **Step 1: Session Report.** Present to user:
 
 ```
