@@ -1,4 +1,6 @@
-# AI-First Development Methodology v1.3 — Codex Version
+# AI-First Development Methodology v1.4 — Codex Version
+
+[Русская версия](README.ru.md)
 
 Structured AI-First development methodology for [OpenAI Codex CLI](https://github.com/openai/codex). Every feature goes through a spec-driven pipeline with automated validators and quality gates at each stage.
 
@@ -259,6 +261,13 @@ Skills are resolved directly from SKILL.md files — no dispatcher scripts neede
 Evolved fork of [molyanov-ai-dev](https://github.com/pavel-molyanov/molyanov-ai-dev) by Pavel Molyanov (MIT License).
 
 ## Changelog
+
+### v1.4 — Unified Knowledge System (2026-03-27)
+
+- **Unified knowledge system** — single reasoning-patterns.md buffer with triad-based dedup instead of scattered lessons-learned.md files
+- **Pruning trigger** — automatic cleanup when >25 entries in triad-index
+- **Mechanical pre-filter** — 3+ content words in Goal = Near match candidate (reduces subjective judgment)
+- **Design categories** — design-taste, design-process, design-iteration in retrospective and quick-learning
 
 ### v1.3 — Battle-Tested on Real Project (2026-03-24)
 
