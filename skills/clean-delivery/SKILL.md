@@ -89,7 +89,7 @@ git log --all --format='%H %s' | grep -iE 'wave [0-9]|session.plan|draft\(techsp
 
 Detect source directories dynamically:
 ```bash
-SOURCE_DIRS=$(find . -maxdepth 2 -type f \( -name '*.py' -o -name '*.ts' -o -name '*.js' -o -name '*.tsx' -o -name '*.jsx' -o -name '*.go' -o -name '*.rs' -o -name '*.java' \) \
+SOURCE_DIRS=$(find . -type f \( -name '*.py' -o -name '*.ts' -o -name '*.js' -o -name '*.tsx' -o -name '*.jsx' -o -name '*.go' -o -name '*.rs' -o -name '*.java' \) \
   -not -path '*/node_modules/*' -not -path '*/.git/*' -not -path '*/venv/*' -not -path '*/__pycache__/*' \
   | xargs -I{} dirname {} | sort -u)
 ```
@@ -137,15 +137,15 @@ work/
 ### 3.2 Remove Pipeline Artifacts from Git Index
 
 ```bash
-git rm -r --cached .claude/ 2>/dev/null
-git rm --cached CLAUDE.md 2>/dev/null
-git rm -r --cached work/ 2>/dev/null
-git rm --cached .pytest_cache/README.md 2>/dev/null
+git rm -r --cached --ignore-unmatch .claude/ 2>/dev/null
+git rm --cached --ignore-unmatch CLAUDE.md 2>/dev/null
+git rm -r --cached --ignore-unmatch work/ 2>/dev/null
+git rm --cached --ignore-unmatch .pytest_cache/README.md 2>/dev/null
 ```
 
-Commit:
+Commit (only if there are staged changes):
 ```bash
-git commit -m "chore: update gitignore"
+git diff --cached --quiet || git commit -m "chore: update gitignore"
 ```
 
 ### 3.3 Clean Code Comments
@@ -167,7 +167,11 @@ Detect all branches:
 BRANCHES=$(git branch --format='%(refname:short)')
 ```
 
-Build refs list: `refs/heads/branch1 refs/heads/branch2 ...`
+Build refs list from detected branches:
+```bash
+REFS=$(echo "$BRANCHES" | sed 's|^|refs/heads/|' | tr '
+' ' ')
+```
 
 ```bash
 git filter-repo --message-callback '
@@ -276,7 +280,7 @@ If `deploy.sh`, `.github/workflows/`, `Dockerfile`, or similar CI/CD config exis
 
 This skill is safe to run multiple times:
 - .gitignore additions check for duplicates before appending
-- `git rm --cached` on untracked files is a no-op
+- `git rm --cached --ignore-unmatch` on untracked files is a no-op
 - filter-repo on already-clean history produces no changes
 - Verification step confirms current state regardless of prior runs
 
