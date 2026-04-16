@@ -8,28 +8,11 @@ description: |
 
 # Do Task
 
+> **CRITICAL:** NEVER generate multiple artifacts without stopping. After EACH artifact: list controversial points, explain simply, WAIT for user decision. Only then proceed.
+
 Execute a spec-driven task with validation and status tracking.
 
-## Step 0: Pre-flight Checks
-
-1. Determine feature path from task file location (`work/{feature}/tasks/{N}.md`).
-2. Check `work/{feature}/logs/session-plan.md` exists and has `status: approved` in frontmatter.
-   - If missing or not approved → **STOP**: "Session plan не утверждён. Сначала `/decompose-tech-spec` и подтверди план сессий."
-3. Check that the requested task belongs to the current session (compare with session-plan.md).
-   - If task is in a future session → **WARN**: "Задача {N} относится к сессии {M}, текущая сессия — {K}. Выполнить досрочно? (да/нет)"
-4. **Codebase readiness:** check that directories from task's "Files to modify" exist (e.g., `src/`, `tests/`, `package.json` or equivalent). If missing → **STOP and redirect**: "Кодовая база не найдена. Сначала запусти `/infrastructure-setup`. После этого вернись к `/do-task`." Do NOT ask user where the code is.
-5. Present scope confirmation before starting:
-
-   ```
-   Задача {N}: {title}
-   Сессия: {session_num} из {total}
-   estimated_loc: ~{loc}
-   Оставшийся LOC бюджет сессии: ~{remaining} из ~1200
-
-   Подтверждаешь запуск? (да/нет)
-   ```
-
-   Wait for explicit **"да"**.
+Before starting, read [quick-ref-do-task.md](../quick-learning/references/quick-ref-do-task.md) — top reasoning patterns for this skill (if file exists and non-empty).
 
 ## Step 1: Read Task
 
@@ -42,13 +25,13 @@ Execute a spec-driven task with validation and status tracking.
 ## Step 2: Execute
 
 1. Load each skill listed in the task (frontmatter `skills: [...]` and "Required Skills" section)
+   - For each skill: read and follow `$AGENTS_HOME/skills/{skill}/SKILL.md`
    - If a skill is not found → warn user, continue with remaining skills
    - If task has no skill (frontmatter `skills: []` or absent) → read the task, execute "What to do" and "Verification Steps" directly. For tasks with user instructions → show the instruction to user, wait for confirmation.
 2. Follow loaded skill workflow
 3. Git commit implementation (code + tests pass): `feat|fix|refactor: task {N} — {brief description}`
-4. **Design review hook** — if `.design-system/tokens.json` exists in the project AND the task changed UI files (`.tsx`, `.vue`, `.html`, `.css`, `.scss`): spawn `design-review` subagent on changed UI files. If either condition is false — skip silently. This hook calls ONLY design-review, not the full design pipeline.
-5. For each reviewer from the task's "Reviewers" section (if present):
-   1. Spawn subagent via spawn_agent tool (agent_type = reviewer name, e.g. `code-reviewer`)
+4. For each reviewer from the task's "Reviewers" section (if present):
+   1. Spawn agent via spawn_agent tool (agent_type = reviewer name, e.g. `code-reviewer`)
    2. Pass: git diff of changes, path to task file, path to tech-spec, path to user-spec
    3. Reviewer loads its own skill automatically (via agent frontmatter `skills:`)
    4. Report is written to the path specified in the task's "Reviewers" section
@@ -71,72 +54,22 @@ Execute a spec-driven task with validation and status tracking.
 4. Git commit: `chore: complete task {N} — update status and decisions`
 5. **Session boundary check** (skip if `work/{feature}/logs/session-plan.md` does not exist):
    Read session-plan.md. Find which session this task belongs to.
+   - If this task is the **last task of current session** (all session's tasks are now `done`):
+     **Quick Learning (subagent, background).** Spawn an agent to read and follow `$AGENTS_HOME/skills/quick-learning/SKILL.md`. Pass it: feature path, current session number, path to decisions.md. The agent runs in the **background** while you proceed. When it finishes, show the user its one-line summary. Do NOT read the quick-learning SKILL.md yourself — the agent loads it independently.
+     Generate next-session prompt from `$AGENTS_HOME/shared/work-templates/session-prompt.md.template`.
+     Save to `work/{feature}/logs/next-session-prompt.md`.
+     Present to user:
+     ```
+     Сессия {N} из {total} завершена.
 
-   **If tasks remain in current session:**
-   Inform user which tasks are left: "В текущей сессии осталось: задачи {list}."
+     Рекомендую начать новую сессию и вставить этот промт:
 
-   **If this task is the last task of current session → SESSION END PROTOCOL (HARD STOP):**
-
-   > **This is a HARD STOP. Do NOT pick up the next task. Do NOT continue to the next session.**
-
-   **a0. Quick Learning (subagent, background).** Spawn a subagent to run [quick-learning](../quick-learning/SKILL.md). Pass it: feature path, current session number, path to decisions.md. The subagent runs in the **background** while you proceed with step (a). When it finishes, show the user its one-line summary. Do NOT read the quick-learning SKILL.md yourself — the subagent loads it independently in its own context.
-
-   a. Present session report:
-      ```
-      ## Отчёт по сессии {N} из {total}
-
-      ### Что сделано
-      - Задача {X}: {краткое описание} ✅
-
-      ### Что не сделано
-      - (если есть)
-
-      ### Проверки и результаты
-      - Тесты: {pass/fail}
-      - Ревью: {раунды, findings}
-
-      ### Риски и замечания
-      - (если есть)
-      ```
-
-   b. **Sync documentation artifacts** (do NOT skip):
-      - Verify `decisions.md` has entries for all tasks completed in this session
-      - Verify all completed task files have `status: done` and checklists checked off
-      - Update `tech-spec.md` checkboxes (`- [ ]` → `- [x]`) for completed tasks
-      - Update `checkpoint.yml` with current state
-      - Git commit: `chore: sync docs for session {N} — decisions, task statuses, tech-spec checkboxes`
-
-   c. Generate next-session prompt from `$AGENTS_HOME/shared/work-templates/session-prompt.md.template`.
-      Save to `work/{feature}/logs/next-session-prompt.md`.
-
-   d. Present handoff:
-      ```
-      Сессия {N} из {total} завершена. Отчёт выше.
-
-      Документация синхронизирована:
-      - decisions.md: записи актуальны
-      - Задачи: статусы обновлены
-      - tech-spec: чеклисты обновлены
-
-      ## Дальше по общему плану
-
-      Следующая сессия: {N+1} из {total} — "{session_title}"
-      Задачи: {task_list} (waves {wave_start}-{wave_end})
-      Estimated LOC: ~{loc}
-      {если последняя — "Это финальная сессия (Audit + QA)."}
-      {если нужно от пользователя — "Требуется от тебя: {что именно}"}
-
-      Скопируй этот промт для старта следующей сессии:
-
-      ---
-      {generated prompt content}
-      ---
-
-      ⚠️ Следующая сессия НЕ начнётся, пока ты явно не запустишь её.
-      ```
-
-   e. Git commit: `chore: complete session {N} — checkpoint and handoff prompt`
-   f. **STOP.** Do not execute any more tasks.
+     ---
+     {generated prompt content}
+     ---
+     ```
+   - If tasks remain in current session: inform user which tasks are left in this session.
+   - If `session-plan.md` does not exist and all tasks in `work/{feature}/tasks/` are `done` → prompt user: "Все задачи выполнены. Запусти `/done` для архивации, затем `/retrospective` для фиксации уроков."
 
 ## Self-Verification
 
@@ -145,5 +78,3 @@ Execute a spec-driven task with validation and status tracking.
 - [ ] decisions.md entry written with reviews and verification results
 - [ ] Git commit created with task reference
 - [ ] Every acceptance criterion from task file is met
-- [ ] Session boundary check performed (if session-plan exists)
-- [ ] If session ended: report + handoff prompt presented, execution stopped

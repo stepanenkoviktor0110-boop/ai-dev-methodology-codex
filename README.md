@@ -1,4 +1,4 @@
-# AI-First Development Methodology v1.4 — Codex Version
+# AI-First Development Methodology v2.0 — Codex Version
 
 [Русская версия](README.ru.md)
 
@@ -97,8 +97,7 @@ After this you'll have:
 /do-feature                    # Step 4: Execute tasks by waves
                                #   ⛔ GATE 3: user confirms session scope + LOC before start
                                #   ⛔ GATE 4: session end → report + handoff prompt + STOP
-/retrospective                 # Step 5: Extract lessons → update skills
-/done                          # Step 6: Update project docs → archive feature
+/done                          # Step 5: Update project docs → archive feature
 ```
 
 Each step has validators and **blocking gates** — no step proceeds without explicit user approval:
@@ -133,8 +132,10 @@ Quick coding with automatic code review. No specs needed.
 | Command | Purpose |
 |---------|---------|
 | `/init-project-knowledge` | Fill project documentation via interview |
-| `/retrospective` | Extract lessons learned, update skills |
+| `/quick-learning` | Extract reasoning patterns (auto at session breaks, manual anytime) |
 | `/done` | Finalize feature, update docs, archive |
+| `/sketch` | Lightweight prototyping without validators |
+| `/pause` | Stop work, save session state for resumption |
 
 ## How It Works
 
@@ -187,7 +188,7 @@ your-project/
 - **Session Handoff** — at session end: structured report (done/not done/checks/risks) + generated prompt for next session. Execution stops until user explicitly starts next session
 - **Checkpoint Recovery** — `checkpoint.yml` persists state; SessionStart hook resumes after compaction
 - **Just-In-Time Context** — agents read only what's needed for current task
-- **Retrospective** — lessons learned embedded back into skills after each feature
+- **Quick Learning** — reasoning patterns auto-extracted at session breaks, embedded into skills via `/skill-trainer`
 
 ### Multi-Agent Architecture
 
@@ -241,7 +242,8 @@ max_depth = 2       # worker (depth 1) can spawn reviewer (depth 2)
 | Execution | code-writing, feature-execution, pre-deploy-qa, post-deploy-qa | code-researcher |
 | Quality | code-reviewing, security-auditor, test-master | code-reviewer, security-auditor, test-reviewer, prompt-reviewer |
 | Validation | — | userspec-quality-validator, userspec-adequacy-validator, tech-spec-validator, skeptic, completeness-validator, task-validator, reality-checker |
-| Meta | methodology, retrospective, quick-learning, documentation-writing, skill-master | documentation-reviewer, deploy-reviewer, infrastructure-reviewer, skill-checker |
+| Meta | methodology, quick-learning, documentation-writing, skill-trainer | documentation-reviewer, deploy-reviewer, infrastructure-reviewer, skill-checker |
+| Utility | sketch, pause, progress | — |
 
 For full details on any skill, read its `SKILL.md` directly:
 ```
@@ -261,6 +263,22 @@ Skills are resolved directly from SKILL.md files — no dispatcher scripts neede
 Evolved fork of [molyanov-ai-dev](https://github.com/pavel-molyanov/molyanov-ai-dev) by Pavel Molyanov (MIT License).
 
 ## Changelog
+
+### v2.0 — Full Sync with Claude Code Source (2026-04-16)
+
+Complete synchronization of all skills with the Claude Code source of truth (v2.0). Every skill updated to latest content with Codex CLI adaptations.
+
+**Skills:**
+- **35 skills total** (was 34): removed `retrospective`, `skill-master`, `skill-test-designer`, `skill-tester`; added `pause`, `progress`, `project-knowledge`, `sketch`, `skill-trainer`
+- **`quick-learning` replaces `retrospective`** — reasoning pattern extraction runs automatically at session breaks and is available as manual `/quick-learning` command
+- **`skill-trainer`** — embeds accumulated triads from quick-learning into target skills as permanent instructions
+- **All skills synced**: CRITICAL rules, Post-Generation Guards, Promoted Patterns, Learned Patterns ported from source
+- **Codex delegation removed** from code-writing (Codex IS the primary agent, not a delegate)
+
+**Methodology:**
+- Pipeline simplified: 6 steps → 5 (retrospective merged into quick-learning auto-trigger)
+- Updated Skills Ecosystem with Utility category (sketch, pause, progress)
+- `.gitignore` updated to exclude Claude Code artifacts
 
 ### v1.4 — Unified Knowledge System (2026-03-27)
 

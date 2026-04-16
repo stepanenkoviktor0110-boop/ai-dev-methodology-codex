@@ -12,6 +12,8 @@ description: |
 
 # Project Planning
 
+**Before starting:** ask once — "Хочешь начать со скетча? `/sketch` — быстрый прототип за 3-5 вопросов, без спеков и валидаторов. Подходит если идея ещё не оформлена или нужен быстрый proof-of-concept. После скетча можно перейти к полному пайплайну или оставить как есть." If user declines → proceed with full interview below.
+
 Conduct adaptive interview → make tech decisions → fill all project documentation in one session.
 
 ## Output Files
@@ -25,27 +27,22 @@ Conduct adaptive interview → make tech decisions → fill all project document
 
 ## Interview Methodology
 
-**Propose-first approach.** For every topic, propose a concrete answer based on what you already know (codebase, user's description, common patterns). The user confirms, adjusts, or rejects — not invents from scratch. Format: "**{Тема}:** предлагаю {вариант}. Причина: {почему}. Подходит / поправишь?"
+**One question at a time.** Ask one question, wait for the answer, then form the next question based on the response.
 
-**NEVER ask open-ended questions.** Wrong: "Какой стек хочешь использовать?" Right: "Предлагаю Next.js + Supabase — у тебя веб-приложение с авторизацией, это покроет и фронт, и бэк, и БД. Подходит?"
+**Build on answers.** If user mentioned a domain — ask domain-relevant follow-ups. If they said something vague — clarify that specific point.
 
-**Human language.** When presenting choices to the user, describe what they will SEE and DO — not technical internals. Wrong: "Unit + интеграционные, без E2E" / "API-режим с backend". Right: "Тесты проверяют логику и связки между частями, но не кликают по интерфейсу" / "Данные подтягиваются автоматически из сервиса". Technical terms go into your reasoning, the choice itself stays in plain language. The user picks a behavior — you translate it into tech decisions.
-
-**One topic at a time.** Propose answer for one topic, wait for response, then next.
-
-**Build on answers.** If user mentioned a domain — propose domain-relevant solutions. If they said something vague — propose a specific interpretation and ask to confirm.
-
-**Confirm understanding.** After 3-5 topics, briefly summarize what you understood. Catches misunderstandings early.
+**Confirm understanding.** After 3-5 questions, briefly summarize what you understood. Catches misunderstandings early.
 
 **Help when stuck.** When user says "not sure" or "don't know":
-1. Propose a default answer with reasoning
-2. If user doesn't like it — offer 2 alternatives with tradeoffs
-3. If still uncertain and optional — mark TBD, move on
-4. If still uncertain and required — break into yes/no choices
+1. Say it's OK
+2. Offer 2-3 common approaches for their type of project
+3. Ask which is closer
+4. If still uncertain and optional — mark TBD, move on
+5. If still uncertain and required — break into simpler sub-questions
 
 **Recount on scope changes.** If user suddenly adds many features or reveals unexpected complexity — stop and recount total scope. Show the updated list, confirm you understood correctly.
 
-**If code exists.** Scan the codebase BEFORE the interview to pre-fill as many answers as possible. Present findings as proposals, not questions.
+**If code exists.** Scan the codebase in parallel with the interview to pre-fill technical decisions and ask more targeted questions.
 
 ## Phase 1: Project Discovery
 
@@ -111,7 +108,7 @@ Move to Phase 3 when:
 
 Documentation goal: someone opens these files and understands the project without reading code. Describe what exists, what it does, and why. Record decisions, operational details (server addresses, deploy procedures, log locations), high-level component overview. Write in prose, link to source files for code details. Each fact lives in one file only.
 
-Use Edit tool to replace template placeholders with real content. Content language: English.
+Edit the file to replace template placeholders with real content. Content language: English.
 
 ### 3.1 Project Knowledge Files
 
@@ -165,7 +162,7 @@ Fix any issues before proceeding.
 
 ### 4.2 Documentation Review
 
-Run `documentation-reviewer` agent (spawn_agent tool, gpt-5.4-mini) on the project. Fix critical and major findings. Minor findings — fix or leave at your discretion.
+Run `documentation-reviewer` spawn_agent (gpt-5.4-mini) on the project. Fix critical and major findings. Minor findings — fix or leave at your discretion.
 
 ### 4.3 Show Files
 

@@ -13,6 +13,8 @@ description: |
 
 # Design Generate
 
+> **CRITICAL:** NEVER generate multiple artifacts without stopping. After EACH artifact: list controversial points, explain simply, WAIT for user decision. Only then proceed.
+
 Generate HTML+SVG page mockups from text descriptions using the project's design system.
 
 ```
@@ -152,7 +154,7 @@ Regenerate both HTML and SVG after each iteration.
 ### 4.4 Handle context exhaustion
 
 If the conversation context is running low and further iterations are needed:
-1. **Quick Learning (background).** Spawn a subagent to run [quick-learning](../quick-learning/SKILL.md). Pass it: "design session", iteration count, user corrections summary. Do NOT read quick-learning SKILL.md yourself.
+1. **Quick Learning (background).** Spawn a spawn_agent (gpt-5.4-mini) to run quick-learning. Pass it: "design session", iteration count, user corrections summary. Do NOT read quick-learning SKILL.md yourself.
 2. Save the current state of all generated files
 3. Generate a continuation prompt the user can paste into a new session:
 
@@ -171,52 +173,9 @@ Open the HTML file, apply the feedback, regenerate HTML+SVG.
 ## Phase 5: Before/After Collage
 
 Triggers when the user confirms the final variant ("да", "этот", "утверждаю", "go", "approved").
+Read [collage-workflow.md](references/collage-workflow.md) for full collage generation + cleanup steps.
 
-### 5.1 Capture "Before"
-
-- If replacing an existing page → take a screenshot of the current version (or ask user to paste one)
-- If designing from scratch → use a solid `var(--color-neutral-200)` rectangle with centered text "No previous design"
-
-### 5.2 Build collage
-
-Generate a single HTML file with diagonal split overlay:
-
-```html
-<div class="collage" style="position:relative; width:100%; max-width:1440px; aspect-ratio:16/9; overflow:hidden">
-  <!-- Bottom layer: After -->
-  <img src="{after-screenshot}" style="width:100%; height:100%; object-fit:cover">
-  <!-- Top layer: Before, clipped diagonally -->
-  <img src="{before-screenshot}" style="position:absolute; inset:0; width:100%; height:100%; object-fit:cover; clip-path:polygon(0 0,100% 0,0 100%)">
-  <!-- Diagonal line -->
-  <div style="position:absolute; inset:0; background:linear-gradient(to bottom right,transparent calc(50% - 1px),white calc(50% - 1px),white calc(50% + 1px),transparent calc(50% + 1px)); pointer-events:none"></div>
-  <!-- Labels -->
-  <span style="position:absolute; top:12%; left:8%; background:rgba(0,0,0,.6); color:#fff; padding:6px 18px; border-radius:4px; font:600 14px/1 system-ui">До</span>
-  <span style="position:absolute; bottom:12%; right:8%; background:rgba(0,0,0,.6); color:#fff; padding:6px 18px; border-radius:4px; font:600 14px/1 system-ui">После</span>
-</div>
-```
-
-Images: embed as base64 data URIs (self-contained file, no external dependencies).
-
-### 5.3 Save
-
-1. Validate name: `/^[a-z0-9-]+$/`
-2. Save to `.design-system/collages/{page-name}-collage.html`
-3. Tell the user: "Collage saved to `.design-system/collages/{page-name}-collage.html` — open in browser to see the diagonal before/after comparison."
-
-**Checkpoint:** collage generated with diagonal clip-path, both images embedded, labels overlaid, file saved.
-
-### 5.4 Cleanup
-
-After the collage is saved, delete intermediate artifacts that were used only for demonstration and iteration:
-
-1. Remove all iteration SVGs: `.design-system/pages/{name}.svg`, `{name}-mobile.svg`, etc.
-2. Remove intermediate HTML previews if the final version has been applied to the actual codebase
-3. Keep only:
-   - `.design-system/collages/{page-name}-collage.html` (before/after comparison)
-   - `.design-system/pages/{name}.html` (final approved version — as reference)
-4. Ask the user: "Промежуточные файлы (SVG, черновики) удалены. Оставлен финальный HTML и коллаж до/после. Ок?"
-
-**Checkpoint:** intermediate artifacts removed, only final HTML + collage remain.
+**Checkpoint:** collage generated, intermediate artifacts cleaned up, only final HTML + collage remain.
 
 ## Final Check
 
@@ -231,3 +190,7 @@ Before finishing, verify:
 - [ ] Intermediate artifacts (SVGs, draft HTMLs) cleaned up — only final HTML + collage remain
 - [ ] Taste-profile прочитан (если `.design-system/taste-profile.md` существует) и предпочтения применены в Phase 2 и Phase 3
 - [ ] Two-layer description сгенерировано и сохранено в `.design-system/pages/{name}.description.md`
+
+## Learned Patterns
+
+**Lazy load:** Read [design-learned-patterns.md](references/design-learned-patterns.md) at Phase 2 start (4 rules: typography, photo positioning, color weight, structure).

@@ -1,19 +1,26 @@
 ---
 description: |
-  Execute feature by orchestrating worker/reviewer waves.
+  Execute feature with team of agents — waves, reviews, commits.
 
   Use when: "выполни фичу", "do feature", "execute feature", "запусти фичу"
 ---
 
 # Do Feature
 
-Read and follow `$AGENTS_HOME/skills/feature-execution/SKILL.md` — it contains the full procedure.
+Execute a full feature using a team of agents.
 
-Do NOT look for helper scripts. Follow the skill phases exactly as written.
+## Step 1: Load Skill
 
-Before starting, verify:
-1. `work/{feature}/tech-spec.md` exists and has `status: approved`
-2. `work/{feature}/tasks/` contains task files
-3. `work/{feature}/logs/session-plan.md` exists and has `status: approved`
+Read and follow `$AGENTS_HOME/skills/feature-execution/SKILL.md`
 
-If any are missing — stop and tell user what's needed.
+## Step 2: Find Feature
+
+1. User provides feature path or name
+2. Read `work/{feature}/tech-spec.md` — verify exists and approved
+3. Read `work/{feature}/tasks/` — verify task files exist
+4. If tech-spec or tasks missing → stop, tell user what's needed
+
+## Step 3: Execute
+
+Follow the loaded feature-execution skill workflow.
+The skill checks `checkpoint.yml` in Phase 1 and handles resume automatically.

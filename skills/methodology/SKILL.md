@@ -72,8 +72,6 @@ The full path from idea to production. Each step has a command, a skill behind i
 
 **Skill:** `tech-spec-planning`
 
-**After completion:** run `/retrospective` to extract lessons from the spec creation process.
-
 ### Step 3: Task Decomposition — `/decompose-tech-spec`
 
 **What:** Break tech-spec into atomic task files.
@@ -147,26 +145,9 @@ Tasks can be code, user-action, deploy, config, or verification. Task nature is 
 
 **Skill:** `feature-execution`
 
-**After completion:** run `/retrospective` to extract lessons from the implementation process.
-
 **Note:** At every session break within `/do-feature` and `/do-task`, the `quick-learning` skill runs automatically (before session end protocol). It extracts meta-level reasoning patterns — not specific technical decisions, but transferable insights about HOW problems were approached. These accumulate in `$AGENTS_HOME/skills/quick-learning/references/reasoning-patterns.md` and benefit all methodology users.
 
-### Step 5: Retrospective — `/retrospective`
-
-**What:** Extract lessons learned from problems encountered during tech-spec creation and implementation.
-
-**Process:**
-- Reads `decisions.md` and git log of the feature
-- Identifies process problems: multiple validation rounds, review fix cycles, scope changes, wrong technical choices
-- Writes lessons as triad entries in `$AGENTS_HOME/skills/quick-learning/references/reasoning-patterns.md`
-- Each entry: Triad + Context + Pattern + Scope + Category
-- Uses triad-based dedup via triad-index.md (same as quick-learning)
-
-**Output:** triad entries in `$AGENTS_HOME/skills/quick-learning/references/reasoning-patterns.md`
-
-**Skill:** `retrospective`
-
-### Step 6: Done — `/done`
+### Step 5: Done — `/done`
 
 **What:** Finalize feature, update project knowledge, archive.
 
@@ -241,7 +222,7 @@ Commit after each step where the repository state is stable and meaningful. Not 
 
 - **Planning stages** (user-spec, tech-spec, tasks): draft commit → validation round commits → approval commit
 - **Single task execution** (do-task): implementation commit (tests pass) → review fix commits (tests pass) → status/decisions commit
-- **Feature execution** (do-feature): teammates commit code + review fixes, lead commits statuses per wave
+- **Feature execution** (do-feature): workers commit code + review fixes, lead commits statuses per wave
 - **Finalization** (done): single commit with PK updates + archive
 
 ### Spec-Driven Development
@@ -306,14 +287,18 @@ Feature execution persists state to `checkpoint.yml` after each wave. A `Session
 | Skill | Purpose |
 |-------|---------|
 | `methodology` | This skill — how the process works |
-| `retrospective` | Extract lessons learned from process problems, embed best practices into skills |
-| `quick-learning` | Fast meta-analysis at session breaks — reasoning patterns, not decisions. Auto-triggered. |
+| `quick-learning` | Fast meta-analysis at session breaks — reasoning patterns, not decisions. Auto-triggered + manual `/quick-learning` |
 | `documentation-writing` | Manage Project Knowledge files |
-| `skill-master` | Create and maintain quality skills |
 | `infrastructure-setup` | Framework init, Docker, pre-commit hooks, testing setup |
 | `deploy-pipeline` | CI/CD pipelines, deployment config, automated deploy |
-| `skill-test-designer` | Design test scenarios for skills |
-| `skill-tester` | Execute skill test scenarios |
+| `skill-trainer` | Embed accumulated triads from quick-learning into target skills as permanent instructions |
+
+### Utility Skills
+| Skill | Purpose |
+|-------|---------|
+| `sketch` | Lightweight prototyping without validators — collect requirements, write code, decide to develop or archive |
+| `pause` | Stop work, capture session state to project docs for resumption |
+| `progress` | Generate AI summary of project progress from local files |
 
 ---
 
@@ -349,7 +334,7 @@ Agents are isolated subprocesses with fresh context. They receive input, do one 
 - `post-deploy-qa` — post-deploy verification on live environment (MCP tools, AVP)
 
 ### Meta
-- `skill-checker` — validates skills against skill-master standards
+- `skill-checker` — validates skills against quality standards
 
 ---
 
@@ -362,12 +347,13 @@ Agents are isolated subprocesses with fresh context. They receive input, do one 
 | `/decompose-tech-spec` | Tech-spec → task files |
 | `/do-task` | Execute single task with quality gates |
 | `/do-feature` | Execute all tasks via agent teams |
-| `/retrospective` | Extract lessons learned, update skills with best practices |
-| `quick-learning` | Auto: fast reasoning analysis at session breaks (not a command — runs automatically) |
+| `/quick-learning` | Extract reasoning patterns — auto at session breaks, manual anytime |
 | `/done` | Update PK, archive feature |
 | `/write-code` | Ad-hoc coding with TDD and reviews |
 | `/init-project` | Initialize new project with template, git, GitHub |
 | `/init-project-knowledge` | Fill all project documentation via project-planning skill |
+| `/sketch` | Lightweight prototyping without validators |
+| `/pause` | Stop work, save session state for resumption |
 
 ---
 
@@ -377,7 +363,7 @@ Agents are isolated subprocesses with fresh context. They receive input, do one 
 `/init-project` → `/init-project-knowledge` (interview + fill all docs) → start features
 
 **New feature:**
-`/new-user-spec` → `/new-tech-spec` → `/decompose-tech-spec` → `/do-feature` or `/do-task` → `/retrospective` → `/done`
+`/new-user-spec` → `/new-tech-spec` → `/decompose-tech-spec` → `/do-feature` or `/do-task` → `/done`
 
 **Ad-hoc coding (no spec):**
 `/write-code`

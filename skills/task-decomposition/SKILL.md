@@ -9,13 +9,15 @@ description: |
 
 # Task Decomposition
 
+> **CRITICAL:** NEVER generate multiple artifacts without stopping. After EACH artifact: list controversial points, explain simply, WAIT for user decision. Only then proceed.
+
 Decompose tech-spec Implementation Tasks into individual task files with parallel creation and validation.
+
+Before starting, read [quick-ref-task-decomposition.md](../quick-learning/references/quick-ref-task-decomposition.md) — top reasoning patterns for this skill (if file exists and non-empty).
 
 **Input:** `work/{feature}/tech-spec.md` (status: approved)
 **Output:** `work/{feature}/tasks/*.md` (validated)
 **Language:** Task files in English, communication in Russian
-
-Before starting, read [quick-ref.md](../quick-learning/references/quick-ref.md) — top reasoning patterns from past sessions (if file exists and non-empty).
 
 ## Phase 0: Scope Estimation
 
@@ -24,7 +26,12 @@ Before creating tasks, present the user a structural plan:
 1. Read tech-spec Implementation Tasks section.
 2. Estimate total lines of code for the feature.
 3. **Break down into blocks of ~1200 lines (±300)**, each block into **steps of ~300 lines (±100)**.
-4. Present the plan as a table: blocks → steps with line estimates.
+4. Present the plan as a table: blocks → steps with line estimates. Add a **Complexity** column:
+   - **L1** (trivial) — estimated_loc < 50 AND task description contains none of: auth, login, password, token, session, input validation, upload, file input, database query, SQL, API endpoint, CORS, RBAC, permission, PII, personal data, export fields
+   - **Standard** — everything else
+
+   L1 tasks get `reviewers: [code-reviewer]` only (security-auditor and test-reviewer skipped). Audit Wave covers security holistically at feature level regardless.
+
 5. Get user confirmation before proceeding to task creation.
 
 This ensures predictable scope, manageable task sizes, and clear progress tracking. Each "step" typically maps to one task file. Each "block" maps to a wave or a group of related tasks.
@@ -49,8 +56,9 @@ This ensures predictable scope, manageable task sizes, and clear progress tracki
    - feature_path, task_number, task_name
    - template_path: `$AGENTS_HOME/shared/work-templates/tasks/task.md.template`
    - files_to_modify, files_to_read (from tech-spec)
-   - depends_on, wave, skills, reviewers, verify (from tech-spec)
-- worker_name (if specified in tech-spec, optional)
+   - depends_on, wave, skills, verify (from tech-spec)
+   - reviewers: if task was classified **L1** in Phase 0 → pass `[code-reviewer]`; otherwise pass reviewers from tech-spec
+   - worker_name (if specified in tech-spec, optional)
    Each task-creator copies the template to `tasks/{N}.md` first, then edits each section in place. This ensures no sections are skipped.
 
 7. Confirm each task-creator returned a file path. Skip reading task content — preserve context budget for validation phase.
@@ -94,44 +102,30 @@ Launch both in parallel:
 
 After individual validation passes, run a final cross-task check:
 
-1. **depends_on vs wave consistency — MANDATORY check.** For every task, verify: if `depends_on` lists task X, then task X MUST be in an earlier wave (lower wave number). A task CANNOT depend on another task in the same wave — same-wave tasks run in parallel and cannot guarantee execution order. If found — move the dependent task to the next wave or remove the dependency. This check is non-negotiable.
-
-2. Launch both validators on ALL tasks in a single batch (not split into smaller batches):
-   - `task-validator` — focus: shared resource ownership (one owner, consumers depend_on owner), no competing instances in same wave, **depends_on vs wave conflicts**
+1. Launch both validators on ALL tasks in a single batch (not split into smaller batches):
+   - `task-validator` — focus: shared resource ownership (one owner, consumers depend_on owner), no competing instances in same wave
    - `reality-checker` — focus: duplicate heavy resource init, hidden dependencies, inconsistent approaches across tasks
 
-3. If issues found → launch `task-creator` in fix mode for affected tasks. Re-validate fixed tasks.
+2. If issues found → launch `task-creator` in fix mode for affected tasks. Re-validate fixed tasks.
 
-4. Max 2 iterations for cross-task check (on top of the 3 individual iterations).
+3. Max 2 iterations for cross-task check (on top of the 3 individual iterations).
 
 **Checkpoint:**
 - [ ] Both validators: status=approved OR user resolved remaining issues
 - [ ] Cross-task integration check: no cross-task conflicts
 
-## Phase 3: Present to User — BLOCKING GATE
+## Phase 3: Present to User
 
-> **HARD STOP.** Do NOT proceed to Session Planning until user gives explicit approval.
-
-1. Present summary as a table:
-
-   | # | Task | Wave | depends_on | estimated_loc | Description |
-   |---|------|------|------------|---------------|-------------|
-   | 1 | ... | 1 | — | 200 | ... |
-
-2. Show totals: task count, total estimated LOC, wave count, validation results (iterations, issues found/fixed).
-3. Ask user explicitly: **"Декомпозиция готова. Подтверждаешь задачи? (да/нет/правки)"**
-4. Wait for one of:
-   - **"да"** → proceed to Phase 4
-   - **"нет"** / corrections → apply changes, re-validate affected tasks, re-present
-   - No response → do NOT proceed. Remind user that approval is required.
-5. Only after explicit approval: Git commit `chore(tasks): task decomposition approved for {feature}`
+1. Summary: task count, waves, dependencies, validation results (iterations, issues found/fixed).
+2. Wait for user approval.
+3. Git commit: `chore(tasks): task decomposition approved for {feature}`
 
 **Checkpoint:**
-- [ ] Summary table presented to user
-- [ ] User explicitly approved (not assumed)
+- [ ] Summary presented to user
+- [ ] User approved task decomposition
 - [ ] Approval committed
 
-## Phase 4: Session Planning — BLOCKING GATE
+## Phase 4: Session Planning
 
 After user approves task decomposition, calculate session grouping for predictable execution.
 
@@ -145,41 +139,58 @@ After user approves task decomposition, calculate session grouping for predictab
    f. If a single wave > budget → it gets its own session (warn user: "Wave N exceeds session budget").
 3. For each session, collect unique Context Files from all tasks in that session (deduplicate).
 4. Give each session a short descriptive title based on its tasks' descriptions.
-5. Generate `work/{feature}/logs/session-plan.md` from template `$AGENTS_HOME/shared/work-templates/session-plan.md.template`.
-6. Present session plan to user as a table:
-
-   | Session | Title | Waves | Tasks | Estimated LOC |
-   |---------|-------|-------|-------|---------------|
-   | 1 | ... | 1-2 | 1,2,3 | 950 |
-
-7. Ask user explicitly: **"План сессий готов. Подтверждаешь? (да/нет/правки)"**
-8. Wait for explicit approval. Do NOT suggest running `/do-feature` until user confirms.
-9. Only after explicit approval:
-   - Update `session-plan.md` frontmatter: `status: approved`
-   - Use `git add -f work/{feature}/logs/session-plan.md` (the `logs/` directory is typically gitignored — force-add is required)
-   - Git commit: `chore(tasks): session plan approved for {feature} — {N} sessions`
-10. After approval, inform user:
-
-    ```
-    Декомпозиция и план сессий утверждены.
-
-    Следующий шаг: `/do-feature {feature}` для запуска сессии 1,
-    или `/do-task` для ручного выполнения отдельной задачи.
-
-    ⚠️ Реализация НЕ начнётся, пока вы явно не запустите одну из этих команд.
-    ```
-
-> **HARD STOP.** This is the end of `/decompose-tech-spec`. Do NOT auto-transition to `/do-feature` or `/do-task`. The user must explicitly invoke the next command in a separate action.
+5. Generate `work/{feature}/logs/session-plan.md` from template `$AGENTS_HOME/shared/work-templates/session-plan.md.template`. Include prompts for ALL sessions in the file (for reference).
+6. Present session plan to user as a table: session number, title, waves, tasks, estimated LOC.
+7. Git commit: `chore(tasks): session plan for {feature} — {N} sessions`
+8. Show ONLY the prompt for Session 1. Do NOT show prompts for later sessions — they are in session-plan.md and will be delivered by feature-execution at the end of each session.
 
 **Checkpoint:**
 - [ ] session-plan.md created and committed
-- [ ] User explicitly approved session plan
-- [ ] status: approved set in session-plan.md frontmatter
-- [ ] User informed about next step (no auto-transition)
+- [ ] User saw session grouping
 
 ## Final Check
 
-- [ ] All phases completed (tasks created, validation passed, session plan approved)
+- [ ] All phases completed (tasks created, validation passed)
 - [ ] All tasks match template (frontmatter: status, depends_on, wave, skills, reviewers, worker_name)
 - [ ] Validation: both validators passed or user confirmed remaining issues
-- [ ] Session plan: approved by user, committed
+
+## Promoted Patterns
+
+**Verify all cross-references after task generation (Seen: 2):** Check file paths via `test -e`, decision numbers by counting in tech-spec, depends_on by confirming the dependency actually produces the referenced artifact. Agents generate references by analogy/assumption, not by verification.
+
+**Тест на стыке задач — добавить явно в spec/AC (Seen: 2):** Если при выполнении Task N обнаруживается тест, относящийся к scope Task M — добавить его явно в AC или TDD Anchor задачи M. Записи в decisions.md недостаточно: агент Task M decisions.md предыдущих задач не читает.
+
+**Wave поля Audit/Final Wave — числа, не метки (Seen: 2):** Если имплементационных волн N — audit = N+1, final = N+2. Передавать task-creator числа явно. Строки "audit"/"final" не проходят frontmatter schema-validation.
+
+**String-output assertions — ограничивай scope (Seen: 2):** Для тестов структурированного string-output (markdown, отчёты) недостаточно проверять наличие значения — добавь assertion на scope: извлекай нужную секцию (regex/split), затем проверяй значение внутри неё. Это отличает "значение есть" от "значение в нужном месте".
+
+**Scope задач разных волн для одного файла (Seen: 2):** Если задача A создаёт файл а задача B в позднейшей волне его расширяет — явно ограничить scope A ("только save/load — нужны в wave 1"), и в бриф B включить: "файл уже существует с функциями X, Y. Добавить только Z." Параллельные task-creator'ы не общаются — scope должен быть однозначен в каждом брифе.
+
+**Wave ordering: последовательные задачи внутри одной "названной волны" (Seen: 3):** Если tech-spec называет группу "Final Wave" — это семантическая метка, не число. Если задачи внутри группы зависят друг от друга (A→B→C) — каждая получает своё число: A=N, B=N+1, C=N+2. При валидации проверять wave(B) > wave(A) для КАЖДОЙ пары (A→output, B→consumer) — не только для named/semantic волн, но и для любых задач в одной волне где B потребляет output A. Проверять после генерации: wave(задача) > max(wave(depends_on)).
+
+## Learned Patterns
+
+Full pattern history: [references/learned-patterns.md](references/learned-patterns.md)
+Load only for audit wave and retrospective — not during task decomposition.
+
+When a task changes a mandatory parameter of a public function and a downstream task calls the old signature → explicitly state the new signature in the downstream task's brief, to avoid silent TypeError from cross-task wiring gap.
+
+When a task-creator writes a curl command or HTTP call for a QA step → search the real endpoint path in integration test helpers or route definitions, not guessing by REST convention, to avoid a non-working QA script from a non-existent endpoint.
+
+When two task-creators create new files that share similar code patterns → check real import dependencies between those files (not thematic similarity) before assigning wave and depends_on, to avoid artificial serialization or incorrect parallel placement.
+
+When a tech-spec specifies paths in app-relative format and the app lives in a subdirectory of the repo → pass the full path from the repo root in each task-creator brief, to prevent broken Context File links across all tasks.
+
+When web app responds 20+ sec despite simple route handlers → check all module-level code and background threads for blocking network calls (auth, API) at startup, to find root cause without profiling.
+
+When migration helper / detection banner remains in code after migration completion or rollback → delete migration helper immediately after migration completes; if missed — mark TODO with date, to avoid false positives and blockers on next architecture change.
+
+When scroll-триггер срабатывает в неверной точке на элементе высотой больше viewport → заменить процентный offset на абсолютные пиксели вычисленные из высоты viewport, to триггер срабатывает в предсказуемой точке независимо от высоты элемента.
+
+When при составлении параллельной волны в tech-spec → проверить Files to modify всех задач волны попарно на пересечения файлов, to предотвратить merge conflict до того, как его поймает validator.
+
+When две анимации в разных компонентах управляют одними и теми же элементами → отключить немедленный рендер начального состояния в анимации-потребителе, to не терять начальное состояние установленное другим компонентом.
+
+When задача требует добавить client state (useState) в существующий server component → явно предписать client wrapper pattern, запретить конвертацию layout в "use client", to не потерять server component преимущества из-за неоднозначной инструкции.
+
+When две задачи описывают поведение для одного edge case (напр. "последний элемент удалён") → cross-check описания обеих задач на консистентность до коммита, to предотвратить противоречие пойманное только валидатором.

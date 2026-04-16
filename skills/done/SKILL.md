@@ -1,94 +1,191 @@
 ---
+name: done
 description: |
-  Finalize a completed feature: read specs and decisions, update project knowledge files,
-  archive feature directory to work/completed/.
+  Finalize work session: detect documentation drift from git changes,
+  show drift items for review, update project knowledge, optionally archive feature.
 
-  Use when: "фича готова", "заверши фичу", "done", "финализация", "закрой фичу", "перенеси в completed"
+  Use when: "done", "/done", "проект done", "фича готова", "заверши фичу",
+  "финализация", "закрой фичу", "перенеси в completed"
 ---
 
-# Done — Finalize Feature
+# Done — Finalize Session
 
-## Step 1: Load Documentation Skill
+Closes a work session by detecting what changed in code/config and verifying
+that project documentation reflects those changes.
 
-Read `$AGENTS_HOME/skills/documentation-writing/SKILL.md` and follow its principles.
+Works in two modes:
+- **Feature mode** — if `work/{feature}/` directory exists with specs
+- **Session mode** — any work session, no feature directory required
 
-## Step 2: Identify Feature
+## Step 1: Collect Session Diff
 
-User typically provides feature directory with the command (e.g., `/done work/my-feature`).
-- If provided → use it
-- If not → ask: "Which feature to finalize? Provide path to work/{feature}/ directory."
+Determine what changed in this session:
 
-## Step 3: Read Feature Artifacts
+```
+git log --oneline -20
+```
 
-Read these files from the feature directory:
-1. `user-spec.md` — what was planned
-2. `tech-spec.md` — how it was implemented
-3. `decisions.md` — what decisions were made during implementation
+From the log, identify the range of commits made in the current session
+(typically: everything after the last `docs:` commit or the last commit
+before the session started).
 
-If `decisions.md` is missing or sparse, use `git log --oneline` for feature-related commits to understand what changed.
+Then collect changed files:
+```
+git diff --name-only <first-session-commit>^..HEAD
+```
 
-**Completeness check:** If the feature looks incomplete (tasks not marked done in tech-spec, missing implementation, failing tests) — warn the user: "Feature appears incomplete: {reason}. Continue with finalization anyway?"
+## Step 2: Check if Project Knowledge Exists
 
-## Step 4: Retrospective
+If `.agents/skills/project-knowledge/references/` does not exist or is empty:
+- Skip documentation check
+- Inform user: "Project knowledge not initialized, skipping docs check."
+- Jump to Step 6
 
-Run retrospective skill to extract lessons learned from the feature process:
+## Step 3: Load Drift Checklist
 
-1. Read and execute `$AGENTS_HOME/skills/retrospective/SKILL.md`
-2. Pass feature path to the skill
-3. Wait for completion — lessons will be written as triad entries to `$AGENTS_HOME/skills/quick-learning/references/reasoning-patterns.md`
+Read `.agents/skills/project-knowledge/references/drift-checklist.md`.
 
-## Step 5: Update Project Knowledge
+This file maps source file patterns → PK documentation sections.
+Each project maintains its own checklist tailored to its structure.
 
-If `.agents/skills/project-knowledge/references/` does not exist or is empty — skip this step, inform the user that project knowledge has not been initialized.
+**If the file does not exist** — generate it:
+1. Read the project's PK files to understand what's documented
+2. Scan the project structure (`ls` key directories)
+3. Create a checklist mapping actual project paths → PK sections
+4. Write to `.agents/skills/project-knowledge/references/drift-checklist.md`
+5. Inform user: "Generated drift checklist. Review it after session close."
 
-Otherwise, read current PK files and update only those affected by the feature:
-- `architecture.md` — new components, changed structure, data model / schema changes
-- `patterns.md` — new project-specific patterns, testing approaches, business rules
-- `deployment.md` — deployment or monitoring changes
-- If the project has a backlog file, note any status updates for the user
+**If session changes revealed new mappings** not in the checklist
+(e.g., a new config file was added that affects deployment):
+- Append the new mapping to the checklist
+- Note it in the drift report: "Added to drift checklist: {mapping}"
 
-Apply quality principles from documentation-writing skill: no code examples, no obvious content, only project-specific information.
+### Drift Checklist Format
 
-## Step 6: Pre-archive Safety Check
+```markdown
+# Drift Checklist
 
-**MUST check working tree state before archiving.** Run `git status`.
-- If there are uncommitted changes in `work/{feature}/` → commit them first: `chore: sync final state of {feature} before archiving`
-- If there are uncommitted changes OUTSIDE `work/{feature}/` (parallel work, other features) → do NOT touch them. Archive ONLY the feature directory. Warn user: "В рабочем дереве есть изменения вне {feature} — они не затронуты."
-- If there are untracked files in `work/{feature}/` that should be preserved → stage and commit them.
+Maps source files/patterns to PK documentation sections.
+Used by `/done` to detect when documentation may be outdated.
 
-## Step 7: Archive
+## architecture.md
+- path/to/config.* — what it documents (e.g., "images, output mode")
+- path/to/schema.ts — what it documents (e.g., "data model, table count")
+- path/to/page.tsx — what it documents (e.g., "sections, anchors")
 
-Move `work/{feature}/` → `work/completed/{feature}/` (create `work/completed/` if it doesn't exist).
+## deployment.md
+- .github/workflows/ — CI/CD pipeline, secrets
+- path/to/pm2.config.* — process manager config
 
-**Post-archive path consistency.** After moving the directory, check if any committed files reference the old path `work/{feature}/`:
-- `checkpoint.yml` — update `feature_path` if it contains the old path.
-- Do NOT update paths in `tech-spec.md` or `user-spec.md` — they are historical records.
-- Do NOT search-and-replace across the whole repo. Only fix operational files that would break.
+## patterns.md
+- (typically empty — patterns drift is hard to map to files)
+
+## ux-guidelines.md
+- path/to/styles/ — breakpoints, responsive rules
+```
+
+Each line: `- <glob or path pattern> — <what aspect of the PK section it affects>`
+
+## Step 4: Detect Documentation Drift
+
+Cross-reference the session's changed files against the drift checklist.
+
+For each match:
+1. Read the relevant PK section
+2. Read the actual source file to see current state
+3. Compare: does the PK section reflect the source file's current state?
+4. If not → record as drift item with one-line description
+
+**For each drift item, produce a one-line description:**
+```
+[architecture.md] images config changed: was formats:webp, now unoptimized:true
+[deployment.md] REVALIDATE_SECRET added to env but not documented
+```
+
+## Step 5: Present Drift Report
+
+Show the user the drift report:
+
+```
+Documentation drift detected (N items):
+
+[architecture.md]
+  1. <description>
+  2. <description>
+
+[deployment.md]
+  3. <description>
+
+No drift: patterns.md, ux-guidelines.md
+```
+
+Then ask: "Update documentation? (all / pick numbers / skip)"
+
+- **all** → update all drift items
+- **pick numbers** → update only selected items (e.g., "1, 3")
+- **skip** → skip documentation update entirely
+
+## Step 6: Update Documentation
+
+For each approved drift item:
+1. Read the current PK file
+2. Read the actual source file to get current values
+3. Update only the specific section affected
+4. Do NOT rewrite unrelated sections
+
+Quality rules (from documentation-writing):
+- No code blocks in PK files — describe in prose
+- No obvious/generic content — only project-specific
+- Keep sections concise — one fact per line where possible
+- Update counts/versions to match reality
+
+After updates, show a brief summary of what was changed in each file.
+
+## Step 7: Feature Archive (Feature Mode Only)
+
+If a `work/{feature}/` directory was involved:
+
+1. Read `decisions.md` (if exists) for quick-learning signals
+2. Run quick-learning signal gate (fix rounds, scope change, recovery, context waste)
+3. If signals present → extract patterns per quick-learning procedure
+4. Move `work/{feature}/` → `work/completed/{feature}/`
+
+If no feature directory — skip this step silently.
 
 ## Step 8: Commit & Report
 
-1. Commit PK file changes and feature archive move.
-   ```
-   docs: update project knowledge after {feature-name}
-   ```
+If any documentation was updated:
+```
+docs: update project knowledge — <brief list of what changed>
+```
 
-2. Report to user:
-   - What was done (brief summary from specs)
-   - What PK files were updated and what changed
-   - Feature archived to `work/completed/{feature}/`
+If drift checklist was created or updated, include it in the commit.
+
+Report to user:
+- Documentation items updated (or "no drift detected")
+- Drift checklist updates (if any)
+- Feature archived (if applicable)
+- Session closed
+
+## Quick Path
+
+If drift detection finds 0 items:
+```
+Documentation is up to date. Session closed.
+```
+
+No commit needed, no questions asked.
 
 ## Self-Verification
 
-ALL items MUST be checked. Do NOT mark as done without actual verification.
-
-- [ ] Documentation-writing skill loaded
-- [ ] Feature artifacts read and understood
-- [ ] Completeness assessed (user warned if incomplete)
-- [ ] Retrospective completed (lessons extracted)
-- [ ] PK files updated (only affected ones)
-- [ ] Working tree checked — no uncommitted feature changes lost
-- [ ] Parallel work outside feature directory left untouched
-- [ ] Feature archived to work/completed/
-- [ ] Post-archive paths consistent (checkpoint.yml updated)
-- [ ] Changes committed
-- [ ] Report delivered to user
+- [ ] Session diff collected (git log + changed files)
+- [ ] Drift checklist loaded (or generated if missing)
+- [ ] Changed files cross-referenced against checklist
+- [ ] PK sections verified against actual source state (not just "file changed")
+- [ ] Drift report shown to user (or "no drift" confirmed)
+- [ ] User approved updates before writing
+- [ ] Only affected sections updated (no unnecessary rewrites)
+- [ ] Drift checklist updated if new mappings discovered
+- [ ] Feature archived if applicable
+- [ ] Changes committed and pushed
+- [ ] Report delivered

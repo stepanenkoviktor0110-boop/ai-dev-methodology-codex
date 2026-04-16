@@ -12,192 +12,141 @@ description: |
 
 # User Spec Planning
 
-Before starting, read [quick-ref.md](../quick-learning/references/quick-ref.md) — top reasoning patterns from past sessions (if file exists and non-empty).
-
 Thorough adaptive interview → codebase scan → user-spec.md → dual validation → user approval.
 Output: `work/{feature}/user-spec.md` with status `approved`.
 
 ## Interview Style
 
-Conduct interview in Russian. Be thorough and opinionated — an engaged co-thinker who actively proposes solutions and challenges weak answers.
+Conduct in Russian. Be an engaged co-thinker — propose solutions from Project Knowledge, challenge with concrete counterexamples and code references.
 
-**How to interview — propose-first approach:**
-- 3-4 items per batch. Run as many batches as needed until the cycle's items are fully covered.
-- For EVERY question, propose a concrete answer based on Project Knowledge + code research + your own reasoning. The user confirms, adjusts, or rejects — not invents from scratch.
-- Format: "**{Тема}:** я предлагаю {конкретный вариант}. Причина: {почему}. Подходит / поправишь?"
-- NEVER ask open-ended questions like "Что считаем главным результатом?" — instead: "Главный результат MVP: пользователь должен уметь {X}. Основываюсь на {project.md / код / логику}. Так?"
-- **Human language:** Formulate proposals and choices in plain language the user understands — describe what they will SEE and DO, not technical internals. Wrong: "Локальный импорт файлов (ручная загрузка)" / "API-режим с backend". Right: "Вы загружаете файл с результатами вручную" / "Данные подтягиваются автоматически из сервиса". Technical details go into your reasoning, not into the choice text. The user picks a behavior, you translate it into architecture.
-- Challenge with substance — concrete counterexamples, code references, unexplored scenarios: "А что если пользователь сделает Z? В коде модуль Q не обрабатывает этот случай."
-- Accept the answer after one substantive challenge and move on to the next gap.
-- When user says "не знаю": propose a default answer with reasoning, ask to confirm. Optional item → mark TBD. Required item → break into simpler yes/no choices.
-
-**Interview depth** depends on feature size (S/M/L in interview metadata):
-- S (1-3 files, local fix): focused interview, core behavior
-- M (several components): moderate depth, integration questions
-- L (new architecture): deep interview, thorough edge cases and risk analysis
+- 3-4 questions per batch, as many batches as needed until cycle items fully covered
+- Challenge with substance once, accept answer, move on. "Не знаю" → help think through (examples, patterns); optional → TBD, required → simpler questions
+- Depth by size: **S** (1-3 files) → focused, core behavior; **M** (several components) → moderate, integration; **L** (new architecture) → deep, edge cases + risks
 
 ## Process
 
 ### Phase 0: Init
 
-1. Check for existing interview: look in `work/*/logs/userspec/interview.yml` for `metadata.status: in_progress`. If found — load, show discussed topics summary, resume. If multiple found — show list, let user choose.
-2. Get task description: "Опиши, что хочешь сделать."
-3. Determine work_type (feature / bug / refactoring) from description.
-4. Propose feature name (kebab-case), get user confirmation.
-5. **Create feature folder structure** (do NOT run shell scripts — create directly):
-   ```
-   work/{name}/
-   ├── tasks/
-   ├── logs/userspec/
-   ├── logs/techspec/
-   ├── logs/tasks/
-   ├── logs/working/
-   ├── user-spec.md       ← from $AGENTS_HOME/shared/work-templates/user-spec.md.template
-   ├── decisions.md        ← from $AGENTS_HOME/shared/work-templates/decisions.md.template
-   └── logs/userspec/interview.yml  ← from $AGENTS_HOME/shared/interview-templates/feature.yml
-   ```
-   Copy templates, replace `[DATE]` with today's date and `{Feature Name}` with the feature name. If a file already exists — do NOT overwrite.
-6. Update interview.yml: set metadata.started, metadata.status: in_progress, phase1_feature_overview.feature_name, phase1_feature_overview.work_type.
-
-**Checkpoint:** interview.yml exists with status in_progress, feature name confirmed.
+0. **Sketch offer:** "Хочешь начать со скетча? `/sketch` — быстрый прототип за 3-5 вопросов, без спеков и валидаторов." If declined → proceed.
+1. Check for existing interview in `work/*/logs/userspec/interview.yml` (status: in_progress). Found → load, show summary, resume.
+2. Get task description, determine work_type (feature/bug/refactoring), propose feature name (kebab-case).
+3. Run `$AGENTS_HOME/shared/scripts/init-feature-folder.sh {name}`, update interview.yml: metadata + phase1_feature_overview.
 
 ### Phase 1: Study Project Knowledge
 
-Read ALL files from `.agents/skills/project-knowledge/references/`. If directory missing or empty — warn user, suggest running project-planning skill (or `/init-project-knowledge` command).
-
-These files are your context for the entire interview. Reference them when asking questions and proposing solutions.
+Read [quick-ref-user-spec-planning.md](../quick-learning/references/quick-ref-user-spec-planning.md) (if exists).
+Read ALL files from `.agents/skills/project-knowledge/references/`. Missing → warn, suggest project-planning skill.
 
 ### Phase 2: Cycle 1 — General Understanding
 
-**Scope:** `phase1_feature_overview` items in interview.yml.
+**Scope:** `phase1_feature_overview` items.
 
-1. Score user's initial description against all items (detailed 80-95%, brief 50-70%, vague 20-40%, not mentioned 0%).
-2. Run interview loop (see below) on phase1_feature_overview items.
-3. During this cycle — determine feature size S/M/L and agree on testing strategy:
-   - S: integration/E2E usually not needed — state why
-   - M: propose whether integration tests make sense, explain reasoning
-   - L: propose specific integration and E2E scope with justification
+1. Score user's description against all items (detailed 80-95%, brief 50-70%, vague 20-40%, not mentioned 0%).
+2. Run interview loop on phase1 items.
+3. Determine feature size S/M/L and agree on testing strategy: S → integration/E2E usually not needed; M → propose whether integration fits; L → propose specific integration + E2E scope.
 
 ### Phase 3: Code Scanning
 
-Launch `code-researcher` subagent (spawn_agent tool, gpt-5.4) with feature path and feature description from Cycle 1.
-
-After subagent completes — read `{feature_path}/code-research.md`. Use findings in Cycle 2 questions.
-
-If during later phases a gap is discovered — launch `code-researcher` again with the specific question to investigate.
+Launch `code-researcher` spawn_agent (gpt-5.4) with feature path and description. After completion — read `{feature_path}/code-research.md`, use in Cycle 2. If gap discovered later — re-launch with specific question.
 
 ### Phase 4: Cycle 2 — Code-Informed Refinement
 
 **Scope:** `phase2_user_experience` + `phase3_integration` items.
 
-1. Summarize understanding: "Я понял задачу так: [X]. Делать планирую так: [Y, based on code]."
-2. Questions based on code findings: "Нашёл модуль X, который делает Y — переиспользуем?"
-3. Cover deploy and user actions (items `deploy_approach`, `manual_user_actions`):
-   - "Нужны ли ручные шаги для запуска? (создать бота, получить API ключи, настроить сервис, зарегистрироваться где-то)"
-   - "Как деплоить? Что нужно настроить? (уже есть CI/CD, нужно настроить, ручной деплой)"
-   - "Как проверить что работает после деплоя? (MCP-инструменты, curl, ручная проверка)"
-   - "Что можно проверить прямо во время разработки, без деплоя? (вызвать внешний API, запустить локально, проверить конфиг, потыкать UI на localhost, протестировать промпт)"
+1. Summarize: "Я понял задачу так: [X]. Делать планирую так: [Y, based on code]."
+2. Code-based questions: "Нашёл модуль X, который делает Y — переиспользуем?"
+3. Cover deploy + manual actions: what manual steps needed (API keys, bot creation, service setup)? Deploy approach (CI/CD, manual)? Post-deploy verification (MCP, curl, manual)? Pre-deploy checks (local API calls, localhost UI, config validation)?
 4. Run interview loop on phase2 + phase3 items.
 
 ### Phase 5: Cycle 3 — Review & Finalize
 
-**Scope:** ALL items across all phases still below threshold.
-
-Cleanup pass: revisit anything not fully covered in Cycles 1-2. Deepen edge cases and error scenarios — probe for scenarios user hasn't considered, even if items formally passed threshold.
-
-Run interview loop on remaining gaps.
+**Scope:** ALL items still below threshold. Cleanup pass — revisit gaps, deepen edge cases and error scenarios. Run interview loop.
 
 ### Phase 6: Completeness Check
 
-Launch `interview-completeness-checker` subagent (spawn_agent tool, gpt-5.4-mini) with feature path. It reviews interview.yml against PK files and code-research.md.
-
-- `needs_more` → ask the suggested questions, re-run checker
-- `complete` → proceed to Phase 7
+Launch `interview-completeness-checker` spawn_agent (gpt-5.4-mini) with feature path. `needs_more` → ask suggested questions, re-run. `complete` → proceed.
 
 ### Phase 7: Create User Spec
 
-1. Copy template to working file:
-   - Copy `$AGENTS_HOME/shared/work-templates/user-spec.md.template` → `work/{feature}/user-spec.md`
-   - Edit sections one by one using Edit tool, replacing placeholders with interview data
-   Reason: agent sees template structure and comments while editing each section, preventing drift from template format.
-2. Content rules:
-   - "Что делаем" — self-contained, understandable without the interview
-   - "Зачем" — concrete user value, not "улучшить UX"
-   - Acceptance criteria — testable, no "работает корректно"
-   - Every discussed topic from interview must appear in the spec
-3. If feature seems large (>10 criteria, >3 user flows, >5 integrations) — suggest splitting.
+1. Copy `$AGENTS_HOME/shared/work-templates/user-spec.md.template` → `work/{feature}/user-spec.md`. Edit sections one by one (agent sees template comments while editing).
+2. Rules: "Что делаем" self-contained; "Зачем" = concrete value; AC testable (no "работает корректно"); every discussed topic appears.
+3. Large feature (>10 criteria, >3 flows, >5 integrations) → suggest splitting.
 
 Git commit: `draft(userspec): create user-spec for {feature}`
 
 ### Phase 8: Validation
 
-Run 2 validators in parallel (spawn_agent tool):
-- `userspec-quality-validator` (gpt-5.4-mini) — document structure, template compliance, formal completeness. Returns JSON with per-check pass/fail and findings list.
-- `userspec-adequacy-validator` (gpt-5.4) — feasibility, over/underengineering, better alternatives. Returns JSON with findings by category and severity.
+Run 2 validators in parallel: `userspec-quality-validator` (gpt-5.4-mini) — structure, template compliance; `userspec-adequacy-validator` (gpt-5.4) — feasibility, over/underengineering.
 
-**Handling findings:**
-- Obvious issue → fix silently
-- Borderline → discuss with user
-- Disagree with finding → reject with reasoning
-- Conflict between validators → userspec-adequacy-validator takes priority (substance over form)
+Findings: obvious → fix silently; borderline → discuss with user; disagree → reject with reasoning; conflict between validators → adequacy takes priority (substance over form).
 
-After each validation round (validators wrote reports + you applied fixes), git commit: `chore(userspec): validation round {N} — {summary of fixes}`. Re-run validators. Max 3 iterations, then show remaining issues to user.
+After fixes → commit `chore(userspec): validation round {N} — {summary}`. Re-run validators. Max 3 iterations.
 
 ### Phase 9: User Approval
 
-Show user-spec.md link + validation summary. If changes requested — edit and show again.
-
-When approved:
-1. Set user-spec.md frontmatter `status: approved`
-2. Set interview.yml `metadata.status: completed`
-3. Git commit: `chore(userspec): approve user-spec for {feature}`
-4. Suggest `/new-tech-spec {feature-name}`
+Show user-spec.md link + validation summary. When approved:
+1. Set user-spec.md frontmatter `status: approved`, interview.yml `metadata.status: completed`
+2. Git commit: `chore(userspec): approve user-spec for {feature}`
+3. Suggest `/new-tech-spec {feature-name}`
 
 ## Interview Loop
 
-Runs inside each cycle. Repeats until the cycle's scope is fully covered.
+Runs inside each cycle until scope fully covered:
 
-```
-1. Find gaps: required items in current scope with score < 85%. Lowest first.
-2. Propose answers for 3-4 gaps. Each proposal: your concrete suggestion + reasoning from PK/code. User confirms or adjusts.
-3. User responds.
-4. Update interview.yml:
-   - conversation_history: add full Q&A entry
-   - Item: score, value, gaps, status
-   - metadata: last_updated, current_question_num
-   - Save immediately
-5. Check stop criteria (BOTH must be true):
-   a) All required items in scope score >= 85%
-   b) Structural: every required item has non-empty value,
-      no TBD in value, gaps empty or only conscious limitations
-6. Not done → step 1. Done → exit cycle.
-```
+1. Find gaps: required items in scope with score < 85%, lowest first
+2. Ask 3-4 questions about different gaps (reference PK + code findings)
+3. User responds → update interview.yml immediately (conversation_history, item scores/values/gaps, metadata)
+4. Stop when BOTH: all required items >= 85% AND every required item has non-empty value, no TBD, gaps empty or only conscious limitations
+5. Not done → step 1
 
-Scoring: detailed answer 80-95%, brief 50-70%, vague 20-40%, not mentioned 0%.
-
-Optional items: cover when user mentions relevant context or when naturally connected to required items.
+Scoring: detailed 80-95%, brief 50-70%, vague 20-40%, not mentioned 0%.
+Optional items: cover when user mentions relevant context or naturally connected to required items.
 
 ## Work Type Adaptations
 
 All three cycles apply to any work_type, but focus shifts:
-
-**Bug:** Cycle 1 → reproduction steps, expected vs actual, severity, when it broke. Code scanning → find bug location and root cause. Cycle 2 → fix approach, regression risks.
-
-**Refactoring:** Cycle 1 → current problems, target architecture, stability guarantees. Code scanning → current structure, dependencies, test coverage. Cycle 2 → migration path, backward compatibility.
+- **Bug:** Cycle 1 → reproduction, expected vs actual, severity. Code scan → bug location + root cause. Cycle 2 → fix approach, regression risks.
+- **Refactoring:** Cycle 1 → current problems, target architecture, stability guarantees. Code scan → structure, deps, test coverage. Cycle 2 → migration path, backward compatibility.
 
 ## Scope Changes
 
-If understanding changes significantly during interview:
-- Update affected scores downward, add new gaps
-- Reassess feature size (S/M/L)
-- If work_type changes (was feature, actually bug) — pivot items accordingly
-- Note the change in interview.yml notes section
+If understanding changes significantly: update scores downward, reassess size S/M/L, pivot items if work_type changed, note in interview.yml.
 
 ## Self-Verification
 
 - [ ] All cycles completed, completeness checker passed
-- [ ] user-spec.md filled with real content (no placeholders)
-- [ ] Both validators passed (or issues resolved with user)
-- [ ] User approved, frontmatter status: approved
-- [ ] interview.yml metadata.status: completed
+- [ ] user-spec.md filled (no placeholders), both validators passed or issues resolved
+- [ ] User approved, frontmatter status: approved, interview.yml completed
 - [ ] Suggested `/new-tech-spec` as next step
+
+## Promoted Patterns
+
+- **Генерируй все шаги deliverable целиком** (Seen: 3): Когда deliverable состоит из нескольких шагов (серия промптов, roadmap, план сессий, деплой-инструкция) — генерировать ВСЕ шаги сразу. Частичный deliverable заставляет пользователя ловить недостающие части и запрашивать доработку.
+
+## Learned Patterns
+
+- When writing client-facing documentation on behalf of the user -> filter every paragraph through the reader's knowledge model to avoid iterative corrections
+- When user spec grows to 3+ sequentially-dependent deliverables -> keep the first active, create the rest as planned stubs with visible progress and preserved post-feature context
+- When the repo contains skills/modules from multiple domains -> enumerate all domains and get is_in_scope per domain before writing spec, to avoid rewriting scope from iterative boundary clarification
+- When user-spec has a descriptive block with a requirement not reflected in AC -> follow only the AC; document the gap with a decision record and update user-spec
+- When user adds a non-trivial feature mid-interview -> ask a scope-impact question before updating the spec, to prevent expanding v1 to an architecture of a different complexity level
+- When user-spec describes delete/cleanup in a system with pipeline statuses -> restrict deletion to terminal statuses (enriched/done), not field values, to avoid deleting records still in processing
+- When a new role appears mid-interview -> immediately build a role x capabilities matrix and validate with the user, to avoid 3+ batches clarifying role intersections
+- When user describes several interrelated features to implement -> explicitly clarify implementation order BEFORE initializing the first feature folder
+- When a client sends amendments to an approved user-spec -> run a focused mini-interview on changed points only and update spec directly, to avoid restarting the full interview cycle
+- When clarifying UI element placement during a spec interview -> choose a standard UX pattern without asking, to avoid blocking the interview on details the user does not formulate
+- When updating user-spec for an already-implemented feature -> launch code-researcher to diff new requirements against existing code, to avoid creating tasks for already-implemented functionality
+- When a feature generates a list of items where each item has a numeric attribute (price, score, rating) -> explicitly ask during interview who/what sets that value (LLM estimate, user catalog, or manual input) before writing AC, to prevent a critical architectural gap discovered only at validation
+- When a user rejects a proposed simplification during interview -> ask "what distinction is lost by simplifying?" before continuing, to surface a missing key abstraction before the spec is finalized
+- When spec describes a CRUD form for a single entity but the target workflow is an action over a group -> clarify cardinality ("one or many?") before implementation, to avoid rewriting finished UI due to UX mismatch
+- When user describes "split UI area into X and Y" -> clarify whether existing interaction elements survive in the new layout, to avoid treating an additive change as a replacement
+- When user-spec describes instant-save operations (click → write to DB) -> explicitly add AC for network error and rollback before validation, to avoid missing critical negative scenarios in round 1
+- When a UI task adds visible disabled buttons as placeholders for a future task -> do not add visible disabled placeholders until the future task is confirmed, to prevent reactive feature reversal after user verification
+- When user-spec is for a feature completing an existing sketch/stub with real API routes -> during code scanning read all API implementations (role checks, data filtering) and include found bugs in AC as explicit fix-requirements, to avoid critical/major security and correctness findings from validators that could have been caught earlier
+- When the task adapts existing UI (responsive, a11y) without creating new visuals -> note in spec that design-plan can be skipped and go from design-spec directly to tech-spec, to not block on absent tokens.json or design system
+- When parallel task-creators will reference the same external utility or approach -> explicitly capture the chosen approach as a Decision in user-spec before decomposition, to prevent contradictory instructions across tasks
+- When MVP plan contains only modules without a runnable entry point or start script -> verify during spec writing that the plan includes a runnable entry point and npm start, so the user can launch and verify the result without developer help
+- When user-spec explicitly excludes a capability in post-MVP -> before adding an analogous capability as a Decision check the exclusions list in user-spec, to prevent scope creep caught only at validation
+- When a task creates a UI component -> include entry point integration (import and render in App/page) in the spec's implementation notes, to not leave downstream tasks with a wrong assumption that the component is already wired in
+- When user-spec is for a style-only refactoring with full audit -> skip heavy validators or limit to lightweight validation, to not lose hours on stuck agents when architectural risk is zero
+- When пользователь описывает фичу знакомым термином (демо, шаблон, виджет) → спросить «кто потребитель и зачем ему это?» до технических деталей, to не потратить 3 батча интервью на выяснение реальной потребности.

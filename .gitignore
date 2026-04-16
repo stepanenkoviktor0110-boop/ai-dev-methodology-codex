@@ -20,3 +20,9 @@ todos/
 ide/
 plugins/
 projects/
+
+# Claude Code artifacts (this is a Codex repo)
+.claude/
+CLAUDE.md
+claude_output/
+.claude.json
